@@ -1,0 +1,55 @@
+{
+  "heightCm": 173.0,
+  "chest": {
+    "yMm": 422.0,
+    "viewerYMm": 1306.0,
+    "centerMm": [
+      3.8956415145992556,
+      23.729843520823263
+    ],
+    "semiMajorMm": 152.9241677917476,
+    "semiMinorMm": 127.075226716984,
+    "rotationDeg": 0.0,
+    "circumferenceCm": 88.15192504049966,
+    "uncertaintyCm": 1.1126025972825127,
+    "depthCapped": false,
+    "depthCapRemovedMm": 0.0
+  },
+  "waist": {
+    "yMm": 652.0,
+    "viewerYMm": 1076.0,
+    "centerMm": [
+      -10.188742578514171,
+      6.319326980923279
+    ],
+    "semiMajorMm": 136.87607639629573,
+    "semiMinorMm": 124.14555867510748,
+    "rotationDeg": 0.0,
+    "circumferenceCm": 82.05113706318764,
+    "uncertaintyCm": 1.1046440102150785,
+    "depthCapped": false,
+    "depthCapRemovedMm": 0.0
+  },
+  "hip": {
+    "yMm": 814.0,
+    "viewerYMm": 914.0,
+    "centerMm": [
+      -9.188742578514196,
+      12.319326980923277
+    ],
+    "semiMajorMm": 175.4827933529383,
+    "semiMinorMm": 139.63311522514846,
+    "rotationDeg": 0.0,
+    "circumferenceCm": 99.31716632004172,
+    "uncertaintyCm": 1.1231121481972903,
+    "depthCapped": false,
+    "depthCapRemovedMm": 0.0
+  },
+  "shoulderWidthCm": 48.810271176973636,
+  "shoulderWidthUncertaintyCm": 0.3698501213702065,
+  "shoulderTipReliable": false,
+  "shoulderMethod": "arc",
+  "shoulderBiacromialCm": 30.39329832393627,
+  "inseamCm": 71.8060424816236,
+  "inseamUncertaintyCm": 0.3853975937947204
+}

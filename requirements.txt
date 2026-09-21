@@ -1,0 +1,13 @@
+opencv-python
+mediapipe>=0.10
+numpy
+scipy
+matplotlib
+flask
+
+# export_stl.py / verify_stl.py. fast-simplification backs trimesh's
+# quadric decimation; without it the export still succeeds and just
+# keeps the full-resolution mesh (~1M faces instead of 150k).
+scikit-image
+trimesh
+fast-simplification

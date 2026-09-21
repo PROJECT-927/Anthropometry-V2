@@ -1,0 +1,836 @@
+<meta charset="utf-8">
+<title>Visual Hull Viewer</title>
+<style>
+  /* ---------------------------------------------------------------
+     Design concept: a technical drawing has two historical media --
+     pale drafting/graph paper (light mode) and the cyanotype
+     blueprint print made from it (dark mode). Same ink, same accent
+     brass hardware color (a tape-measure / awl reference), inverted
+     ground. The title block in the corner mimics an architectural
+     drawing's metadata block.
+  ----------------------------------------------------------------- */
+  :root {
+    --bg: #e7edf1;
+    --bg-2: #dbe4ea;
+    --ink: #1f2d3d;
+    --ink-dim: #4c5c6b;
+    --grid-line: rgba(31, 45, 61, 0.14);
+    --panel-bg: rgba(231, 237, 241, 0.82);
+    --panel-border: rgba(31, 45, 61, 0.22);
+    --accent-cool: #1f7a8c;
+    --accent-cool-rgb: 31, 122, 140;
+    --accent-warm: #b3791b;
+    --accent-warm-rgb: 179, 121, 27;
+    --point-near-rgb: 179, 121, 27;
+    --point-far-rgb: 31, 122, 140;
+    --focus: #b3791b;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0c2131;
+      --bg-2: #0a1b28;
+      --ink: #e4edf2;
+      --ink-dim: #9db3c2;
+      --grid-line: rgba(228, 237, 242, 0.12);
+      --panel-bg: rgba(12, 33, 49, 0.78);
+      --panel-border: rgba(228, 237, 242, 0.22);
+      --accent-cool: #6fd6e8;
+      --accent-cool-rgb: 111, 214, 232;
+      --accent-warm: #e8ab48;
+      --accent-warm-rgb: 232, 171, 72;
+      --point-near-rgb: 232, 171, 72;
+      --point-far-rgb: 111, 214, 232;
+      --focus: #e8ab48;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0c2131;
+    --bg-2: #0a1b28;
+    --ink: #e4edf2;
+    --ink-dim: #9db3c2;
+    --grid-line: rgba(228, 237, 242, 0.12);
+    --panel-bg: rgba(12, 33, 49, 0.78);
+    --panel-border: rgba(228, 237, 242, 0.22);
+    --accent-cool: #6fd6e8;
+    --accent-cool-rgb: 111, 214, 232;
+    --accent-warm: #e8ab48;
+    --accent-warm-rgb: 232, 171, 72;
+    --point-near-rgb: 232, 171, 72;
+    --point-far-rgb: 111, 214, 232;
+    --focus: #e8ab48;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  #viewport-wrap {
+    position: fixed;
+    inset: 0;
+    background:
+      linear-gradient(var(--bg), var(--bg)),
+      var(--bg-2);
+  }
+
+  canvas#gl {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    cursor: grab;
+  }
+  canvas#gl:active { cursor: grabbing; }
+
+  .label-face {
+    font: 600 11px/1.2 "Segoe UI Semibold", "Segoe UI", Arial, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .title-face {
+    font-family: "Bahnschrift SemiCondensed", "Bahnschrift", "Arial Narrow", "Segoe UI", sans-serif;
+    font-weight: 600;
+  }
+
+  .mono {
+    font-family: "Cascadia Mono", "Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  #masthead {
+    position: fixed;
+    top: 22px;
+    left: 26px;
+    pointer-events: none;
+    text-shadow: 0 1px 0 var(--bg);
+  }
+  #masthead h1 {
+    margin: 0;
+    font-size: clamp(22px, 3vw, 34px);
+    letter-spacing: 0.01em;
+    text-wrap: balance;
+  }
+  #masthead p {
+    margin: 4px 0 0;
+    color: var(--ink-dim);
+    font-size: 12px;
+    letter-spacing: 0.03em;
+  }
+
+  #controls {
+    position: fixed;
+    top: 22px;
+    right: 26px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  button.ctl {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    color: var(--ink);
+    padding: 8px 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+  }
+  button.ctl:hover { border-color: var(--accent-warm); }
+  button.ctl:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  button.ctl[aria-pressed="true"] {
+    color: var(--bg);
+    background: var(--accent-warm);
+    border-color: var(--accent-warm);
+  }
+
+  #legend {
+    position: fixed;
+    left: 26px;
+    bottom: 26px;
+    display: flex;
+    gap: 14px;
+    padding: 10px 14px;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 3px;
+    backdrop-filter: blur(6px);
+  }
+  #legend .axis { display: flex; align-items: center; gap: 6px; }
+  #legend .swatch { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+  #legend span.txt { font-size: 11px; color: var(--ink-dim); letter-spacing: 0.03em; }
+
+  #titleblock {
+    position: fixed;
+    right: 26px;
+    bottom: 26px;
+    width: min(320px, 42vw);
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 3px;
+    backdrop-filter: blur(6px);
+    overflow: hidden;
+  }
+  #titleblock .tb-head {
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid var(--panel-border);
+  }
+  #titleblock .tb-head .name {
+    font-size: 15px;
+    letter-spacing: 0.02em;
+  }
+  #titleblock .tb-head .sub {
+    margin-top: 2px;
+    font-size: 10.5px;
+    color: var(--ink-dim);
+    letter-spacing: 0.05em;
+  }
+  #titleblock dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 6px 10px;
+    padding: 10px 14px;
+  }
+  #titleblock dt {
+    font-size: 10px;
+    color: var(--ink-dim);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    align-self: center;
+  }
+  #titleblock dd {
+    margin: 0;
+    font-size: 12.5px;
+    text-align: right;
+  }
+  #titleblock .flag {
+    margin: 0 14px 10px;
+    padding: 7px 9px;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--accent-warm);
+    border: 1px solid rgba(var(--accent-warm-rgb), 0.4);
+    border-radius: 2px;
+    background: rgba(var(--accent-warm-rgb), 0.08);
+  }
+
+  #titleblock .measurements {
+    margin: 0;
+    padding: 10px 14px;
+    border-top: 1px solid var(--panel-border);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 6px 8px;
+    align-items: baseline;
+  }
+  #titleblock .measurements .swatch {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    align-self: center;
+  }
+  #titleblock .measurements dt {
+    font-size: 10px;
+    color: var(--ink-dim);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  #titleblock .measurements dd {
+    margin: 0;
+    text-align: right;
+    font-size: 12.5px;
+  }
+  #titleblock .measurements dd .unc {
+    color: var(--ink-dim);
+    font-size: 10.5px;
+  }
+
+  #hint {
+    position: fixed;
+    bottom: 26px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: var(--ink-dim);
+    letter-spacing: 0.03em;
+    opacity: 0.85;
+    pointer-events: none;
+    display: none;
+  }
+  @media (max-width: 640px) {
+    #legend { display: none; }
+    #hint { display: block; }
+    #titleblock { width: min(260px, 60vw); }
+  }
+
+  #webgl-fallback {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+    color: var(--ink-dim);
+    font-size: 14px;
+  }
+</style>
+
+<div id="viewport-wrap">
+  <canvas id="gl" aria-label="Interactive 3D point-cloud view of the reconstructed visual hull"></canvas>
+</div>
+<div id="webgl-fallback">This viewer needs WebGL, which this browser/context doesn't have available.</div>
+
+<div id="masthead">
+  <h1 class="title-face">VISUAL HULL</h1>
+  <p class="label-face" id="masthead-sub">Stage 4 &middot; Space-Carved Reconstruction</p>
+</div>
+
+<div id="controls">
+  <button class="ctl label-face" id="btn-rotate" aria-pressed="true">Auto-rotate: On</button>
+  <button class="ctl label-face" id="btn-reset">Reset view</button>
+</div>
+
+<div id="legend" aria-hidden="true">
+  <div class="axis"><span class="swatch" style="background:var(--accent-warm)"></span><span class="txt">X &middot; width</span></div>
+  <div class="axis"><span class="swatch" style="background:var(--ink-dim)"></span><span class="txt">Y &middot; height</span></div>
+  <div class="axis"><span class="swatch" style="background:var(--accent-cool)"></span><span class="txt">Z &middot; depth</span></div>
+</div>
+
+<div id="titleblock">
+  <div class="tb-head">
+    <div class="name title-face">ANTHROPOMETRY &mdash; VISUAL HULL</div>
+    <div class="sub label-face" id="tb-sub">Step 4 output</div>
+  </div>
+  <dl class="mono" id="tb-fields"></dl>
+  <dl class="mono measurements" id="tb-measurements" hidden></dl>
+  <p class="flag" id="tb-flag"></p>
+</div>
+
+<div id="hint" class="label-face">Drag to orbit &middot; pinch to zoom</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var META = __META_JSON__;
+  var POINTS_B64 = "__POINTS_B64__";
+  var MEASUREMENTS = __MEASUREMENTS_JSON__; // null if measurements.json wasn't found at export time
+
+  // Deliberately far from the point cloud's own warm-to-cool height
+  // gradient (ochre near -> cyan far, see uColorNear/uColorFar below) --
+  // using colors from that same family made the rings nearly
+  // impossible to pick out against similarly-colored points at the
+  // same height (confirmed against a real render: the chest ring was
+  // effectively invisible). Magenta/yellow/lime read clearly against
+  // both the point cloud and either theme's background.
+  var ELLIPSE_COLORS = { chest: "#ff4fd8", waist: "#ffe14f", hip: "#7dff4f" };
+  var ELLIPSE_LABELS = { chest: "Chest", waist: "Waist", hip: "Hip" };
+
+  // ---- decode points (int16 mm triplets, Y-up, feet at Y=0) ----
+  function decodePoints(b64) {
+    var bin = atob(b64);
+    var len = bin.length;
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+    return new Int16Array(bytes.buffer);
+  }
+  var raw = decodePoints(POINTS_B64);
+  var pointCount = raw.length / 3;
+  var positions = new Float32Array(raw.length);
+  for (var i = 0; i < raw.length; i++) positions[i] = raw[i];
+
+  // ---- fill title block ----
+  function fmtInt(n) { return n.toLocaleString("en-US"); }
+
+  document.getElementById("masthead-sub").textContent = META.corrected
+    ? "Stage 6 · Corrected Reconstruction + Measurements"
+    : "Stage 4 · Space-Carved Reconstruction";
+  document.getElementById("tb-sub").textContent = META.corrected
+    ? "Step 5 waist-corrected output"
+    : "Step 4 output (uncorrected)";
+
+  var fields = [
+    ["Subject height", META.heightCm.toFixed(1) + " cm"],
+    ["Voxel grid", META.gridDims.join(" × ")],
+    ["Voxel size", META.voxelMm.toFixed(1) + " mm"],
+    ["Front scale", META.frontScaleMmPerPx ? META.frontScaleMmPerPx.toFixed(3) + " mm/px" : "—"],
+    ["Side scale", META.sideScaleMmPerPx ? META.sideScaleMmPerPx.toFixed(3) + " mm/px" : "—"],
+    ["Occupied voxels", fmtInt(META.totalOccupied)],
+    ["Surface voxels", fmtInt(META.surfaceVoxels)],
+    ["Points shown", fmtInt(META.renderedPoints)]
+  ];
+  var dl = document.getElementById("tb-fields");
+  fields.forEach(function (f) {
+    var dt = document.createElement("dt"); dt.textContent = f[0];
+    var dd = document.createElement("dd"); dd.textContent = f[1];
+    dl.appendChild(dt); dl.appendChild(dd);
+  });
+  // Height is the pipeline's sole metric calibration (Step 4 derives
+  // mm-per-pixel from it), so it is worth restating next to the numbers
+  // it scales -- everything shown here moves proportionally with it.
+  document.getElementById("tb-flag").textContent =
+    "Scale calibrated from a subject height of " + META.heightCm.toFixed(0) +
+    " cm. Every dimension shown is proportional to that figure, so an inaccurate " +
+    "height rescales all of them by the same factor.";
+
+  // ---- measurements (Step 6 circumferences + Step 7 uncertainty) ----
+  var measurementsDl = document.getElementById("tb-measurements");
+  if (MEASUREMENTS) {
+    measurementsDl.hidden = false;
+    ["chest", "waist", "hip"].forEach(function (key) {
+      var m = MEASUREMENTS[key];
+      if (!m) return;
+      var sw = document.createElement("span");
+      sw.className = "swatch";
+      sw.style.background = ELLIPSE_COLORS[key];
+      var dt = document.createElement("dt");
+      dt.textContent = ELLIPSE_LABELS[key];
+      var dd = document.createElement("dd");
+      dd.innerHTML = m.circumferenceCm.toFixed(1) + " cm " +
+        '<span class="unc">±' + m.uncertaintyCm.toFixed(1) + "</span>";
+      measurementsDl.appendChild(sw);
+      measurementsDl.appendChild(dt);
+      measurementsDl.appendChild(dd);
+    });
+    [["Shoulder", MEASUREMENTS.shoulderWidthCm, MEASUREMENTS.shoulderWidthUncertaintyCm],
+     ["Inseam", MEASUREMENTS.inseamCm, MEASUREMENTS.inseamUncertaintyCm]].forEach(function (row) {
+      var sw = document.createElement("span");
+      sw.className = "swatch";
+      sw.style.background = "transparent";
+      var dt = document.createElement("dt");
+      dt.textContent = row[0];
+      var dd = document.createElement("dd");
+      dd.innerHTML = row[1].toFixed(1) + " cm " +
+        '<span class="unc">±' + row[2].toFixed(1) + "</span>";
+      measurementsDl.appendChild(sw);
+      measurementsDl.appendChild(dt);
+      measurementsDl.appendChild(dd);
+    });
+  }
+
+  // ---- WebGL setup ----
+  var canvas = document.getElementById("gl");
+  var gl = canvas.getContext("webgl", { antialias: true, alpha: false }) ||
+           canvas.getContext("experimental-webgl", { antialias: true, alpha: false });
+  if (!gl) {
+    canvas.style.display = "none";
+    document.getElementById("webgl-fallback").style.display = "flex";
+    return;
+  }
+
+  var vsSource = [
+    "attribute vec3 aPos;",
+    "uniform mat4 uMVP;",
+    "uniform mat4 uView;",
+    "uniform float uYMin;",
+    "uniform float uYMax;",
+    "uniform float uPixelRatio;",
+    "varying float vT;",
+    "void main() {",
+    "  vT = clamp((aPos.y - uYMin) / (uYMax - uYMin), 0.0, 1.0);",
+    "  vec4 viewPos = uView * vec4(aPos, 1.0);",
+    "  float dist = max(-viewPos.z, 1.0);",
+    "  gl_PointSize = clamp(1600.0 / dist, 1.3, 5.0) * uPixelRatio;",
+    "  gl_Position = uMVP * vec4(aPos, 1.0);",
+    "}"
+  ].join("\n");
+
+  var fsSource = [
+    "precision mediump float;",
+    "varying float vT;",
+    "uniform vec3 uColorNear;",
+    "uniform vec3 uColorFar;",
+    "void main() {",
+    "  vec2 d = gl_PointCoord - vec2(0.5);",
+    "  if (dot(d, d) > 0.25) discard;",
+    "  vec3 col = mix(uColorFar, uColorNear, vT);",
+    "  gl_FragColor = vec4(col, 1.0);",
+    "}"
+  ].join("\n");
+
+  function compile(type, src) {
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+      console.error(gl.getShaderInfoLog(s));
+    }
+    return s;
+  }
+  var prog = gl.createProgram();
+  gl.attachShader(prog, compile(gl.VERTEX_SHADER, vsSource));
+  gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fsSource));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+
+  var aPos = gl.getAttribLocation(prog, "aPos");
+  var uMVP = gl.getUniformLocation(prog, "uMVP");
+  var uView = gl.getUniformLocation(prog, "uView");
+  var uYMin = gl.getUniformLocation(prog, "uYMin");
+  var uYMax = gl.getUniformLocation(prog, "uYMax");
+  var uPixelRatio = gl.getUniformLocation(prog, "uPixelRatio");
+  var uColorNear = gl.getUniformLocation(prog, "uColorNear");
+  var uColorFar = gl.getUniformLocation(prog, "uColorFar");
+
+  var vbo = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+  gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+
+  // ---- ground grid (drafting-paper grid at Y=0, feet level) ----
+  function buildGrid(halfExtent, step) {
+    var lines = [];
+    for (var v = -halfExtent; v <= halfExtent + 1e-6; v += step) {
+      lines.push(-halfExtent, 0, v, halfExtent, 0, v);
+      lines.push(v, 0, -halfExtent, v, 0, halfExtent);
+    }
+    return new Float32Array(lines);
+  }
+  var gridExtent = Math.max(
+    Math.abs(META.xRangeMm[0]), Math.abs(META.xRangeMm[1]),
+    Math.abs(META.zRangeMm[0]), Math.abs(META.zRangeMm[1])
+  ) * 1.8 + 100;
+  var gridData = buildGrid(gridExtent, gridExtent / 10);
+  var gridVbo = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, gridVbo);
+  gl.bufferData(gl.ARRAY_BUFFER, gridData, gl.STATIC_DRAW);
+
+  var gridVs = [
+    "attribute vec3 aPos;",
+    "uniform mat4 uMVP;",
+    "void main() { gl_Position = uMVP * vec4(aPos, 1.0); }"
+  ].join("\n");
+  var gridFs = [
+    "precision mediump float;",
+    "uniform vec4 uColor;",
+    "void main() { gl_FragColor = uColor; }"
+  ].join("\n");
+  var gridProg = gl.createProgram();
+  gl.attachShader(gridProg, compile(gl.VERTEX_SHADER, gridVs));
+  gl.attachShader(gridProg, compile(gl.FRAGMENT_SHADER, gridFs));
+  gl.linkProgram(gridProg);
+  var gridAPos = gl.getAttribLocation(gridProg, "aPos");
+  var gridUMVP = gl.getUniformLocation(gridProg, "uMVP");
+  var gridUColor = gl.getUniformLocation(gridProg, "uColor");
+
+  // ---- axis ticks near origin (short lines) ----
+  var axisLen = gridExtent * 0.12;
+  var axisData = new Float32Array([
+    0, 0, 0, axisLen, 0, 0,   // X
+    0, 0, 0, 0, axisLen, 0,   // Y
+    0, 0, 0, 0, 0, axisLen    // Z
+  ]);
+  var axisVbo = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, axisVbo);
+  gl.bufferData(gl.ARRAY_BUFFER, axisData, gl.STATIC_DRAW);
+
+  // ---- measurement ellipses (Step 6 chest/waist/hip circumference rings) ----
+  function hexToRgb01(hex) {
+    var v = parseInt(hex.replace("#", ""), 16);
+    return [((v >> 16) & 255) / 255, ((v >> 8) & 255) / 255, (v & 255) / 255];
+  }
+
+  function buildEllipseRingVertices(m, segments) {
+    var rot = (m.rotationDeg || 0) * Math.PI / 180;
+    var cosR = Math.cos(rot), sinR = Math.sin(rot);
+    var cx = m.centerMm[0], cz = m.centerMm[1];
+    var y = m.viewerYMm;
+    var ring = [];
+    for (var i = 0; i < segments; i++) {
+      var t = (i / segments) * Math.PI * 2;
+      var lx = m.semiMajorMm * Math.cos(t);
+      var lz = m.semiMinorMm * Math.sin(t);
+      ring.push([lx * cosR - lz * sinR + cx, y, lx * sinR + lz * cosR + cz]);
+    }
+    var lines = [];
+    for (var j = 0; j < segments; j++) {
+      var a = ring[j], b = ring[(j + 1) % segments];
+      lines.push(a[0], a[1], a[2], b[0], b[1], b[2]);
+    }
+    return new Float32Array(lines);
+  }
+
+  var ellipseBuffers = [];
+  if (MEASUREMENTS) {
+    ["chest", "waist", "hip"].forEach(function (key) {
+      var m = MEASUREMENTS[key];
+      if (!m) return;
+      var verts = buildEllipseRingVertices(m, 96);
+      var vbo2 = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, vbo2);
+      gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
+      ellipseBuffers.push({
+        vbo: vbo2,
+        count: verts.length / 3,
+        color: hexToRgb01(ELLIPSE_COLORS[key]),
+        label: ELLIPSE_LABELS[key],
+      });
+    });
+  }
+
+  // ---- minimal column-major mat4 helpers ----
+  function m4Identity() {
+    return new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
+  }
+  function m4Multiply(a, b) {
+    var out = new Float32Array(16);
+    for (var c = 0; c < 4; c++) {
+      for (var r = 0; r < 4; r++) {
+        out[c*4+r] = a[0*4+r]*b[c*4+0] + a[1*4+r]*b[c*4+1] + a[2*4+r]*b[c*4+2] + a[3*4+r]*b[c*4+3];
+      }
+    }
+    return out;
+  }
+  function m4Perspective(fovy, aspect, near, far) {
+    var f = 1.0 / Math.tan(fovy / 2);
+    var out = new Float32Array(16);
+    out[0] = f / aspect; out[5] = f;
+    out[10] = (far + near) / (near - far); out[11] = -1;
+    out[14] = (2 * far * near) / (near - far);
+    return out;
+  }
+  function normalize3(v) {
+    var l = Math.hypot(v[0], v[1], v[2]) || 1;
+    return [v[0]/l, v[1]/l, v[2]/l];
+  }
+  function cross3(a, b) {
+    return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+  }
+  function sub3(a, b) { return [a[0]-b[0], a[1]-b[1], a[2]-b[2]]; }
+  function dot3(a, b) { return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
+  function m4LookAt(eye, target, up) {
+    var z = normalize3(sub3(eye, target));
+    var x = normalize3(cross3(up, z));
+    var y = cross3(z, x);
+    var out = new Float32Array(16);
+    out[0]=x[0]; out[1]=y[0]; out[2]=z[0]; out[3]=0;
+    out[4]=x[1]; out[5]=y[1]; out[6]=z[1]; out[7]=0;
+    out[8]=x[2]; out[9]=y[2]; out[10]=z[2]; out[11]=0;
+    out[12]=-dot3(x,eye); out[13]=-dot3(y,eye); out[14]=-dot3(z,eye); out[15]=1;
+    return out;
+  }
+
+  // ---- camera state (orbit around mid-height point) ----
+  var FOVY = 0.62; // radians; must match m4Perspective() call in frame()
+  var target = [0, META.heightCm * 10 * 0.5, 0];
+  // Fit the full body height (the binding constraint for a standing
+  // portrait subject, regardless of viewport aspect) inside the vertical
+  // frustum, with headroom so the ground grid is visible too.
+  var initialDist = Math.max(
+    (META.heightCm * 10 * 0.5 * 1.6) / Math.tan(FOVY / 2),
+    900
+  );
+  var state = {
+    yaw: 0.6, pitch: 0.28, dist: initialDist,
+    autoRotate: true, dragging: false, lastX: 0, lastY: 0
+  };
+
+  function eyeFromState() {
+    var cp = Math.cos(state.pitch), sp = Math.sin(state.pitch);
+    var cy = Math.cos(state.yaw), sy = Math.sin(state.yaw);
+    return [
+      target[0] + state.dist * cp * sy,
+      target[1] + state.dist * sp,
+      target[2] + state.dist * cp * cy
+    ];
+  }
+
+  function resize() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = canvas.clientWidth, h = canvas.clientHeight;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  // A lost context is the one failure this viewer used to hide. The
+  // canvas keeps its last pixels (or none at all), the surrounding
+  // chrome carries on rendering, and nothing anywhere says why -- so it
+  // reads as "the 3D view crashed" with no explanation. Browsers drop
+  // contexts when too many live at once, which is what happens when a
+  // page swaps this viewer in repeatedly, and the same file opened in a
+  // fresh tab then works, making it look like a file problem instead.
+  canvas.addEventListener("webglcontextlost", function (e) {
+    e.preventDefault();  // required, or the context can never be restored
+    var el = document.getElementById("webgl-fallback");
+    el.textContent = "The browser dropped this view's WebGL context — "
+                   + "usually too many 3D views open at once. Reload the page, "
+                   + "or open this viewer in its own tab.";
+    el.style.display = "flex";
+  }, false);
+
+  canvas.addEventListener("webglcontextrestored", function () {
+    document.getElementById("webgl-fallback").style.display = "none";
+    resize();
+  }, false);
+
+  function cssVarRgb(name, fallback) {
+    var v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    if (!v) return fallback;
+    // The theme tokens are hex (#0a1b28), not the "10, 27, 40" triples
+    // this used to assume: splitting a hex string on commas yields one
+    // piece, parseFloat("#0a1b28") is NaN, and gl.clearColor(NaN, ...)
+    // silently clears to black -- so every build so far has ignored its
+    // own background token in both themes.
+    if (v.charAt(0) === "#") {
+      if (v.length === 4) {  // #abc
+        v = "#" + v[1] + v[1] + v[2] + v[2] + v[3] + v[3];
+      }
+      if (v.length !== 7) return fallback;
+      var n = parseInt(v.slice(1), 16);
+      if (isNaN(n)) return fallback;
+      return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+    }
+    var parts = v.replace(/^rgba?\(|\)$/g, "").split(/[,\s/]+/)
+                 .map(function (s) { return parseFloat(s) / 255; })
+                 .filter(function (x) { return !isNaN(x); });
+    return parts.length >= 3 ? parts.slice(0, 3) : fallback;
+  }
+
+  var reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reducedMotion) {
+    state.autoRotate = false;
+    document.getElementById("btn-rotate").setAttribute("aria-pressed", "false");
+    document.getElementById("btn-rotate").textContent = "Auto-rotate: Off";
+  }
+
+  gl.enable(gl.DEPTH_TEST);
+  gl.clearColor(0, 0, 0, 1); // overwritten per-frame from CSS token below
+
+  function frame(tMs) {
+    if (state.autoRotate && !state.dragging) {
+      state.yaw += 0.0016;
+    }
+
+    resize();
+    var aspect = canvas.width / Math.max(1, canvas.height);
+    var proj = m4Perspective(FOVY, aspect, 20, 20000);
+    var eye = eyeFromState();
+    var view = m4LookAt(eye, target, [0, 1, 0]);
+    var mvp = m4Multiply(proj, view);
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    var bg = cssVarRgb("--bg-2", [0.04, 0.13, 0.19]);
+    gl.clearColor(bg[0], bg[1], bg[2], 1);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    // grid
+    gl.useProgram(gridProg);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gridVbo);
+    gl.enableVertexAttribArray(gridAPos);
+    gl.vertexAttribPointer(gridAPos, 3, gl.FLOAT, false, 0, 0);
+    gl.uniformMatrix4fv(gridUMVP, false, mvp);
+    var gridRgb = cssVarRgb("--grid-line", [0.5, 0.5, 0.5]);
+    gl.uniform4f(gridUColor, gridRgb[0], gridRgb[1], gridRgb[2], 1.0);
+    gl.drawArrays(gl.LINES, 0, gridData.length / 3);
+
+    // axis ticks
+    gl.bindBuffer(gl.ARRAY_BUFFER, axisVbo);
+    gl.vertexAttribPointer(gridAPos, 3, gl.FLOAT, false, 0, 0);
+    var warm = cssVarRgb("--accent-warm-rgb", [0.7, 0.5, 0.1]);
+    var cool = cssVarRgb("--accent-cool-rgb", [0.1, 0.5, 0.55]);
+    var dim = cssVarRgb("--ink-dim", [0.5,0.5,0.5]);
+    gl.uniform4f(gridUColor, warm[0], warm[1], warm[2], 0.9);
+    gl.drawArrays(gl.LINES, 0, 2);
+    gl.uniform4f(gridUColor, dim[0], dim[1], dim[2], 0.9);
+    gl.drawArrays(gl.LINES, 2, 2);
+    gl.uniform4f(gridUColor, cool[0], cool[1], cool[2], 0.9);
+    gl.drawArrays(gl.LINES, 4, 2);
+
+    // points
+    gl.useProgram(prog);
+    gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+    gl.uniformMatrix4fv(uMVP, false, mvp);
+    gl.uniformMatrix4fv(uView, false, view);
+    gl.uniform1f(uYMin, META.yRangeMm[0]);
+    gl.uniform1f(uYMax, META.yRangeMm[1]);
+    gl.uniform1f(uPixelRatio, dpr);
+    var near = cssVarRgb("--point-near-rgb", [0.9, 0.67, 0.28]);
+    var far = cssVarRgb("--point-far-rgb", [0.12, 0.48, 0.55]);
+    gl.uniform3f(uColorNear, near[0], near[1], near[2]);
+    gl.uniform3f(uColorFar, far[0], far[1], far[2]);
+    gl.drawArrays(gl.POINTS, 0, pointCount);
+
+    // measurement ellipses -- drawn last, with depth testing off, so
+    // these read as an annotation/overlay and are never lost to
+    // z-fighting against the dense point cloud sitting at the same
+    // radius (the ring's own X/Z position is, by construction, right at
+    // the measured surface, not floating outside it).
+    if (ellipseBuffers.length) {
+      gl.useProgram(gridProg);
+      gl.disable(gl.DEPTH_TEST);
+      ellipseBuffers.forEach(function (eb) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, eb.vbo);
+        gl.enableVertexAttribArray(gridAPos);
+        gl.vertexAttribPointer(gridAPos, 3, gl.FLOAT, false, 0, 0);
+        gl.uniformMatrix4fv(gridUMVP, false, mvp);
+        gl.uniform4f(gridUColor, eb.color[0], eb.color[1], eb.color[2], 1.0);
+        gl.drawArrays(gl.LINES, 0, eb.count);
+      });
+      gl.enable(gl.DEPTH_TEST);
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // ---- interaction ----
+  function onDown(x, y) {
+    state.dragging = true;
+    state.lastX = x; state.lastY = y;
+  }
+  function onMove(x, y) {
+    if (!state.dragging) return;
+    var dx = x - state.lastX, dy = y - state.lastY;
+    state.lastX = x; state.lastY = y;
+    state.yaw -= dx * 0.006;
+    state.pitch = Math.max(-1.4, Math.min(1.4, state.pitch + dy * 0.006));
+  }
+  function onUp() { state.dragging = false; }
+
+  canvas.addEventListener("mousedown", function (e) { onDown(e.clientX, e.clientY); });
+  window.addEventListener("mousemove", function (e) { onMove(e.clientX, e.clientY); });
+  window.addEventListener("mouseup", onUp);
+
+  canvas.addEventListener("touchstart", function (e) {
+    if (e.touches.length === 1) onDown(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+  canvas.addEventListener("touchmove", function (e) {
+    if (e.touches.length === 1) { onMove(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); }
+  }, { passive: false });
+  canvas.addEventListener("touchend", onUp);
+
+  canvas.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    state.dist = Math.max(300, Math.min(6000, state.dist * (1 + e.deltaY * 0.001)));
+  }, { passive: false });
+
+  var btnRotate = document.getElementById("btn-rotate");
+  btnRotate.addEventListener("click", function () {
+    state.autoRotate = !state.autoRotate;
+    btnRotate.setAttribute("aria-pressed", String(state.autoRotate));
+    btnRotate.textContent = "Auto-rotate: " + (state.autoRotate ? "On" : "Off");
+  });
+  document.getElementById("btn-reset").addEventListener("click", function () {
+    state.yaw = 0.6; state.pitch = 0.28; state.dist = initialDist;
+  });
+})();
+</script>

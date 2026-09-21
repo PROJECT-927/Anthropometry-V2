@@ -1,0 +1,44 @@
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+W0000 00:00:1786903481.885851    2008 inference_feedback_manager.cc:114] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1786903482.071135   21932 inference_feedback_manager.cc:114] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1786903482.295230   22040 landmark_projection_calculator.cc:186] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+W0000 00:00:1786903488.642485   16468 inference_feedback_manager.cc:114] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1786903488.819389   21944 inference_feedback_manager.cc:114] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+Step 1: height = 172.0 cm (default placeholder)
+[front] Step 2: GrabCut silhouette extraction...
+[front]   -> 200351 foreground pixels
+[front] Step 3: Procrustes pose normalization...
+[front]   -> rotation=-0.24 deg, scale=1.0000, landmark RMS error 2.5px -> 1.7px
+[side] Step 2: GrabCut silhouette extraction...
+[side]   -> 210723 foreground pixels
+[side] Step 3: Procrustes pose normalization...
+[side]   -> rotation=-3.50 deg, scale=0.9741, landmark RMS error 31.5px -> 22.1px
+Wrote front_normalized_mask.png and side_normalized_mask.png
+Step 4: Visual Hull 3D reconstruction...
+  -> grid 220x860x425 (14,693,134 occupied voxels @ 2.0mm), front scale=1.515 mm/px, side scale=1.411 mm/px
+Wrote visual_hull.npz
+Step 5: Curvature-based waist correction...
+  -> waist at y=712mm from head, d_left=5.0mm, d_right=0.9mm, cross-section area 620.6cm2 -> 607.0cm2 (removed ~7.8cm2)
+Wrote visual_hull_corrected.npz
+Step 6: Convex hull + ellipse fitting...
+  -> chest :  94.7 cm  (y=472mm, hull=56pts, fit RMS=0.030)
+  -> waist :  82.1 cm  (y=712mm, hull=52pts, fit RMS=0.031)
+  -> hip   :  99.8 cm  (y=842mm, hull=52pts, fit RMS=0.031)
+  -> shoulder width: 31.1 cm
+  -> inseam: 69.7 cm
+  ! chest: height is a proportional estimate (35% of the way from shoulder to waist), not detected from the silhouette -- so the chest slice may sit above or below your actual fullest chest point. The circumference itself is measured normally at that height.
+  ! chest: side-view depth was 9% larger than a plausible torso proportion (likely the arm/hand in profile, not the torso -- see MAX_DEPTH_TO_WIDTH_RATIO), so 27mm of depth was removed and that axis is now an assumed proportion rather than a measured one. Step 7 widens this measurement's confidence interval accordingly. Retake the side photo with arms held clear of the torso for a reading that doesn't rest on an assumption.
+  ! waist: side-view depth was 2% larger than a plausible torso proportion (likely the arm/hand in profile, not the torso -- see MAX_DEPTH_TO_WIDTH_RATIO), so 5mm of depth was removed and that axis is now an assumed proportion rather than a measured one. Step 7 widens this measurement's confidence interval accordingly. Retake the side photo with arms held clear of the torso for a reading that doesn't rest on an assumption.
+  -> ratio checks: all within expected bands
+Step 7: Geometric uncertainty propagation...
+
+Final measurements (95% confidence, per Step 7's error budget):
+  chest           :  94.7 cm +/- 4.1 cm  (s=2.4mm b=9.7mm c=0.0mm e=2.0mm d=40.0mm)  [depth assumed, not measured]
+  waist           :  82.1 cm +/- 1.3 cm  (s=2.1mm b=9.7mm c=0.3mm e=1.9mm d=7.4mm)  [depth assumed, not measured]
+  hip             :  99.8 cm +/- 1.0 cm  (s=2.5mm b=9.7mm c=0.0mm e=2.3mm d=0.1mm)  [depth assumed, not measured]
+  shoulder width  :  31.1 cm +/- 0.3 cm  (s=0.6mm b=3.2mm c=0.0mm e=0.0mm d=0.0mm)
+  inseam          :  69.7 cm +/- 0.3 cm  (s=1.3mm b=3.2mm c=0.0mm e=0.0mm d=0.0mm)
+Wrote measurements.json
+
+Pipeline complete (Steps 1-7).

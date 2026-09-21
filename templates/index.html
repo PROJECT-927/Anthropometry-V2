@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anthropometry — Body Measurement from Two Photos</title>
+<style>
+  :root {
+    --bg: #0f1216;
+    --panel: #171c22;
+    --panel-2: #1e242c;
+    --line: #2a323c;
+    --text: #e6ebf0;
+    --muted: #8f9bab;
+    --accent: #4db6ac;
+    --accent-dim: #2f6f68;
+    --warn: #e0a955;
+    --err: #e06c62;
+    --ok: #6fcf97;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 20px 80px; }
+  header h1 { margin: 0 0 6px; font-size: 24px; font-weight: 650; letter-spacing: -0.01em; }
+  header p { margin: 0 0 28px; color: var(--muted); }
+  .card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 22px; margin-bottom: 20px;
+  }
+  .drops { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  @media (max-width: 700px) { .drops { grid-template-columns: 1fr; } }
+  .drop {
+    position: relative; border: 1.5px dashed var(--line); border-radius: 10px;
+    background: var(--panel-2); min-height: 210px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 16px; transition: border-color .15s, background .15s;
+    overflow: hidden;
+  }
+  .drop:hover, .drop.over { border-color: var(--accent); background: #202832; }
+  .drop input[type=file] { display: none; }
+  .drop .label { font-weight: 600; margin-bottom: 4px; }
+  .drop .hint { color: var(--muted); font-size: 13px; }
+  .drop img { max-width: 100%; max-height: 260px; border-radius: 6px; display: block; }
+  .drop .fname {
+    color: var(--muted); font-size: 12px; margin-top: 8px;
+    max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .row { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; }
+  label.field { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  input[type=number] {
+    background: var(--panel-2); border: 1px solid var(--line); color: var(--text);
+    border-radius: 8px; padding: 11px 13px; font-size: 16px; width: 160px;
+    font-family: inherit;
+  }
+  input[type=number]:focus { outline: none; border-color: var(--accent); }
+  button {
+    background: var(--accent); color: #08201e; border: 0; border-radius: 8px;
+    padding: 12px 22px; font-size: 15px; font-weight: 650; cursor: pointer;
+    font-family: inherit;
+  }
+  button:hover:not(:disabled) { filter: brightness(1.08); }
+  button:disabled { background: var(--accent-dim); color: #9fc4bf; cursor: not-allowed; }
+  .note { color: var(--muted); font-size: 13px; margin-top: 14px; }
+  .stlrow { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 18px; }
+  .stlrow .stlnote { margin-top: 0; }
+  .note b { color: var(--text); font-weight: 600; }
+  .hidden { display: none !important; }
+
+  .bar { height: 7px; background: var(--panel-2); border-radius: 4px; overflow: hidden; }
+  .bar > div { height: 100%; width: 0; background: var(--accent); transition: width .4s ease; }
+  .steprow { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
+  .steprow .pct { color: var(--muted); font-variant-numeric: tabular-nums; }
+  pre.log {
+    background: #0b0e12; border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px 14px; margin: 16px 0 0; max-height: 240px; overflow: auto;
+    font: 12px/1.5 ui-monospace, "Cascadia Code", Consolas, monospace;
+    color: #a8b6c6; white-space: pre-wrap; word-break: break-word;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 11px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+  td.val { font-size: 19px; font-weight: 650; font-variant-numeric: tabular-nums; }
+  td.pm { color: var(--muted); font-variant-numeric: tabular-nums; }
+  tr.flagged td.val { color: var(--warn); }
+  .pill {
+    display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px;
+    background: #3a2f1c; color: var(--warn); margin-left: 8px; vertical-align: middle;
+    font-weight: 600;
+  }
+  h2 { font-size: 16px; margin: 0 0 14px; font-weight: 650; }
+  .banner { border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; font-size: 14px; }
+  .banner.ok { background: #16301f; border: 1px solid #2c5c3c; color: var(--ok); }
+  .banner.warn { background: #302614; border: 1px solid #5c4a22; color: var(--warn); }
+  .banner.err { background: #331c1a; border: 1px solid #6b3733; color: var(--err); }
+  ul.flags { margin: 0; padding-left: 18px; }
+  ul.flags li { margin-bottom: 10px; color: #d3b98a; font-size: 13.5px; }
+  ul.flags li:last-child { margin-bottom: 0; }
+  iframe.viewer {
+    width: 100%; height: 560px; border: 1px solid var(--line);
+    border-radius: 8px; background: #000; display: block;
+  }
+  .imgs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 700px) { .imgs { grid-template-columns: 1fr; } }
+  .imgs figure { margin: 0; }
+  .imgs img { width: 100%; border-radius: 8px; border: 1px solid var(--line); display: block; }
+  .imgs figcaption { color: var(--muted); font-size: 12px; margin-top: 6px; }
+  a.btn-link {
+    color: var(--accent); text-decoration: none; font-size: 14px; font-weight: 600;
+  }
+  a.btn-link:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Body Measurement from Two Photos</h1>
+    <p>Upload a front and side photo, enter your real height, and the pipeline reconstructs a 3D hull to measure from.</p>
+  </header>
+
+  <!-- ---------------- Input form ---------------- -->
+  <section class="card" id="form-card">
+    <div class="drops">
+      <label class="drop" id="drop-front">
+        <input type="file" id="file-front" accept="image/*">
+        <div class="placeholder">
+          <div class="label">Front photo</div>
+          <div class="hint">Click or drop an image</div>
+        </div>
+        <img class="hidden" id="prev-front" alt="Front preview">
+        <div class="fname" id="name-front"></div>
+      </label>
+
+      <label class="drop" id="drop-side">
+        <input type="file" id="file-side" accept="image/*">
+        <div class="placeholder">
+          <div class="label">Side photo</div>
+          <div class="hint">Click or drop an image</div>
+        </div>
+        <img class="hidden" id="prev-side" alt="Side preview">
+        <div class="fname" id="name-side"></div>
+      </label>
+    </div>
+
+    <div class="row">
+      <div>
+        <label class="field" for="height">Your height (cm)</label>
+        <input type="number" id="height" step="0.5"
+               min="{{ min_height }}" max="{{ max_height }}" placeholder="172">
+      </div>
+      <button id="run">Measure</button>
+    </div>
+
+    <div class="note">
+      <b>Height is the only scale reference</b> — every measurement is calibrated from it, so an
+      inaccurate height rescales all results proportionally.
+      <br>
+      <b>Pose matters:</b> stand straight, arms hanging down but angled out roughly 15–20° so there is
+      a visible gap between arm and torso — and keep that same angle in both photos. Arms flush against
+      the body, or held straight out, both degrade the measurements.
+      Max {{ max_upload_mb }}MB total.
+    </div>
+
+    <div class="banner err hidden" id="form-error"></div>
+  </section>
+
+  <!-- ---------------- Progress ---------------- -->
+  <section class="card hidden" id="progress-card">
+    <div class="steprow">
+      <span id="step-label">Starting…</span>
+      <span class="pct" id="step-pct">0%</span>
+    </div>
+    <div class="bar"><div id="bar-fill"></div></div>
+    <pre class="log" id="log"></pre>
+  </section>
+
+  <!-- ---------------- Results ---------------- -->
+  <section class="card hidden" id="results-card">
+    <h2>Measurements</h2>
+    <div id="ratio-banner"></div>
+    <table>
+      <thead>
+        <tr><th>Measurement</th><th>Value</th><th>95% confidence</th></tr>
+      </thead>
+      <tbody id="results-body"></tbody>
+    </table>
+    <div class="note">
+      Height (<span id="echo-height"></span> cm) is the input calibration, not a measured output.
+    </div>
+  </section>
+
+  <section class="card hidden" id="flags-card">
+    <h2>Reliability flags from the pipeline</h2>
+    <ul class="flags" id="flags-list"></ul>
+  </section>
+
+  <section class="card hidden" id="viewer-card">
+    <h2>3D reconstruction</h2>
+    <iframe class="viewer" id="viewer" title="3D hull viewer"></iframe>
+    <div class="note"><a class="btn-link" id="viewer-link" target="_blank" rel="noopener">Open viewer in a new tab ↗</a></div>
+    <div class="stlrow">
+      <button type="button" id="stl-btn">Download 3D model (.stl)</button>
+      <span class="note stlnote" id="stl-note"></span>
+    </div>
+  </section>
+
+  <section class="card hidden" id="debug-card">
+    <h2>Silhouette &amp; pose check</h2>
+    <div class="imgs">
+      <figure>
+        <img id="dbg-front" alt="Front pose normalization">
+        <figcaption>Front — detected silhouette and pose landmarks</figcaption>
+      </figure>
+      <figure>
+        <img id="dbg-side" alt="Side pose normalization">
+        <figcaption>Side — detected silhouette and pose landmarks</figcaption>
+      </figure>
+    </div>
+    <div class="note">
+      If the green silhouette does not closely match your body outline, the measurements above
+      inherit that error — retake the photo against a plainer background.
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const files = { front: null, side: null };
+
+  // ---- file pickers + drag/drop ----
+  function wireDrop(kind) {
+    const drop = $("drop-" + kind);
+    const input = $("file-" + kind);
+    const prev = $("prev-" + kind);
+    const name = $("name-" + kind);
+
+    function accept(file) {
+      if (!file || !file.type.startsWith("image/")) return;
+      files[kind] = file;
+      prev.src = URL.createObjectURL(file);
+      prev.classList.remove("hidden");
+      drop.querySelector(".placeholder").classList.add("hidden");
+      name.textContent = file.name;
+    }
+
+    input.addEventListener("change", () => accept(input.files[0]));
+    ["dragenter", "dragover"].forEach((ev) =>
+      drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+    ["dragleave", "drop"].forEach((ev) =>
+      drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
+    drop.addEventListener("drop", (e) => accept(e.dataTransfer.files[0]));
+  }
+  wireDrop("front");
+  wireDrop("side");
+
+  // ---- submit ----
+  const runBtn = $("run");
+  const formError = $("form-error");
+
+  function showError(msg) {
+    formError.textContent = msg;
+    formError.classList.remove("hidden");
+    runBtn.disabled = false;
+    runBtn.textContent = "Measure";
+  }
+
+  runBtn.addEventListener("click", async () => {
+    formError.classList.add("hidden");
+    const height = $("height").value.trim();
+
+    if (!files.front) return showError("Please choose a front photo.");
+    if (!files.side) return showError("Please choose a side photo.");
+    if (!height) return showError("Please enter your height in centimetres.");
+
+    const fd = new FormData();
+    fd.append("front", files.front);
+    fd.append("side", files.side);
+    fd.append("height", height);
+
+    runBtn.disabled = true;
+    runBtn.textContent = "Measuring…";
+    ["results-card", "flags-card", "viewer-card", "debug-card"].forEach((id) =>
+      $(id).classList.add("hidden"));
+    $("progress-card").classList.remove("hidden");
+    $("log").textContent = "";
+
+    let res, data;
+    try {
+      res = await fetch("/api/run", { method: "POST", body: fd });
+      data = await res.json();
+    } catch (e) {
+      $("progress-card").classList.add("hidden");
+      return showError("Could not reach the server. Is app.py still running?");
+    }
+    if (!res.ok) {
+      $("progress-card").classList.add("hidden");
+      return showError(data.error || "The run could not be started.");
+    }
+    poll(data.job_id);
+  });
+
+  // ---- polling ----
+  function poll(jobId) {
+    const timer = setInterval(async () => {
+      let job;
+      try {
+        const r = await fetch("/api/job/" + jobId);
+        job = await r.json();
+      } catch (e) { return; }
+
+      $("step-label").textContent = job.step || "";
+      $("step-pct").textContent = (job.progress || 0) + "%";
+      $("bar-fill").style.width = (job.progress || 0) + "%";
+
+      const log = $("log");
+      const atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 40;
+      log.textContent = (job.log || []).join("\n");
+      if (atBottom) log.scrollTop = log.scrollHeight;
+
+      if (job.state === "running") return;
+      clearInterval(timer);
+      runBtn.disabled = false;
+      runBtn.textContent = "Measure";
+
+      if (job.state === "error") {
+        showError(job.error || "The pipeline failed.");
+        return;
+      }
+      render(jobId, job);
+    }, 900);
+  }
+
+  // ---- STL export ----
+  // The mesh is built server-side on demand, so closing this page does
+  // not cancel it: the job keeps running and the finished file waits in
+  // the run's folder. Reopening the same result picks it back up,
+  // because the server reports readiness from disk rather than memory.
+  let stlTimer = null;
+
+  function stlUI(jobId, s) {
+    const btn = $("stl-btn"), note = $("stl-note");
+    if (s.state === "ready") {
+      const mb = (s.size_bytes || 0) / (1024 * 1024);
+      btn.disabled = false;
+      btn.textContent = "Download 3D model (.stl)";
+      note.textContent = mb ? `Ready — ${mb.toFixed(1)} MB.` : "Ready.";
+      btn.onclick = () => { window.location.href = "/runs/" + jobId + "/body.stl"; };
+    } else if (s.state === "running") {
+      btn.disabled = true;
+      btn.textContent = "Building mesh…";
+      note.textContent = "About a minute. You can close this page — it keeps building.";
+    } else if (s.state === "error") {
+      btn.disabled = false;
+      btn.textContent = "Retry 3D model (.stl)";
+      note.textContent = s.error || "The mesh export failed.";
+      btn.onclick = () => startStl(jobId);
+    } else if (s.state === "unavailable") {
+      btn.disabled = true;
+      btn.textContent = "Download 3D model (.stl)";
+      note.textContent = s.error || "No voxel grid to mesh.";
+    } else {
+      btn.disabled = false;
+      btn.textContent = "Download 3D model (.stl)";
+      note.textContent = "Built on request — takes about a minute.";
+      btn.onclick = () => startStl(jobId);
+    }
+  }
+
+  function watchStl(jobId) {
+    if (stlTimer) clearInterval(stlTimer);
+    stlTimer = setInterval(async () => {
+      let s;
+      try {
+        s = await (await fetch("/api/job/" + jobId + "/stl")).json();
+      } catch (e) { return; }
+      if (s.state !== "running") clearInterval(stlTimer);
+      stlUI(jobId, s);
+    }, 2000);
+  }
+
+  async function startStl(jobId) {
+    stlUI(jobId, { state: "running" });
+    try {
+      const s = await (await fetch("/api/job/" + jobId + "/stl", { method: "POST" })).json();
+      stlUI(jobId, s);
+      if (s.state === "running") watchStl(jobId);
+    } catch (e) {
+      stlUI(jobId, { state: "error", error: "Could not reach the server." });
+    }
+  }
+
+  async function initStl(jobId) {
+    try {
+      const s = await (await fetch("/api/job/" + jobId + "/stl")).json();
+      stlUI(jobId, s);
+      if (s.state === "running") watchStl(jobId);
+    } catch (e) { /* leave the button in its default state */ }
+  }
+
+  // ---- results ----
+  const ROWS = [
+    ["Chest",          (r) => r.chest.circumferenceCm,  (r) => r.chest.uncertaintyCm,  "chest", (r) => r.chest.depthCapped],
+    ["Waist",          (r) => r.waist.circumferenceCm,  (r) => r.waist.uncertaintyCm,  "waist", (r) => r.waist.depthCapped],
+    ["Hip",            (r) => r.hip.circumferenceCm,    (r) => r.hip.uncertaintyCm,    "hip",   (r) => r.hip.depthCapped],
+    ["Shoulder width", (r) => r.shoulderWidthCm,        (r) => r.shoulderWidthUncertaintyCm, "shoulder", () => false],
+    ["Inseam",         (r) => r.inseamCm,               (r) => r.inseamUncertaintyCm,  "inseam", () => false],
+  ];
+
+  function render(jobId, job) {
+    const r = job.results;
+    const flags = job.flags || [];
+    const flaggedNames = new Set();
+    flags.forEach((f) => {
+      const m = /^(chest|waist|hip|shoulder|inseam)/i.exec(f);
+      if (m) flaggedNames.add(m[1].toLowerCase());
+    });
+
+    const body = $("results-body");
+    body.innerHTML = "";
+    for (const [label, val, unc, key, capped] of ROWS) {
+      const tr = document.createElement("tr");
+      if (flaggedNames.has(key)) tr.className = "flagged";
+      let pill = flaggedNames.has(key) ? '<span class="pill">check flags</span>' : "";
+      // A capped slice had its depth set by an assumed torso proportion
+      // rather than measured off the side photo. That is a different
+      // kind of caveat from the generic flags -- it says the number
+      // itself partly rests on an assumption -- so it gets its own mark.
+      if (capped(r)) pill += '<span class="pill">depth assumed</span>';
+      tr.innerHTML =
+        "<td>" + label + pill + "</td>" +
+        '<td class="val">' + val(r).toFixed(1) + " cm</td>" +
+        '<td class="pm">± ' + unc(r).toFixed(1) + " cm</td>";
+      body.appendChild(tr);
+    }
+    $("echo-height").textContent = (r.heightCm).toFixed(1);
+    $("results-card").classList.remove("hidden");
+
+    const banner = $("ratio-banner");
+    if (job.ratios_ok) {
+      banner.className = "banner ok";
+      banner.textContent = "All anthropometric ratio checks passed (waist/hip, waist/chest, waist/height).";
+    } else {
+      banner.className = "banner warn";
+      banner.textContent = "Some anthropometric ratio checks failed — see the flags below before trusting these numbers.";
+    }
+
+    if (flags.length) {
+      const ul = $("flags-list");
+      ul.innerHTML = "";
+      flags.forEach((f) => {
+        const li = document.createElement("li");
+        li.textContent = f;
+        ul.appendChild(li);
+      });
+      $("flags-card").classList.remove("hidden");
+    }
+
+    if (job.has_viewer) {
+      const url = "/runs/" + jobId + "/hull_viewer.html";
+      $("viewer-link").href = url;
+      // Unhide before handing the iframe a src, so the viewer lays out
+      // and sizes its canvas against real dimensions on first paint
+      // rather than relying on a later resize to correct a 0x0 start.
+      // (Measured: loading it hidden also works -- the rAF loop calls
+      // resize() every frame and recovers once the card is shown -- so
+      // this is ordering hygiene, not a fix for a known failure.)
+      $("viewer-card").classList.remove("hidden");
+      // Tear the previous viewer down before loading the next one.
+      // Each results render points this iframe at a new document, and
+      // each of those creates a WebGL context; pointing src straight at
+      // the new URL leaves the old context alive until the browser
+      // happens to collect it. Enough of those and the browser starts
+      // dropping contexts to stay under its limit -- which kills a view
+      // that is already on screen, silently. about:blank first makes
+      // the teardown deterministic: one live context at a time.
+      const frame = $("viewer");
+      frame.src = "about:blank";
+      requestAnimationFrame(() => { frame.src = url; });
+      initStl(jobId);
+    }
+
+    $("dbg-front").src = "/runs/" + jobId + "/debug_pose_normalization_front.png";
+    $("dbg-side").src = "/runs/" + jobId + "/debug_pose_normalization_side.png";
+    $("debug-card").classList.remove("hidden");
+  }
+})();
+</script>
+</body>
+</html>

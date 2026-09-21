@@ -1,0 +1,27 @@
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+W0000 00:00:1786889311.296884   12988 inference_feedback_manager.cc:114] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1786889311.432908   12988 inference_feedback_manager.cc:114] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1786889311.632681   15320 landmark_projection_calculator.cc:186] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+W0000 00:00:1786889316.710746   18500 inference_feedback_manager.cc:114] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1786889316.857848   10548 inference_feedback_manager.cc:114] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+ERROR: No occupied voxels in the cross-section at y=411mm.
+Step 1: height = 172.0 cm (default placeholder)
+[front] Step 2: GrabCut silhouette extraction...
+[front]   -> 200351 foreground pixels
+[front] Step 3: Procrustes pose normalization...
+[front]   -> rotation=-0.24 deg, scale=1.0000, landmark RMS error 2.5px -> 1.7px
+[side] Step 2: GrabCut silhouette extraction...
+[side]   -> 210723 foreground pixels
+[side] Step 3: Procrustes pose normalization...
+[side]   -> rotation=-3.50 deg, scale=0.9741, landmark RMS error 31.5px -> 22.1px
+Wrote front_normalized_mask.png and side_normalized_mask.png
+Step 4: Visual Hull 3D reconstruction...
+  -> grid 220x860x425 (14,693,134 occupied voxels @ 2.0mm), front scale=1.515 mm/px, side scale=1.411 mm/px
+Wrote visual_hull.npz
+Wrote debug_hull_front.png, debug_hull_side.png, debug_hull_cross_sections.png
+Step 5: Curvature-based waist correction...
+  -> waist at y=411mm from head, d_left=1.2mm, d_right=0.2mm, cross-section area 2572.8cm2 -> 2547.3cm2 (removed ~-122959853726344.7cm2)
+Wrote visual_hull_corrected.npz
+Wrote debug_waist_correction.png, debug_waist_boundary.png
+Step 6: Convex hull + ellipse fitting...
