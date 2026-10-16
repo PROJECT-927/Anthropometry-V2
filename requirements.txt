@@ -4,6 +4,7 @@ numpy
 scipy
 matplotlib
 flask
+gunicorn>=22,<24
 
 # export_stl.py / verify_stl.py. fast-simplification backs trimesh's
 # quadric decimation; without it the export still succeeds and just
