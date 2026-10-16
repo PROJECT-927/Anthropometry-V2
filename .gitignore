@@ -18,8 +18,7 @@ crop_bottom_left.png
  pipeline_run*.log
 
 # Per-run output directories created by the web interface (app.py).
-# Same reasoning as the entries above: these hold uploaded photos and
-# every derived silhouette/voxel/measurement file for a real person.
+# These contain derived silhouettes, landmarks, voxel grids and measurements.
 runs/
 
 # Local permission settings (machine-specific); launch.json (dev server

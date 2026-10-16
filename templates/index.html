@@ -100,9 +100,18 @@
   ul.flags li { margin-bottom: 10px; color: #d3b98a; font-size: 13.5px; }
   ul.flags li:last-child { margin-bottom: 0; }
   iframe.viewer {
-    width: 100%; height: 560px; border: 1px solid var(--line);
+    width: 100%; height: min(72vh, 680px); min-height: 360px; border: 1px solid var(--line);
     border-radius: 8px; background: #000; display: block;
   }
+  .viewer-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .viewer-heading h2 { margin: 0 0 14px; }
+  .viewer-expand { padding: 8px 12px; margin-bottom: 14px; white-space: nowrap; }
+  body.viewer-expanded { overflow: hidden; }
+  #viewer-card.expanded {
+    position: fixed; inset: 10px; z-index: 1000; margin: 0; max-width: none;
+    overflow: auto; background: var(--panel); box-shadow: 0 12px 50px #000b;
+  }
+  #viewer-card.expanded iframe.viewer { height: min(78vh, 900px); }
   .imgs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 700px) { .imgs { grid-template-columns: 1fr; } }
   .imgs figure { margin: 0; }
@@ -112,6 +121,45 @@
     color: var(--accent); text-decoration: none; font-size: 14px; font-weight: 600;
   }
   a.btn-link:hover { text-decoration: underline; }
+
+  /* Keep the measurement flow comfortable on narrow touch screens. */
+  .wrap { width: min(100%, 1080px); }
+  button, input, .drop { touch-action: manipulation; }
+  .drop { -webkit-tap-highlight-color: transparent; }
+  .viewer { max-width: 100%; }
+  @media (max-width: 700px) {
+    .wrap { padding: 20px 14px 40px; }
+    header h1 { font-size: clamp(21px, 6vw, 25px); line-height: 1.2; }
+    header p { font-size: 14px; margin-bottom: 20px; }
+    .card { padding: 16px; margin-bottom: 14px; border-radius: 10px; }
+    .drops { gap: 12px; margin-bottom: 16px; }
+    .drop { min-height: 148px; padding: 14px; }
+    .drop img { max-height: 230px; object-fit: contain; }
+    .row { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: stretch; }
+    input[type=number] { width: 100%; min-height: 48px; }
+    button { min-height: 48px; width: 100%; }
+    .note { font-size: 12.5px; line-height: 1.5; }
+    .stlrow { align-items: stretch; }
+    .stlrow .stlnote { text-align: center; }
+    iframe.viewer { height: min(72vh, 620px); min-height: 360px; }
+    #viewer-card.expanded { inset: 0; border-radius: 0; padding: max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom)); }
+    #viewer-card.expanded iframe.viewer { height: calc(100dvh - 170px); min-height: 300px; }
+    .viewer-heading h2 { font-size: 15px; }
+    .viewer-expand { width: auto; min-height: 42px; padding: 8px 10px; font-size: 13px; }
+    table { table-layout: fixed; }
+    th, td { padding: 9px 6px; overflow-wrap: anywhere; }
+    th { font-size: 10px; letter-spacing: .02em; }
+    td { font-size: 13px; }
+    td.val { font-size: 15px; }
+    .pill { margin-left: 0; margin-top: 4px; }
+    pre.log { max-height: 180px; font-size: 11px; }
+  }
+  @media (max-width: 380px) {
+    .wrap { padding-inline: 10px; }
+    .card { padding: 13px; }
+    th, td { padding-inline: 4px; }
+    td.val { font-size: 14px; }
+  }
 </style>
 </head>
 <body>
@@ -119,7 +167,7 @@
 
   <header>
     <h1>Body Measurement from Two Photos</h1>
-    <p>Upload a front and side photo, enter your real height, and the pipeline reconstructs a 3D hull to measure from.</p>
+    <p>Choose front and side photos and enter your height. Photos are processed on this device; only silhouettes and pose landmarks are sent for measurement.</p>
   </header>
 
   <!-- ---------------- Input form ---------------- -->
@@ -129,7 +177,7 @@
         <input type="file" id="file-front" accept="image/*">
         <div class="placeholder">
           <div class="label">Front photo</div>
-          <div class="hint">Click or drop an image</div>
+          <div class="hint">Tap to choose or take a photo</div>
         </div>
         <img class="hidden" id="prev-front" alt="Front preview">
         <div class="fname" id="name-front"></div>
@@ -139,7 +187,7 @@
         <input type="file" id="file-side" accept="image/*">
         <div class="placeholder">
           <div class="label">Side photo</div>
-          <div class="hint">Click or drop an image</div>
+          <div class="hint">Tap to choose or take a photo</div>
         </div>
         <img class="hidden" id="prev-side" alt="Side preview">
         <div class="fname" id="name-side"></div>
@@ -162,10 +210,11 @@
       <b>Pose matters:</b> stand straight, arms hanging down but angled out roughly 15–20° so there is
       a visible gap between arm and torso — and keep that same angle in both photos. Arms flush against
       the body, or held straight out, both degrade the measurements.
-      Max {{ max_upload_mb }}MB total.
+      The browser processes the photos locally and uploads only the derived black-and-white masks and pose points ({{ max_upload_mb }}MB request limit).
     </div>
 
     <div class="banner err hidden" id="form-error"></div>
+    <div class="note hidden" id="local-status" aria-live="polite"></div>
   </section>
 
   <!-- ---------------- Progress ---------------- -->
@@ -199,9 +248,12 @@
   </section>
 
   <section class="card hidden" id="viewer-card">
-    <h2>3D reconstruction</h2>
+    <div class="viewer-heading">
+      <h2>3D reconstruction</h2>
+      <button type="button" class="viewer-expand" id="viewer-expand" aria-pressed="false">Expand view</button>
+    </div>
     <iframe class="viewer" id="viewer" title="3D hull viewer"></iframe>
-    <div class="note"><a class="btn-link" id="viewer-link" target="_blank" rel="noopener">Open viewer in a new tab ↗</a></div>
+    <div class="note"><a class="btn-link" id="viewer-link" target="_blank" rel="noopener">Open viewer in a separate tab ↗</a></div>
     <div class="stlrow">
       <button type="button" id="stl-btn">Download 3D model (.stl)</button>
       <span class="note stlnote" id="stl-note"></span>
@@ -227,6 +279,124 @@
   </section>
 
 </div>
+
+<script>
+const MEDIAPIPE_VERSION = "0.10.22-rc.20250304";
+const VISION_BUNDLE = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MEDIAPIPE_VERSION}/vision_bundle.mjs`;
+const WASM_ROOT = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MEDIAPIPE_VERSION}/wasm`;
+const MODEL_URL = "/models/pose_landmarker_heavy.task";
+const LANDMARK_MAP = {
+  left_shoulder: 11, right_shoulder: 12,
+  left_elbow: 13, right_elbow: 14,
+  left_wrist: 15, right_wrist: 16,
+  left_hip: 23, right_hip: 24,
+  left_ankle: 27, right_ankle: 28,
+};
+let landmarkerPromise;
+let visionTasksPromise;
+
+async function getLandmarker() {
+  if (!visionTasksPromise) visionTasksPromise = import(VISION_BUNDLE);
+  const { FilesetResolver, PoseLandmarker } = await visionTasksPromise;
+  if (!landmarkerPromise) {
+    landmarkerPromise = (async () => {
+      const vision = await FilesetResolver.forVisionTasks(WASM_ROOT);
+      const options = {
+        baseOptions: { modelAssetPath: MODEL_URL, delegate: "GPU" },
+        runningMode: "IMAGE", numPoses: 1, outputSegmentationMasks: true,
+        minPoseDetectionConfidence: 0.5, minPosePresenceConfidence: 0.5,
+      };
+      try { return await PoseLandmarker.createFromOptions(vision, options); }
+      catch (_) {
+        options.baseOptions.delegate = "CPU";
+        return PoseLandmarker.createFromOptions(vision, options);
+      }
+    })();
+  }
+  try { return await landmarkerPromise; }
+  catch (error) { landmarkerPromise = null; throw error; }
+}
+
+function toBlob(canvas) {
+  return new Promise((resolve, reject) => canvas.toBlob(
+    blob => blob ? resolve(blob) : reject(new Error("Could not encode the silhouette.")), "image/png"));
+}
+
+async function preparePhoto(file, label) {
+  // Reuse the preview image: browsers that can display it have already
+  // decoded it, and HTMLImageElement works on more mobile browsers than
+  // createImageBitmap(file) (notably for camera-library images).
+  const preview = document.getElementById(`prev-${label}`);
+  try { await preview.decode(); }
+  catch (_) {
+    const format = file.type || file.name.split(".").pop() || "unknown format";
+    const advice = /heic|heif/i.test(format)
+      ? "Export it as JPEG or PNG and select it again."
+      : "Try saving it as a standard JPEG or PNG and selecting it again.";
+    throw new Error(`This browser cannot decode the ${label} photo (${format}). ${advice}`);
+  }
+  const scale = Math.min(1, 1280 / preview.naturalWidth, 1920 / preview.naturalHeight);
+  const width = Math.max(1, Math.round(preview.naturalWidth * scale));
+  const height = Math.max(1, Math.round(preview.naturalHeight * scale));
+  const source = document.createElement("canvas");
+  source.width = width; source.height = height;
+  source.getContext("2d", { willReadFrequently: true }).drawImage(preview, 0, 0, width, height);
+  const detector = await getLandmarker();
+  let result;
+  try { result = detector.detect(source); }
+  catch (_) {
+    throw new Error(`MediaPipe could not read the ${label} photo. Try a standard JPEG or PNG image.`);
+  }
+  const points = result.landmarks?.[0];
+  const masks = result.segmentationMasks;
+  if (!points?.length || !masks?.length) {
+    masks?.forEach(mask => mask.close());
+    throw new Error(`Could not find a person in the ${label} photo. Use a clear, full-body photo.`);
+  }
+  const landmarks = {};
+  for (const [name, index] of Object.entries(LANDMARK_MAP)) {
+    const p = points[index];
+    if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) {
+      masks.forEach(mask => mask.close());
+      throw new Error(`Could not locate ${name.replaceAll("_", " ")} in the ${label} photo.`);
+    }
+    landmarks[name] = { x: p.x, y: p.y, visibility: p.visibility ?? 1 };
+  }
+
+  const mask = masks[0];
+  const mw = mask.width, mh = mask.height;
+  const values = mask.getAsFloat32Array();
+  const canvas = document.createElement("canvas");
+  // The returned mask can have a different raster size from the input.
+  // Re-sample it to the exact image dimensions so normalized landmarks and
+  // mask pixels share one coordinate system on the server.
+  canvas.width = width; canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  const pixels = ctx.createImageData(width, height);
+  for (let y = 0; y < height; y++) {
+    const sy = Math.min(mh - 1, Math.floor(y * mh / height));
+    for (let x = 0; x < width; x++) {
+      const sx = Math.min(mw - 1, Math.floor(x * mw / width));
+      const v = values[sy * mw + sx] >= 0.5 ? 255 : 0;
+      const j = (y * width + x) * 4;
+      pixels.data[j] = pixels.data[j + 1] = pixels.data[j + 2] = v;
+      pixels.data[j + 3] = 255;
+    }
+  }
+  ctx.putImageData(pixels, 0, 0);
+  masks.forEach(item => item.close());
+  const silhouette = await toBlob(canvas);
+  return { silhouette, landmarks: JSON.stringify(landmarks) };
+}
+
+window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
+  onProgress("Loading on-device pose model…");
+  const front = await preparePhoto(frontFile, "front");
+  onProgress("Extracting side silhouette on this device…");
+  const side = await preparePhoto(sideFile, "side");
+  return { front, side };
+};
+</script>
 
 <script>
 (function () {
@@ -262,6 +432,20 @@
   // ---- submit ----
   const runBtn = $("run");
   const formError = $("form-error");
+  const viewerCard = $("viewer-card");
+  const viewerExpand = $("viewer-expand");
+
+  viewerExpand.addEventListener("click", () => {
+    const expanded = viewerCard.classList.toggle("expanded");
+    document.body.classList.toggle("viewer-expanded", expanded);
+    viewerExpand.setAttribute("aria-pressed", String(expanded));
+    viewerExpand.textContent = expanded ? "Close expanded view" : "Expand view";
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && viewerCard.classList.contains("expanded")) {
+      viewerExpand.click();
+    }
+  });
 
   function showError(msg) {
     formError.textContent = msg;
@@ -277,29 +461,42 @@
     if (!files.front) return showError("Please choose a front photo.");
     if (!files.side) return showError("Please choose a side photo.");
     if (!height) return showError("Please enter your height in centimetres.");
-
-    const fd = new FormData();
-    fd.append("front", files.front);
-    fd.append("side", files.side);
-    fd.append("height", height);
+    if (typeof window.prepareAnthropometryInputs !== "function") {
+      return showError("The on-device photo processor is still loading. Wait a moment and try again.");
+    }
 
     runBtn.disabled = true;
-    runBtn.textContent = "Measuring…";
+    runBtn.textContent = "Preparing privately…";
     ["results-card", "flags-card", "viewer-card", "debug-card"].forEach((id) =>
       $(id).classList.add("hidden"));
     $("progress-card").classList.remove("hidden");
     $("log").textContent = "";
+    const localStatus = $("local-status");
+    localStatus.textContent = "Your photos are being processed on this device and are not uploaded.";
+    localStatus.classList.remove("hidden");
 
     let res, data;
     try {
+      const derived = await window.prepareAnthropometryInputs(files.front, files.side, (message) => {
+        $("step-label").textContent = message;
+      });
+      const fd = new FormData();
+      fd.append("front_mask", derived.front.silhouette, "front-silhouette.png");
+      fd.append("side_mask", derived.side.silhouette, "side-silhouette.png");
+      fd.append("front_landmarks", derived.front.landmarks);
+      fd.append("side_landmarks", derived.side.landmarks);
+      fd.append("height", height);
+      runBtn.textContent = "Measuring…";
       res = await fetch("/api/run", { method: "POST", body: fd });
       data = await res.json();
     } catch (e) {
       $("progress-card").classList.add("hidden");
-      return showError("Could not reach the server. Is app.py still running?");
+      localStatus.classList.add("hidden");
+      return showError(e.message || "Could not prepare the photos on this device. Check your connection and try again.");
     }
     if (!res.ok) {
       $("progress-card").classList.add("hidden");
+      localStatus.classList.add("hidden");
       return showError(data.error || "The run could not be started.");
     }
     poll(data.job_id);

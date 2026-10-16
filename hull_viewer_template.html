@@ -273,8 +273,25 @@
   }
   @media (max-width: 640px) {
     #legend { display: none; }
-    #hint { display: block; }
-    #titleblock { width: min(260px, 60vw); }
+    #masthead { top: 10px; left: 12px; }
+    #masthead h1 { font-size: 18px; }
+    #masthead p { display: none; }
+    #controls { top: 8px; right: 8px; gap: 4px; }
+    button.ctl { padding: 7px 9px; font-size: 9px; }
+    #titleblock {
+      display: none;
+      right: 8px;
+      bottom: 50px;
+      width: min(300px, calc(100vw - 16px));
+      max-height: calc(100dvh - 108px);
+      overflow-y: auto;
+    }
+    #titleblock.open { display: block; }
+    #btn-details { display: block; position: fixed; right: 8px; bottom: 8px; z-index: 5; }
+    #hint { display: block; left: 10px; bottom: 14px; transform: none; }
+  }
+  @media (min-width: 641px) {
+    #btn-details { display: none; }
   }
 
   #webgl-fallback {
@@ -304,6 +321,7 @@
   <button class="ctl label-face" id="btn-rotate" aria-pressed="true">Auto-rotate: On</button>
   <button class="ctl label-face" id="btn-reset">Reset view</button>
 </div>
+<button class="ctl label-face" id="btn-details" aria-expanded="false" aria-controls="titleblock">Show details</button>
 
 <div id="legend" aria-hidden="true">
   <div class="axis"><span class="swatch" style="background:var(--accent-warm)"></span><span class="txt">X &middot; width</span></div>
@@ -831,6 +849,12 @@
   });
   document.getElementById("btn-reset").addEventListener("click", function () {
     state.yaw = 0.6; state.pitch = 0.28; state.dist = initialDist;
+  });
+  var detailsButton = document.getElementById("btn-details");
+  detailsButton.addEventListener("click", function () {
+    var open = document.getElementById("titleblock").classList.toggle("open");
+    detailsButton.setAttribute("aria-expanded", String(open));
+    detailsButton.textContent = open ? "Hide details" : "Show details";
   });
 })();
 </script>

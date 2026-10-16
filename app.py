@@ -1,10 +1,10 @@
 """
 Web interface for the anthropometry pipeline (Steps 1-7).
 
-Takes the three real inputs the pipeline needs -- a front photo, a side
-photo, and the subject's true height -- and runs pipeline.py on them,
-streaming progress back to the browser and presenting the measurements,
-the pipeline's own reliability flags, and the interactive 3D hull viewer.
+The browser runs MediaPipe on the front and side photos locally and sends
+only binary silhouettes, normalized pose landmarks, and true height. The
+server runs pipeline.py on those derived inputs, streams progress, and
+presents measurements, reliability flags, and the interactive 3D hull viewer.
 
 Each submission runs in its own directory under runs/, as a subprocess
 with that directory as its working directory. The pipeline and its debug
@@ -37,8 +37,7 @@ from flask import Flask, jsonify, render_template, request, send_from_directory,
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 RUNS_DIR = os.path.join(PROJECT_ROOT, "runs")
 
-MAX_UPLOAD_BYTES = 40 * 1024 * 1024  # per request, both photos combined
-ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
+MAX_UPLOAD_BYTES = 40 * 1024 * 1024  # per request, both derived silhouettes combined
 
 # Physically sensible bounds for the height input. This is not a
 # cosmetic form check: height is the pipeline's *only* metric
@@ -84,6 +83,8 @@ STL_TIMEOUT_S = 900
 # how long each stage actually takes, not evenly by step number.
 PROGRESS_MARKERS = [
     ("Step 1:", 4, "Reading height calibration"),
+    ("[front] Using client-side silhouette", 10, "Using private front silhouette"),
+    ("[side] Using client-side silhouette", 35, "Using private side silhouette"),
     ("[front] Step 2:", 8, "Segmenting front photo (GrabCut)"),
     ("[front] Step 3:", 22, "Normalizing front pose"),
     ("[side] Step 2:", 32, "Segmenting side photo (GrabCut)"),
@@ -189,8 +190,10 @@ def _run_pipeline(job_id, job_dir, front_path, side_path, height_cm):
 
     cmd = [
         sys.executable, os.path.join(PROJECT_ROOT, "pipeline.py"),
-        "--front", front_path,
-        "--side", side_path,
+        "--front-mask", front_path,
+        "--side-mask", side_path,
+        "--front-landmarks", os.path.join(job_dir, "front_landmarks.json"),
+        "--side-landmarks", os.path.join(job_dir, "side_landmarks.json"),
         "--height", str(height_cm),
         "--debug",
     ]
@@ -373,39 +376,59 @@ def _fail_stl(job_id, part_path, message):
 # Upload validation
 # ---------------------------------------------------------------------------
 
-def _save_upload(file_storage, dest_dir, stem):
-    """
-    Validates an uploaded photo and saves it, returning (path, error).
-
-    The extension check is a cheap first pass; the decisive test is
-    decoding the bytes with the same library the pipeline itself uses,
-    so anything cv2.imread would later return None for is rejected here
-    -- while the user is still looking at the form -- instead of failing
-    several minutes into a run.
-    """
+def _save_silhouette(file_storage, dest_dir, stem):
+    """Accept only a binary mask image; never accept/store a source photo."""
     if file_storage is None or not file_storage.filename:
-        return None, "No file was selected."
-
-    ext = os.path.splitext(file_storage.filename)[1].lower()
-    if ext not in ALLOWED_EXTENSIONS:
-        shown = ext or "unknown"
-        return None, f"Unsupported file type '{shown}'. Use JPG, PNG, BMP or WEBP."
-
+        return None, "No silhouette was provided."
     data = file_storage.read()
     if not data:
-        return None, "The uploaded file is empty."
-
-    image = cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
-    if image is None:
-        return None, "That file could not be read as an image."
-
-    h, w = image.shape[:2]
+        return None, "The silhouette is empty."
+    mask = cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_GRAYSCALE)
+    if mask is None:
+        return None, "The silhouette image could not be decoded."
+    h, w = mask.shape
     if min(h, w) < 200:
-        return None, f"Image is too small ({w}x{h}px) to measure from; use a larger photo."
+        return None, f"The silhouette is too small ({w}x{h}px); use a larger photo."
+    # Reject ordinary photographs instead of silently thresholding them.
+    if not np.all((mask == 0) | (mask == 255)):
+        return None, "Only a black-and-white silhouette is accepted; original photos are not uploaded."
+    area = np.count_nonzero(mask) / mask.size
+    if area < 0.02 or area > 0.85:
+        return None, "The silhouette does not look like a full-body mask. Retake the photo."
+    path = os.path.join(dest_dir, stem + ".png")
+    if not cv2.imwrite(path, mask):
+        return None, "Could not save the silhouette."
+    return path, None
 
-    path = os.path.join(dest_dir, stem + ext)
-    with open(path, "wb") as f:
-        f.write(data)
+
+LANDMARK_NAMES = {
+    "left_shoulder", "right_shoulder", "left_elbow", "right_elbow",
+    "left_wrist", "right_wrist", "left_hip", "right_hip",
+    "left_ankle", "right_ankle",
+}
+
+
+def _save_landmarks(raw, dest_dir, stem):
+    try:
+        landmarks = json.loads(raw or "")
+    except (TypeError, json.JSONDecodeError):
+        return None, "Pose landmarks were missing or invalid."
+    if not isinstance(landmarks, dict) or not LANDMARK_NAMES.issubset(landmarks):
+        return None, "Pose landmarks are incomplete. Please retake the photo."
+    clean = {}
+    for name in LANDMARK_NAMES:
+        point = landmarks[name]
+        try:
+            x, y = float(point["x"]), float(point["y"])
+            visibility = float(point.get("visibility", 1.0))
+        except (TypeError, KeyError, ValueError, AttributeError):
+            return None, "Pose landmarks contain invalid coordinates."
+        if not (0 <= x <= 1 and 0 <= y <= 1 and 0 <= visibility <= 1):
+            return None, "Pose landmark coordinates are outside the image."
+        clean[name] = {"x": x, "y": y, "visibility": visibility}
+    path = os.path.join(dest_dir, stem + "_landmarks.json")
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(clean, f)
     return path, None
 
 
@@ -421,6 +444,13 @@ def index():
         max_height=MAX_HEIGHT_CM,
         max_upload_mb=MAX_UPLOAD_BYTES // (1024 * 1024),
     )
+
+
+@app.route("/models/pose_landmarker_heavy.task")
+def pose_model():
+    """Serve the same pinned MediaPipe model to the on-device browser runtime."""
+    return send_from_directory(PROJECT_ROOT, "pose_landmarker_heavy.task",
+                               mimetype="application/octet-stream", max_age=86400)
 
 
 @app.route("/api/run", methods=["POST"])
@@ -445,12 +475,18 @@ def api_run():
         shutil.rmtree(job_dir, ignore_errors=True)
         return jsonify({"error": message}), 400
 
-    front_path, err = _save_upload(request.files.get("front"), job_dir, "front")
+    front_path, err = _save_silhouette(request.files.get("front_mask"), job_dir, "front_mask")
     if err:
-        return reject(f"Front photo: {err}")
-    side_path, err = _save_upload(request.files.get("side"), job_dir, "side")
+        return reject(f"Front silhouette: {err}")
+    side_path, err = _save_silhouette(request.files.get("side_mask"), job_dir, "side_mask")
     if err:
-        return reject(f"Side photo: {err}")
+        return reject(f"Side silhouette: {err}")
+    _, err = _save_landmarks(request.form.get("front_landmarks"), job_dir, "front")
+    if err:
+        return reject(f"Front pose: {err}")
+    _, err = _save_landmarks(request.form.get("side_landmarks"), job_dir, "side")
+    if err:
+        return reject(f"Side pose: {err}")
 
     with _jobs_lock:
         _jobs[job_id] = _new_job(job_id, height_cm)
@@ -544,4 +580,6 @@ if __name__ == "__main__":
     # independent, so two are harmless.
     port = int(os.environ.get("PORT", "5000"))
     print(f"Anthropometry interface -> http://127.0.0.1:{port}")
-    app.run(host="127.0.0.1", port=port, threaded=True)
+    host = os.environ.get("HOST", "0.0.0.0")
+    print("For phone testing on the same Wi-Fi, open this computer's LAN address.")
+    app.run(host=host, port=port, threaded=True)

@@ -19,7 +19,8 @@ import numpy as np
 from grabcut import adaptive_contour_grabcut
 from mediapipe_silhouette import (extract_silhouette, extract_silhouette_landmark_prior,
                                   SilhouetteError)
-from pose_normalization import normalize_pose, PoseNormalizationError
+from pose_normalization import (normalize_pose, normalize_pose_from_landmarks,
+                                PoseNormalizationError)
 from visual_hull import (
     visual_hull, VisualHullError, save_debug_projections,
     mask_vertical_extent, body_center_x,
@@ -39,7 +40,27 @@ DEFAULT_HEIGHT_CM = 170.0
 
 
 def process_view(image_path, view_name, height_cm, debug=False,
-                 segmenter="mediapipe"):
+                 segmenter="mediapipe", mask_path=None, landmarks_path=None):
+    if mask_path and landmarks_path:
+        mask_image = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        if mask_image is None:
+            raise FileNotFoundError(f"Could not read silhouette: {mask_path}")
+        mask = (mask_image >= 128).astype(np.uint8)
+        with open(landmarks_path, "r", encoding="utf-8") as f:
+            landmarks = json.load(f)
+        h, w = mask.shape
+        # Client coordinates are normalized to the uploaded silhouette's dimensions.
+        for point in landmarks.values():
+            point["xy"] = [float(point["x"]) * w, float(point["y"]) * h]
+        image = np.repeat((mask * 255)[:, :, None], 3, axis=2)
+        print(f"[{view_name}] Using client-side silhouette and pose landmarks...")
+        normalized_mask, info = normalize_pose_from_landmarks(
+            mask, landmarks, image_bgr=image, debug=debug,
+            debug_path=f"debug_pose_normalization_{view_name}.png",
+        )
+        return {"image": image, "mask": mask,
+                "normalized_mask": normalized_mask, "pose_info": info}
+
     image = cv2.imread(image_path)
     if image is None:
         raise FileNotFoundError(f"Could not read image: {image_path}")
@@ -91,8 +112,12 @@ def process_view(image_path, view_name, height_cm, debug=False,
 
 def main():
     parser = argparse.ArgumentParser(description="Steps 1-7 of the anthropometry pipeline")
-    parser.add_argument("--front", required=True, help="Path to front-view photo")
-    parser.add_argument("--side", required=True, help="Path to side-view photo")
+    parser.add_argument("--front", help="Path to front-view photo (legacy server-side mode)")
+    parser.add_argument("--side", help="Path to side-view photo (legacy server-side mode)")
+    parser.add_argument("--front-mask", help="Client-extracted front silhouette PNG")
+    parser.add_argument("--side-mask", help="Client-extracted side silhouette PNG")
+    parser.add_argument("--front-landmarks", help="JSON front pose landmarks")
+    parser.add_argument("--side-landmarks", help="JSON side pose landmarks")
     parser.add_argument("--height", type=float, default=DEFAULT_HEIGHT_CM,
                          help=f"User height in cm (Step 1 placeholder, default {DEFAULT_HEIGHT_CM})")
     parser.add_argument("--debug", action="store_true", help="Write debug visualization images")
@@ -110,10 +135,22 @@ def main():
     print(f"Step 1: height = {args.height} cm (default placeholder)")
 
     try:
-        front_result = process_view(args.front, "front", args.height,
-                                    debug=args.debug, segmenter=args.segmenter)
-        side_result = process_view(args.side, "side", args.height,
-                                   debug=args.debug, segmenter=args.segmenter)
+        if all((args.front_mask, args.side_mask, args.front_landmarks, args.side_landmarks)):
+            front_result = process_view(None, "front", args.height, debug=args.debug,
+                                        mask_path=args.front_mask,
+                                        landmarks_path=args.front_landmarks)
+            side_result = process_view(None, "side", args.height, debug=args.debug,
+                                       mask_path=args.side_mask,
+                                       landmarks_path=args.side_landmarks)
+        elif any((args.front_mask, args.side_mask, args.front_landmarks, args.side_landmarks)):
+            raise ValueError("Provide both silhouette masks and both landmark files.")
+        else:
+            if not args.front or not args.side:
+                raise ValueError("Provide both client silhouettes and landmarks, or both photos.")
+            front_result = process_view(args.front, "front", args.height,
+                                        debug=args.debug, segmenter=args.segmenter)
+            side_result = process_view(args.side, "side", args.height,
+                                       debug=args.debug, segmenter=args.segmenter)
     except (FileNotFoundError, PoseNormalizationError, SilhouetteError) as e:
         print(f"ERROR: {e}", file=sys.stderr)
         sys.exit(1)

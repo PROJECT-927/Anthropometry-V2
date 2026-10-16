@@ -388,6 +388,28 @@ def normalize_pose(image_bgr, mask, debug=False, debug_path="debug_pose_normaliz
     debugging and, later, Step 7's uncertainty budget).
     """
     landmarks = detect_landmarks(image_bgr, mask=mask, model_complexity=model_complexity)
+    return normalize_pose_from_landmarks(mask, landmarks, image_bgr=image_bgr,
+                                         debug=debug, debug_path=debug_path)
+
+
+def normalize_pose_from_landmarks(mask, landmarks, image_bgr=None, debug=False,
+                                  debug_path="debug_pose_normalization.png"):
+    """Normalize a binary silhouette using already detected pixel landmarks.
+
+    This entry point lets a browser run MediaPipe locally and send only the
+    silhouette plus its landmark coordinates to the measurement server.
+    """
+    mask = (np.asarray(mask) > 0).astype(np.uint8)
+    if mask.ndim != 2 or not np.any(mask):
+        raise PoseNormalizationError("The uploaded silhouette is empty or invalid.")
+    missing = [n for n in PAIR_ORDER if n not in landmarks or "xy" not in landmarks[n]]
+    if missing:
+        raise PoseNormalizationError(f"Missing required pose landmarks: {', '.join(missing)}.")
+    landmarks = {
+        name: {"xy": np.asarray(value["xy"], dtype=float),
+               "visibility": float(value.get("visibility", 1.0))}
+        for name, value in landmarks.items()
+    }
     target = build_canonical_target(landmarks)
 
     src = np.array([landmarks[n]["xy"] for n in PAIR_ORDER])
@@ -443,7 +465,12 @@ def normalize_pose(image_bgr, mask, debug=False, debug_path="debug_pose_normaliz
     }
 
     if debug:
-        _save_debug_visualization(image_bgr, mask, normalized_mask, landmarks, target, src_after, debug_path)
+        # Deliberately use a silhouette-only background. The original photo
+        # never needs to reach the server for diagnostics either.
+        debug_image = (np.repeat((mask * 255)[:, :, None], 3, axis=2)
+                       if image_bgr is None else image_bgr)
+        _save_debug_visualization(debug_image, mask, normalized_mask, landmarks,
+                                  target, src_after, debug_path)
 
     return normalized_mask, info
 
