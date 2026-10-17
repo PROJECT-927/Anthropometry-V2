@@ -1,0 +1,27 @@
+{
+  "known_ellipse_historical_axes": [
+    155.3591750686138,
+    97.09948441788363
+  ],
+  "known_ellipse_corrected_axes": [
+    160.0,
+    100.0
+  ],
+  "pilot_from_displayed_values": {
+    "mae_cm": 2.692999999999999,
+    "rmse_cm": 3.134764743964051,
+    "mape_pct": 3.3897072431883597
+  },
+  "document_validation": {
+    "engine": "Tectonic 0.17.0 (XeTeX)",
+    "compile_exit_code": 0,
+    "pages": 27,
+    "unique_labels": 65,
+    "embedded_references": 14,
+    "overfull_boxes": 0,
+    "underfull_boxes": 0,
+    "undefined_references": 0,
+    "missing_characters": 0,
+    "external_content_files": 0
+  }
+}

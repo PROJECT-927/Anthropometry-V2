@@ -12,13 +12,15 @@ Usage:
 import argparse
 import json
 import sys
+import hashlib
+from pathlib import Path
 
 import cv2
 import numpy as np
 
 from grabcut import adaptive_contour_grabcut
 from mediapipe_silhouette import (extract_silhouette, extract_silhouette_landmark_prior,
-                                  SilhouetteError)
+                                  SilhouetteError, keep_largest_component, fill_small_holes)
 from pose_normalization import (normalize_pose, normalize_pose_from_landmarks,
                                 PoseNormalizationError)
 from visual_hull import (
@@ -34,18 +36,25 @@ from waist_correction import (
 from measurement_extraction import extract_measurements, MeasurementError, save_debug_ellipses
 from profile_carve import carve_from_front_profile, round_cross_sections
 from uncertainty_propagation import propagate_all
+from memory_diagnostics import memory_snapshot, tracked_call
+from voxel_memory import GridMemoryError
 
 # --- Step 1 placeholder --------------------------------------------------
 DEFAULT_HEIGHT_CM = 170.0
 
 
 def process_view(image_path, view_name, height_cm, debug=False,
-                 segmenter="mediapipe", mask_path=None, landmarks_path=None):
+                 segmenter="mediapipe", mask_path=None, landmarks_path=None,
+                 masks_preprocessed=False):
     if mask_path and landmarks_path:
         mask_image = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
         if mask_image is None:
             raise FileNotFoundError(f"Could not read silhouette: {mask_path}")
         mask = (mask_image >= 128).astype(np.uint8)
+        # Same binary cleanup as the original photo path. This operates only
+        # on the uploaded silhouette; source photos remain on the device.
+        if not masks_preprocessed:
+            mask = fill_small_holes(keep_largest_component(mask))
         with open(landmarks_path, "r", encoding="utf-8") as f:
             landmarks = json.load(f)
         h, w = mask.shape
@@ -118,6 +127,8 @@ def main():
     parser.add_argument("--side-mask", help="Client-extracted side silhouette PNG")
     parser.add_argument("--front-landmarks", help="JSON front pose landmarks")
     parser.add_argument("--side-landmarks", help="JSON side pose landmarks")
+    parser.add_argument("--masks-preprocessed", action="store_true",
+                        help="Browser already applied largest-component and small-hole cleanup")
     parser.add_argument("--height", type=float, default=DEFAULT_HEIGHT_CM,
                          help=f"User height in cm (Step 1 placeholder, default {DEFAULT_HEIGHT_CM})")
     parser.add_argument("--debug", action="store_true", help="Write debug visualization images")
@@ -133,15 +144,21 @@ def main():
     args = parser.parse_args()
 
     print(f"Step 1: height = {args.height} cm (default placeholder)")
+    if args.front_mask or args.side_mask:
+        print("[input] silhouette preprocessing: " + (
+            "browser-v2 (cleaned on device, cropped landmark refinement)"
+            if args.masks_preprocessed else "older client / CLI (binary cleanup on server)"))
 
     try:
         if all((args.front_mask, args.side_mask, args.front_landmarks, args.side_landmarks)):
             front_result = process_view(None, "front", args.height, debug=args.debug,
                                         mask_path=args.front_mask,
-                                        landmarks_path=args.front_landmarks)
+                                        landmarks_path=args.front_landmarks,
+                                        masks_preprocessed=args.masks_preprocessed)
             side_result = process_view(None, "side", args.height, debug=args.debug,
                                        mask_path=args.side_mask,
-                                       landmarks_path=args.side_landmarks)
+                                       landmarks_path=args.side_landmarks,
+                                       masks_preprocessed=args.masks_preprocessed)
         elif any((args.front_mask, args.side_mask, args.front_landmarks, args.side_landmarks)):
             raise ValueError("Provide both silhouette masks and both landmark files.")
         else:
@@ -161,11 +178,11 @@ def main():
 
     print("Step 4: Visual Hull 3D reconstruction...")
     try:
-        hull = visual_hull(
+        hull = tracked_call("hull:carve", visual_hull,
             front_result["normalized_mask"], side_result["normalized_mask"],
             height_cm=args.height, voxel_mm=args.voxel_mm, coarse_voxel_mm=args.coarse_voxel_mm,
         )
-    except VisualHullError as e:
+    except (VisualHullError, ValueError, MemoryError) as e:
         print(f"ERROR: {e}", file=sys.stderr)
         sys.exit(1)
 
@@ -173,17 +190,19 @@ def main():
     raw_occ = hull["occupied"]
     raw_count = int(raw_occ.sum())
 
-    cleaned_occ = keep_largest_3d_component(raw_occ)
+    cleaned_occ = tracked_call("hull:components:first", keep_largest_3d_component, raw_occ)
     n_debris = raw_count - int(cleaned_occ.sum())
     if n_debris > 0:
         print(f"  -> removed {n_debris:,} voxels of disconnected debris (not connected to the body in 3D)")
     hull["occupied"] = cleaned_occ
+    del raw_occ
 
-    smoothed_occ = smooth_hull_extents(hull)
+    smoothed_occ = tracked_call("hull:smooth", smooth_hull_extents, hull)
     n_trimmed = int(cleaned_occ.sum()) - int(smoothed_occ.sum())
     trimmed_frac = n_trimmed / max(int(cleaned_occ.sum()), 1)
     print(f"  -> smoothed per-row width/depth, trimmed {n_trimmed:,} outlier voxels ({trimmed_frac:.1%})")
     hull["occupied"] = smoothed_occ
+    del cleaned_occ
 
     # Needed here (not just at Step 5) -- moved up from where Step 5
     # used to compute these on its own, no longer duplicated there.
@@ -198,11 +217,12 @@ def main():
     shoulder_y_mm = (shoulder_row_px - front_top_row) * hull["front_scale_mm_per_px"]
     hip_y_mm = (hip_row_px - front_top_row) * hull["front_scale_mm_per_px"]
 
-    final_occ = keep_largest_3d_component(hull["occupied"])
+    final_occ = tracked_call("hull:components:second", keep_largest_3d_component, hull["occupied"])
     n_final = int(smoothed_occ.sum()) - int(final_occ.sum())
     if n_final > 0:
         print(f"  -> post-smoothing safety check removed {n_final:,} more disconnected voxels")
     hull["occupied"] = final_occ
+    del smoothed_occ, final_occ
 
     nx, ny, nz = hull["occupied"].shape
     n_occ = int(hull["occupied"].sum())
@@ -228,7 +248,7 @@ def main():
 
     print("Step 5: Curvature-based waist correction...")
     try:
-        correction = correct_waist(
+        correction = tracked_call("waist:correct", correct_waist,
             front_result["normalized_mask"], hull, shoulder_y_mm, hip_y_mm
         )
     except WaistCorrectionError as e:
@@ -249,11 +269,11 @@ def main():
     # duplicate arms/feet -- see profile_carve.py's module docstring.
     # Display only; Steps 6/7 below still measure from the original grid.
     try:
-        disp = carve_from_front_profile(
+        disp = tracked_call("display:carve", carve_from_front_profile,
             front_result["normalized_mask"], side_result["normalized_mask"],
             height_cm=args.height, voxel_mm=args.voxel_mm,
         )
-        display_occupied = round_cross_sections(
+        display_occupied = tracked_call("display:round", round_cross_sections,
             disp["occupied"], args.voxel_mm, limb_columns=disp["limb_columns"]
         )
         display_axes = (disp["x_mm"], disp["y_mm"], disp["z_mm"])
@@ -274,6 +294,9 @@ def main():
             f"{disp['occupied'].sum() * vox_l:.1f}L -> "
             f"{display_occupied.sum() * vox_l:.1f}L"
         )
+    except GridMemoryError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        sys.exit(1)
     except Exception as e:
         print(f"  ! profile carve failed ({e}); showing the unmodified hull instead")
         display_occupied = correction["corrected_occupied"]
@@ -289,6 +312,7 @@ def main():
         height_cm=args.height,
     )
     print("Wrote visual_hull_corrected.npz")
+    del display_occupied, display_axes
 
     if args.debug:
         save_debug_cross_section(hull, correction)
@@ -300,7 +324,7 @@ def main():
     side_top_row, side_bot_row = mask_vertical_extent(side_result["normalized_mask"])
     cx_s = body_center_x(side_result["normalized_mask"], side_top_row, side_bot_row)
     try:
-        measurements = extract_measurements(
+        measurements = tracked_call("measurements:extract", extract_measurements,
             front_result["normalized_mask"], side_result["normalized_mask"], hull, correction, front_landmarks,
             front_top_row, hull["front_scale_mm_per_px"], cx_f,
             side_top_row, hull["side_scale_mm_per_px"], cx_s,
@@ -399,4 +423,12 @@ def main():
 
 
 if __name__ == "__main__":
+    # Identify deployed allocation code; this distinguishes rebuilt images
+    # from an older image still running on the instance.
+    for name in ("visual_hull.py", "voxel_memory.py", "profile_carve.py",
+                 "waist_correction.py", "measurement_extraction.py"):
+        path = Path(__file__).with_name(name)
+        print(f"[build] {name}: {hashlib.sha256(path.read_bytes()).hexdigest()[:16]}", flush=True)
+    memory_snapshot("pipeline:start")
     main()
+    memory_snapshot("pipeline:complete")

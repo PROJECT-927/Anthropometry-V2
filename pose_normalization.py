@@ -37,9 +37,6 @@ straightforward generalization of the plan's equal-weight version.
 
 import cv2
 import numpy as np
-import mediapipe as mp
-from mediapipe.tasks import python as mp_python
-from mediapipe.tasks.python import vision as mp_vision
 
 # Landmark indices in MediaPipe Pose (same ordering as the old PoseLandmark enum)
 LANDMARK_INDEX = {
@@ -156,6 +153,12 @@ def detect_landmarks(image_bgr, mask=None, upscale_target=1024,
 
     Returns: {name: {"xy": np.array([x, y]), "visibility": float}}
     """
+    # The web pipeline already receives landmarks from the browser. Load the
+    # Python inference runtime only when using the legacy photo entry point.
+    import mediapipe as mp
+    from mediapipe.tasks import python as mp_python
+    from mediapipe.tasks.python import vision as mp_vision
+
     if image_bgr is None or image_bgr.size == 0:
         raise PoseNormalizationError("Empty image passed to detect_landmarks.")
 

@@ -33,6 +33,7 @@ from datetime import datetime
 import cv2
 import numpy as np
 from flask import Flask, jsonify, render_template, request, send_from_directory, abort
+from compute_queue import ComputeQueue
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 RUNS_DIR = os.path.join(PROJECT_ROOT, "runs")
@@ -52,6 +53,13 @@ app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_BYTES
 
 _jobs = {}
 _jobs_lock = threading.Lock()
+
+# Pipeline, viewer and STL exports share this budget. Web threads can keep
+# accepting requests without starting an unbounded number of memory-heavy jobs.
+_compute_queue = ComputeQueue(
+    workers=int(os.environ.get("MAX_CONCURRENT_COMPUTE_JOBS", "1")),
+    pending=int(os.environ.get("MAX_PENDING_COMPUTE_JOBS", "8")),
+)
 
 # STL export runs on demand rather than as part of every job: marching
 # cubes over a ~9M-voxel grid plus smoothing and decimation costs about
@@ -101,6 +109,7 @@ PROGRESS_MARKERS = [
 # fixed set of startup notices to stderr on every single run regardless
 # of outcome; showing them in the UI's log would bury the real output.
 NOISE_PATTERNS = [
+    re.compile(r"^\s*\[(?:memory|grid|build|timing)\]"),
     re.compile(r"^INFO: Created TensorFlow Lite"),
     re.compile(r"^WARNING: All log messages before"),
     re.compile(r"^W\d{4} "),
@@ -119,9 +128,9 @@ def _is_noise(line):
 def _new_job(job_id, height_cm):
     return {
         "id": job_id,
-        "state": "running",
+        "state": "queued",
         "progress": 2,
-        "step": "Starting",
+        "step": "Waiting for server capacity",
         "log": [],
         "error": None,
         "results": None,
@@ -141,10 +150,15 @@ def _update(job_id, **fields):
 
 
 def _append_log(job_id, line):
+    # Keep internal diagnostics in server/run logs, including export output,
+    # without exposing them in the browser's progress log.
+    if _is_noise(line):
+        return
     with _jobs_lock:
         job = _jobs.get(job_id)
         if job is not None:
             job["log"].append(line)
+            del job["log"][:-1000]
 
 
 _JOB_ID_RE = re.compile(r"^[0-9a-f]{12}$")
@@ -173,7 +187,7 @@ def _job_dir(job_id):
 # Pipeline execution
 # ---------------------------------------------------------------------------
 
-def _run_pipeline(job_id, job_dir, front_path, side_path, height_cm):
+def _run_pipeline(job_id, job_dir, front_path, side_path, height_cm, masks_preprocessed=False):
     """
     Runs pipeline.py, then export_hull_viewer.py, inside job_dir.
 
@@ -184,6 +198,7 @@ def _run_pipeline(job_id, job_dir, front_path, side_path, height_cm):
     the job's own folder, so the pipeline's sibling-module imports
     (grabcut, visual_hull, ...) would not otherwise resolve.
     """
+    _update(job_id, state="running", step="Starting")
     env = dict(os.environ)
     env["PYTHONPATH"] = PROJECT_ROOT + os.pathsep + env.get("PYTHONPATH", "")
     env["PYTHONUNBUFFERED"] = "1"  # progress must arrive line-by-line, not in a final flush
@@ -197,6 +212,8 @@ def _run_pipeline(job_id, job_dir, front_path, side_path, height_cm):
         "--height", str(height_cm),
         "--debug",
     ]
+    if masks_preprocessed:
+        cmd.append("--masks-preprocessed")
 
     try:
         proc = subprocess.Popen(
@@ -209,10 +226,52 @@ def _run_pipeline(job_id, job_dir, front_path, side_path, height_cm):
         return
 
     flags = []
-    ratios_ok = None
+    # Persist the complete log on the instance and forward diagnostic lines
+    # to the container log, so a remote failure can be investigated there.
+    log_file = open(os.path.join(job_dir, "pipeline.log"), "w", encoding="utf-8", buffering=1)
+    try:
+        _consume_pipeline_output(proc, job_id, flags, log_file)
+    finally:
+        log_file.close()
+        proc.stdout.close()
+        proc.wait()
 
+    with _jobs_lock:
+        recorded = list(_jobs.get(job_id, {}).get("log", []))
+    ratios_ok = not any(f.startswith("ratio check") for f in flags)
+
+    if proc.returncode != 0:
+        detail = next((line for line in reversed(recorded) if line.startswith("ERROR")), None)
+        if proc.returncode == -9:
+            detail = ("The server killed the pipeline (SIGKILL). Check the container's "
+                      "memory limit and host OOM events; see this run's pipeline.log.")
+        _update(job_id, state="error", flags=flags,
+                error=detail or f"The pipeline exited with code {proc.returncode}.")
+        app.logger.error("Pipeline job %s exited with code %s", job_id, proc.returncode)
+        return
+
+    results_path = os.path.join(job_dir, "measurements.json")
+    if not os.path.exists(results_path):
+        _update(job_id, state="error", flags=flags,
+                error="The pipeline finished but wrote no measurements.json.")
+        return
+
+    with open(results_path, "r", encoding="utf-8") as f:
+        results = json.load(f)
+
+    _update(job_id, progress=97, step="Building 3D viewer")
+    has_viewer = _export_viewer(job_id, job_dir, env)
+
+    _update(job_id, state="done", progress=100, step="Complete",
+            results=results, flags=flags, ratios_ok=ratios_ok, has_viewer=has_viewer)
+
+
+def _consume_pipeline_output(proc, job_id, flags, log_file):
     for raw in proc.stdout:
+        log_file.write(raw)
         line = raw.rstrip()
+        if line.startswith(("[memory]", "[grid]", "[build]", "[timing]")):
+            app.logger.warning("job=%s %s", job_id, line)
         if not line or _is_noise(line):
             continue
 
@@ -231,40 +290,6 @@ def _run_pipeline(job_id, job_dir, front_path, side_path, height_cm):
         stripped = line.strip()
         if stripped.startswith("! "):
             flags.append(stripped[2:].strip())
-        elif "ratio checks: all within expected bands" in stripped:
-            ratios_ok = True
-
-    proc.wait()
-
-    if ratios_ok is None:
-        ratios_ok = not any(f.startswith("ratio check") for f in flags)
-
-    if proc.returncode != 0:
-        with _jobs_lock:
-            log = list(_jobs.get(job_id, {}).get("log", []))
-        detail = next((l for l in reversed(log) if l.startswith("ERROR")), None)
-        _update(
-            job_id, state="error", flags=flags,
-            error=detail or f"The pipeline exited with code {proc.returncode}.",
-        )
-        return
-
-    results_path = os.path.join(job_dir, "measurements.json")
-    if not os.path.exists(results_path):
-        _update(job_id, state="error", flags=flags,
-                error="The pipeline finished but wrote no measurements.json.")
-        return
-
-    with open(results_path, "r", encoding="utf-8") as f:
-        results = json.load(f)
-
-    _update(job_id, progress=97, step="Building 3D viewer")
-    has_viewer = _export_viewer(job_id, job_dir, env)
-
-    _update(
-        job_id, state="done", progress=100, step="Complete",
-        results=results, flags=flags, ratios_ok=ratios_ok, has_viewer=has_viewer,
-    )
 
 
 def _export_viewer(job_id, job_dir, env):
@@ -282,6 +307,7 @@ def _export_viewer(job_id, job_dir, env):
         _append_log(job_id, f"(3D viewer export skipped: {e})")
         return False
 
+    _record_export_output(job_id, job_dir, "viewer.log", result)
     if result.returncode != 0:
         _append_log(job_id, "(3D viewer export failed; measurements are unaffected)")
         return False
@@ -290,6 +316,15 @@ def _export_viewer(job_id, job_dir, env):
         if line.strip():
             _append_log(job_id, line.strip())
     return os.path.exists(os.path.join(job_dir, "hull_viewer.html"))
+
+
+def _record_export_output(job_id, job_dir, filename, result):
+    output = (result.stdout or "") + (result.stderr or "")
+    with open(os.path.join(job_dir, filename), "w", encoding="utf-8") as f:
+        f.write(output)
+    for line in output.splitlines():
+        if line.startswith("[memory]"):
+            app.logger.warning("job=%s %s", job_id, line)
 
 
 # ---------------------------------------------------------------------------
@@ -327,6 +362,8 @@ def _export_stl(job_id, job_dir):
     it is the server doing the work, not the page -- but not the server
     itself being stopped.
     """
+    with _stl_lock:
+        _stl_jobs[job_id] = {"state": "running"}
     env = dict(os.environ)
     env["PYTHONPATH"] = PROJECT_ROOT + os.pathsep + env.get("PYTHONPATH", "")
     part = os.path.join(job_dir, STL_PART)
@@ -342,6 +379,7 @@ def _export_stl(job_id, job_dir):
         _fail_stl(job_id, part, f"The mesh export did not finish: {e}")
         return
 
+    _record_export_output(job_id, job_dir, "stl.log", result)
     if result.returncode != 0:
         detail = (result.stderr or result.stdout or "").strip().splitlines()
         _fail_stl(job_id, part,
@@ -491,12 +529,16 @@ def api_run():
     with _jobs_lock:
         _jobs[job_id] = _new_job(job_id, height_cm)
 
-    thread = threading.Thread(
-        target=_run_pipeline,
-        args=(job_id, job_dir, front_path, side_path, height_cm),
-        daemon=True,
+    submitted = _compute_queue.submit(
+        _run_pipeline, job_id, job_dir, front_path, side_path, height_cm,
+        request.form.get("preprocessing") == "browser-v2",
+        on_error=lambda error: _update(job_id, state="error", error=f"Pipeline failed: {error}"),
     )
-    thread.start()
+    if not submitted:
+        with _jobs_lock:
+            _jobs.pop(job_id, None)
+        shutil.rmtree(job_dir, ignore_errors=True)
+        return jsonify({"error": "The server queue is full. Please try again shortly."}), 429
 
     return jsonify({"job_id": job_id})
 
@@ -526,16 +568,23 @@ def api_job_stl(job_id):
         abort(404)
 
     status = _stl_status(job_id, job_dir)
-    if request.method == "GET" or status["state"] in ("ready", "running", "unavailable"):
+    if request.method == "GET" or status["state"] in ("ready", "queued", "running", "unavailable"):
         return jsonify(status)
 
     with _stl_lock:
-        if job_id in _stl_jobs and _stl_jobs[job_id].get("state") == "running":
+        if job_id in _stl_jobs and _stl_jobs[job_id].get("state") in ("queued", "running"):
             return jsonify(dict(_stl_jobs[job_id]))
-        _stl_jobs[job_id] = {"state": "running"}
+        _stl_jobs[job_id] = {"state": "queued"}
 
-    threading.Thread(target=_export_stl, args=(job_id, job_dir), daemon=True).start()
-    return jsonify({"state": "running"})
+    submitted = _compute_queue.submit(
+        _export_stl, job_id, job_dir,
+        on_error=lambda error: _fail_stl(job_id, os.path.join(job_dir, STL_PART), str(error)),
+    )
+    if not submitted:
+        with _stl_lock:
+            _stl_jobs.pop(job_id, None)
+        return jsonify({"state": "error", "error": "The server queue is full. Please retry shortly."}), 429
+    return jsonify(_stl_status(job_id, job_dir))
 
 
 @app.route("/runs/<job_id>/body.stl")

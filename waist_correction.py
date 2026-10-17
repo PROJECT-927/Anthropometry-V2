@@ -97,24 +97,19 @@ def _row_runs(cols):
     return [(int(cols[s]), int(cols[e])) for s, e in zip(starts, ends)]
 
 
-def _boundary_traces(front_mask, y0_row, y1_row, center_x_px):
+def _boundary_traces(front_mask, y0_row, y1_row, center_x_px, max_gap_rows=None):
     """
     Per-row torso-only left/right boundary column, y0_row..y1_row
     inclusive.
 
-    Arms hang alongside the body in these photos, so lower in the band
-    the mask often splits into 3 runs (left arm, torso, right arm) with
-    visible background gaps between them. Picking whichever run is
-    nearest the body centerline independently *per row* isn't reliable
-    -- a forearm can briefly sit closer to center than the torso itself,
-    which yanks the trace onto the arm for a few rows and fabricates a
-    fake pinch. Instead this tracks the torso run *continuously* from
-    the top of the band downward: row 0 (near the shoulders, where arms
-    are still flush against the body, so it's a single run) seeds the
-    track, and every row after that keeps whichever run's center is
-    closest to the previous row's -- the same continuity trick
-    grabcut.py's track_boundary_outside_in uses for the same reason.
+    The selected torso interval must straddle the supplied centreline.
+    Seeding from the widest run and following its centre can latch onto a
+    detached arm, even while a valid central torso run is present. Missing
+    central runs are gaps, rather than permission to switch onto a limb.
+    Only short internal gaps may be interpolated when max_gap_rows is set;
+    unsupported ends are trimmed rather than extrapolated.
     """
+    y0_row, y1_row = max(0, y0_row), min(front_mask.shape[0] - 1, y1_row)
     rows = np.arange(y0_row, y1_row + 1)
     left_x = np.full(len(rows), np.nan)
     right_x = np.full(len(rows), np.nan)
@@ -125,24 +120,36 @@ def _boundary_traces(front_mask, y0_row, y1_row, center_x_px):
     left_separated = np.zeros(len(rows), dtype=bool)
     right_separated = np.zeros(len(rows), dtype=bool)
 
-    prev_center = None
     for i, y in enumerate(rows):
         cols = np.where(front_mask[y] > 0)[0]
         runs = _row_runs(cols)
         if not runs:
             continue
 
-        if prev_center is None:
-            run = max(runs, key=lambda r: r[1] - r[0])
-        else:
-            run = min(runs, key=lambda r: abs(0.5 * (r[0] + r[1]) - prev_center))
+        central = [run for run in runs if run[0] < center_x_px < run[1]]
+        if not central:
+            continue
+        run = central[0]
 
         left_x[i] = run[0]
         right_x[i] = run[1]
-        prev_center = 0.5 * (run[0] + run[1])
         left_separated[i] = run[0] > cols[0] + 1
         right_separated[i] = run[1] < cols[-1] - 1
 
+    valid = np.flatnonzero(np.isfinite(left_x) & np.isfinite(right_x))
+    if len(valid) < 2:
+        raise WaistCorrectionError(
+            "Too few torso rows straddle the centreline in the requested band; "
+            "inspect the normalized silhouette and pose landmarks."
+        )
+    if max_gap_rows is not None and np.any(np.diff(valid) - 1 > max_gap_rows):
+        raise WaistCorrectionError(
+            "The torso silhouette has a gap across the centreline too large to "
+            "interpolate safely; inspect the normalized silhouette."
+        )
+    first, last = valid[0], valid[-1] + 1
+    rows, left_x, right_x = rows[first:last], left_x[first:last], right_x[first:last]
+    left_separated, right_separated = left_separated[first:last], right_separated[first:last]
     idx = np.arange(len(rows))
     for arr in (left_x, right_x):
         good = ~np.isnan(arr)
@@ -195,7 +202,8 @@ def trace_torso_boundary(front_mask, y0_mm, y1_mm, top_row, scale_mm_per_px, cen
         )
 
     rows, left_x, right_x, left_sep, right_sep = _boundary_traces(
-        front_mask, y0_row, y1_row, center_x_px
+        front_mask, y0_row, y1_row, center_x_px,
+        max_gap_rows=max(1, int(np.ceil(5.0 / scale_mm_per_px))),
     )
 
     # Drop the arm-fused prefix: while a side is still fused with the

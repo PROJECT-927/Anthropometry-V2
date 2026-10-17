@@ -22,6 +22,7 @@ import os
 
 import numpy as np
 from scipy.ndimage import binary_erosion
+from memory_diagnostics import memory_snapshot
 
 # Resolved relative to this script, not the working directory: the
 # template ships alongside the code, while the npz/json inputs and the
@@ -33,13 +34,20 @@ DEFAULT_NPZ_CANDIDATES = ["visual_hull_corrected.npz", "visual_hull.npz"]
 
 
 def extract_surface_points(occ, x_mm, y_mm, z_mm, height_mm, target_points, seed=42):
-    surface = occ & ~binary_erosion(occ)
-    ix, iy, iz = np.where(surface)
-    n_surface = len(ix)
-
-    xs = x_mm[ix]
-    ys = y_mm[iy]
-    zs = z_mm[iz]
+    surface = np.empty_like(occ, dtype=bool)
+    binary_erosion(occ, output=surface)
+    np.logical_not(surface, out=surface)
+    np.logical_and(occ, surface, out=surface)
+    indices = np.flatnonzero(surface)
+    n_surface = len(indices)
+    del surface
+    # Select before constructing three coordinate arrays. Flat indices follow
+    # the same C order as np.where, preserving the seeded point selection.
+    rng = np.random.default_rng(seed)
+    if n_surface > target_points:
+        indices = indices[rng.choice(n_surface, size=target_points, replace=False)]
+    ix, iy, iz = np.unravel_index(indices, occ.shape)
+    xs, ys, zs = x_mm[ix], y_mm[iy], z_mm[iz]
 
     # Viewer convention: Y-up, feet at y=0 (matches how people expect a
     # body to sit in a 3D view; the pipeline's own Y=0-at-head convention
@@ -47,12 +55,6 @@ def extract_surface_points(occ, x_mm, y_mm, z_mm, height_mm, target_points, seed
     vx = xs
     vy = height_mm - ys
     vz = zs
-
-    rng = np.random.default_rng(seed)
-    n = len(ix)
-    if n > target_points:
-        sel = rng.choice(n, size=target_points, replace=False)
-        vx, vy, vz = vx[sel], vy[sel], vz[sel]
 
     pts = np.stack([vx, vy, vz], axis=1)
     pts_i16 = np.round(pts).astype("<i2")
@@ -123,4 +125,6 @@ def main():
 
 
 if __name__ == "__main__":
+    memory_snapshot("viewer:start")
     main()
+    memory_snapshot("viewer:complete")

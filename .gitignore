@@ -20,6 +20,7 @@ crop_bottom_left.png
 # Per-run output directories created by the web interface (app.py).
 # These contain derived silhouettes, landmarks, voxel grids and measurements.
 runs/
+memory_profiles/
 
 # Local permission settings (machine-specific); launch.json (dev server
 # config) is still tracked, that's shared project infra.

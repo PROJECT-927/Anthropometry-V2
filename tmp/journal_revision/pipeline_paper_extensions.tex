@@ -1,0 +1,32 @@
+% Additional derivations inserted at their corresponding method locations by the builder.
+\subsection{Derivation of the weighted Procrustes solution}
+After eliminating translation, the objective in Eq.~\eqref{eq:procrustes_objective} becomes
+\begin{equation}
+E(\sigma,\mathbf R)=\sigma^2A_p+A_q-2\sigma\operatorname{tr}(\mathbf R\mathbf K),
+\end{equation}
+where $A_p=\sum_iw_i\|\mathbf p'_i\|^2$ and $A_q=\sum_iw_i\|\mathbf q'_i\|^2$. For fixed $\sigma>0$, minimizing error maximizes the trace subject to a proper rotation. With $\mathbf K=\mathbf U\mathbf\Sigma\mathbf V^\top$, determinant correction gives the maximizing trace $\operatorname{tr}(\mathbf\Sigma\mathbf S)$. Differentiating with respect to scale then yields $\sigma=\operatorname{tr}(\mathbf\Sigma\mathbf S)/A_p$. The transformation normalizes a global image-plane orientation; residual landmark error remains whenever the canonical targets require changes that no single similarity can represent. Consequently, reduced fitting residual should not be interpreted as validation of anatomical pose correction.
+
+\subsection{Local polynomial filters as explicit linear operators}
+For a window $r=-q,\ldots,q$, define $V_{rt}=r^t$ for $t=0,\ldots,p$. Its least-squares polynomial coefficients are $\hat{\boldsymbol\beta}=(\mathbf V^\top\mathbf V)^{-1}\mathbf V^\top\mathbf f$. The smoothed central value is $\mathbf e_0^\top\hat{\boldsymbol\beta}$, and the $k$th derivative estimate at physical spacing $\Delta$ is $k!\,\mathbf e_k^\top\hat{\boldsymbol\beta}/\Delta^k$. This representation explains both the filter's polynomial-preserving behavior and why differentiation amplifies high-frequency mask jitter. The executable smooths first and separately fits a parabola over an enclosing waist region; it does not obtain all curvature values by a single fixed derivative convolution.
+
+Window size has two interpretations. A $61$-row profile filter spans approximately $61s_s$\,mm, whereas a $15$-slice hull filter spans approximately $15h$\,mm. The former changes physical bandwidth with image scale and the latter with voxel spacing. Reproducing only the integer window widths without the associated scales is therefore insufficient. Filters near signal endpoints follow their library boundary conventions; they do not supply observations outside the captured region.
+
+\subsection{Morphology and distance-transform implementation}
+For set $S$ and structuring element $B_r$, erosion and dilation are $S\ominus B_r=\{x:x+B_r\subseteq S\}$ and $S\oplus B_r=\{x+b:x\in S,b\in B_r\}$. Opening and closing are
+\begin{equation}
+\operatorname{open}_r(S)=(S\ominus B_r)\oplus B_r,\qquad
+\operatorname{close}_r(S)=(S\oplus B_r)\ominus B_r.
+\end{equation}
+An opening removes shape features that cannot contain the selected element and is antiextensive; a closing can fill holes and narrow gaps. These are geometric regularizers, not learned anatomical reconstructions.
+
+The display code implements disk opening through Euclidean distance transforms. With $d_{S^c}$ denoting distance to background, the eroded set is $E=\{x:d_{S^c}(x)>r\}$ and the reconstructed opened set is $\{x:d_E(x)\le r\}$, with discrete strict/weak inequalities retained as written in the implementation. Padding each component by more than the radius makes the background convention explicit. The measurement code instead uses OpenCV's rasterized elliptical element, so the two discrete operators can disagree along the boundary even with the same nominal physical radius. Junction repair uses chessboard distance and is a third operator. These choices must be named when reproducing section shape or mesh volume.
+
+\subsection{Shoulder-tip fallback localization}
+When the shoulder arc cannot be used, tip localization searches from $Y_{\rm sh}-20$\,mm to $Y_{\rm sh}+0.40(Y_e-Y_{\rm sh})$, using the lower available elbow level $Y_e$. If no useful elbow level exists, the upper bound is $Y_{\rm sh}+0.18(Y_{\rm hip}-Y_{\rm sh})$. The boundary is traced without discarding the arm-fused prefix because the desired shoulder corner lies in that region. Each side's half-width uses a degree-two, maximum-nine-sample filter; its maximum defines a candidate tip. Reliability requires a decrease of at least $5$\,mm after the maximum within the same band. If either side fails that test, the method returns the normalized shoulder-landmark chord.
+
+For reliable tips $(x_L,Y_L)$ and $(x_R,Y_R)$, the projected breadth is $\sqrt{(x_R-x_L)^2+(Y_R-Y_L)^2}$. The ratio to the landmark chord is checked against $[1,1.5]$ only as an advisory. An arm posture can remove the taper feature entirely, so a silhouette maximum without the taper test is insufficient evidence of an acromion.
+
+\subsection{Surface smoothing and geometrical consistency}
+For a mesh vertex $\mathbf v_i$, a typical discrete Laplacian is $\Delta\mathbf v_i=\sum_{j\in\mathcal N(i)}w_{ij}(\mathbf v_j-\mathbf v_i)$. Alternating smoothing and expansion passes modifies the spectral response compared with repeated positive Laplacian smoothing~\cite{taubin1995signal}. The exported surface nevertheless depends on its neighbor weights, sign convention, number of passes, field blur, and mesh simplification. None of these operations directly constrains the three reported ellipse perimeters. The historical export passes \texttt{lamb=0.5} and \texttt{nu=-0.53} to the installed mesh library; their operational meaning must be checked against that version's API rather than inferred solely from symbols in a generic Taubin derivation.
+
+Consistency evaluation should slice the final exported triangle mesh at the same physical levels and report the perimeter discrepancy against each pipeline result, together with changes in volume and extents. The final mesh must also be checked for watertightness, component count, orientation, and self-intersection as appropriate to its intended use. A watertight mesh supports a volume calculation but does not establish accurate anatomical geometry.

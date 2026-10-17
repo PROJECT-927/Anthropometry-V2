@@ -280,6 +280,7 @@
 
 </div>
 
+<script src="/static/anthropometry-preprocessing.js?v=2"></script>
 <script>
 const MEDIAPIPE_VERSION = "0.10.22-rc.20250304";
 const VISION_BUNDLE = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MEDIAPIPE_VERSION}/vision_bundle.mjs`;
@@ -302,15 +303,13 @@ async function getLandmarker() {
     landmarkerPromise = (async () => {
       const vision = await FilesetResolver.forVisionTasks(WASM_ROOT);
       const options = {
-        baseOptions: { modelAssetPath: MODEL_URL, delegate: "GPU" },
+        // The original Python path used CPU inference. Use CPU/WASM here
+        // too, to avoid device-specific GPU precision differences.
+        baseOptions: { modelAssetPath: MODEL_URL, delegate: "CPU" },
         runningMode: "IMAGE", numPoses: 1, outputSegmentationMasks: true,
         minPoseDetectionConfidence: 0.5, minPosePresenceConfidence: 0.5,
       };
-      try { return await PoseLandmarker.createFromOptions(vision, options); }
-      catch (_) {
-        options.baseOptions.delegate = "CPU";
-        return PoseLandmarker.createFromOptions(vision, options);
-      }
+      return PoseLandmarker.createFromOptions(vision, options);
     })();
   }
   try { return await landmarkerPromise; }
@@ -338,53 +337,85 @@ async function preparePhoto(file, label) {
   const scale = Math.min(1, 1280 / preview.naturalWidth, 1920 / preview.naturalHeight);
   const width = Math.max(1, Math.round(preview.naturalWidth * scale));
   const height = Math.max(1, Math.round(preview.naturalHeight * scale));
+  const paddedWidth = width + (4 - width % 4) % 4;
   const source = document.createElement("canvas");
-  source.width = width; source.height = height;
-  source.getContext("2d", { willReadFrequently: true }).drawImage(preview, 0, 0, width, height);
+  source.width = paddedWidth; source.height = height;
+  const sourceCtx = source.getContext("2d", { willReadFrequently: true });
+  sourceCtx.drawImage(preview, 0, 0, width, height);
+  if (paddedWidth > width) {
+    sourceCtx.drawImage(source, width - 1, 0, 1, height, width, 0, paddedWidth - width, height);
+  }
   const detector = await getLandmarker();
   let result;
   try { result = detector.detect(source); }
   catch (_) {
     throw new Error(`MediaPipe could not read the ${label} photo. Try a standard JPEG or PNG image.`);
   }
-  const points = result.landmarks?.[0];
   const masks = result.segmentationMasks;
-  if (!points?.length || !masks?.length) {
+  if (!result.landmarks?.[0]?.length || !masks?.length) {
     masks?.forEach(mask => mask.close());
     throw new Error(`Could not find a person in the ${label} photo. Use a clear, full-body photo.`);
   }
+  let cleaned;
+  try {
+    const processor = window.AnthropometryPreprocessing;
+    if (!processor) throw new Error("The local silhouette processor did not load. Reload the page and retry.");
+    const mask = masks[0];
+    const binary = processor.resampleProbability(mask.getAsFloat32Array(), mask.width, mask.height,
+                                                width, height, paddedWidth);
+    cleaned = processor.cleanSilhouette(binary, width, height);
+  } finally {
+    masks.forEach(mask => mask.close());
+  }
+
+  // Match the old landmark pass: crop around the cleaned subject with 15%
+  // margin, upscale small crops, and map the detected coordinates back.
+  const crop = cleaned.crop;
+  const cropScale = Math.max(1, 1024 / Math.max(crop.width, crop.height));
+  const cropCanvas = document.createElement("canvas");
+  cropCanvas.width = Math.max(1, Math.floor(crop.width * cropScale));
+  cropCanvas.height = Math.max(1, Math.floor(crop.height * cropScale));
+  const cropCtx = cropCanvas.getContext("2d");
+  cropCtx.imageSmoothingQuality = "high";
+  cropCtx.drawImage(source, crop.x, crop.y, crop.width, crop.height,
+                    0, 0, cropCanvas.width, cropCanvas.height);
+  let refined;
+  try { refined = detector.detect(cropCanvas); }
+  catch (_) { throw new Error(`Could not refine the ${label} pose. Use a clear, full-body photo.`); }
+  const points = refined.landmarks?.[0];
+  refined.segmentationMasks?.forEach(mask => mask.close());
+  if (!points?.length) throw new Error(`Could not locate the ${label} pose in the subject crop.`);
   const landmarks = {};
   for (const [name, index] of Object.entries(LANDMARK_MAP)) {
     const p = points[index];
     if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) {
-      masks.forEach(mask => mask.close());
       throw new Error(`Could not locate ${name.replaceAll("_", " ")} in the ${label} photo.`);
     }
-    landmarks[name] = { x: p.x, y: p.y, visibility: p.visibility ?? 1 };
+    landmarks[name] = {
+      x: (crop.x + p.x * cropCanvas.width / cropScale) / width,
+      y: (crop.y + p.y * cropCanvas.height / cropScale) / height,
+      visibility: p.visibility ?? 1,
+    };
+  }
+  if (Object.values(landmarks).filter(point => point.visibility < 0.3).length > 3) {
+    throw new Error(`Too many low-confidence ${label} pose points. Use a clear, full-body photo.`);
   }
 
-  const mask = masks[0];
-  const mw = mask.width, mh = mask.height;
-  const values = mask.getAsFloat32Array();
   const canvas = document.createElement("canvas");
-  // The returned mask can have a different raster size from the input.
-  // Re-sample it to the exact image dimensions so normalized landmarks and
-  // mask pixels share one coordinate system on the server.
+  // Original photo and crop stay on this device. Encode only the cleaned
+  // binary silhouette, in the same dimensions as the normalized coordinates.
   canvas.width = width; canvas.height = height;
   const ctx = canvas.getContext("2d");
   const pixels = ctx.createImageData(width, height);
   for (let y = 0; y < height; y++) {
-    const sy = Math.min(mh - 1, Math.floor(y * mh / height));
     for (let x = 0; x < width; x++) {
-      const sx = Math.min(mw - 1, Math.floor(x * mw / width));
-      const v = values[sy * mw + sx] >= 0.5 ? 255 : 0;
+      const v = cleaned.mask[y * width + x] ? 255 : 0;
       const j = (y * width + x) * 4;
       pixels.data[j] = pixels.data[j + 1] = pixels.data[j + 2] = v;
       pixels.data[j + 3] = 255;
     }
   }
   ctx.putImageData(pixels, 0, 0);
-  masks.forEach(item => item.close());
   const silhouette = await toBlob(canvas);
   return { silhouette, landmarks: JSON.stringify(landmarks) };
 }
@@ -394,7 +425,7 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
   const front = await preparePhoto(frontFile, "front");
   onProgress("Extracting side silhouette on this device…");
   const side = await preparePhoto(sideFile, "side");
-  return { front, side };
+  return { front, side, preprocessing: "browser-v2" };
 };
 </script>
 
@@ -485,6 +516,7 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
       fd.append("side_mask", derived.side.silhouette, "side-silhouette.png");
       fd.append("front_landmarks", derived.front.landmarks);
       fd.append("side_landmarks", derived.side.landmarks);
+      fd.append("preprocessing", derived.preprocessing || "browser-v1");
       fd.append("height", height);
       runBtn.textContent = "Measuring…";
       res = await fetch("/api/run", { method: "POST", body: fd });
@@ -520,7 +552,7 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
       log.textContent = (job.log || []).join("\n");
       if (atBottom) log.scrollTop = log.scrollHeight;
 
-      if (job.state === "running") return;
+      if (job.state === "running" || job.state === "queued") return;
       clearInterval(timer);
       runBtn.disabled = false;
       runBtn.textContent = "Measure";
@@ -548,6 +580,10 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
       btn.textContent = "Download 3D model (.stl)";
       note.textContent = mb ? `Ready — ${mb.toFixed(1)} MB.` : "Ready.";
       btn.onclick = () => { window.location.href = "/runs/" + jobId + "/body.stl"; };
+    } else if (s.state === "queued") {
+      btn.disabled = true;
+      btn.textContent = "Waiting to build mesh…";
+      note.textContent = "Your mesh will start when the server has capacity.";
     } else if (s.state === "running") {
       btn.disabled = true;
       btn.textContent = "Building mesh…";
@@ -576,7 +612,7 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
       try {
         s = await (await fetch("/api/job/" + jobId + "/stl")).json();
       } catch (e) { return; }
-      if (s.state !== "running") clearInterval(stlTimer);
+      if (s.state !== "running" && s.state !== "queued") clearInterval(stlTimer);
       stlUI(jobId, s);
     }, 2000);
   }
@@ -586,7 +622,7 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
     try {
       const s = await (await fetch("/api/job/" + jobId + "/stl", { method: "POST" })).json();
       stlUI(jobId, s);
-      if (s.state === "running") watchStl(jobId);
+      if (s.state === "running" || s.state === "queued") watchStl(jobId);
     } catch (e) {
       stlUI(jobId, { state: "error", error: "Could not reach the server." });
     }
@@ -596,7 +632,7 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
     try {
       const s = await (await fetch("/api/job/" + jobId + "/stl")).json();
       stlUI(jobId, s);
-      if (s.state === "running") watchStl(jobId);
+      if (s.state === "running" || s.state === "queued") watchStl(jobId);
     } catch (e) { /* leave the button in its default state */ }
   }
 

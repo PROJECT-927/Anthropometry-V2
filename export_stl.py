@@ -39,6 +39,8 @@ import numpy as np
 import trimesh
 from scipy import ndimage
 from skimage import measure
+from voxel_memory import check_grid_size, component_counts
+from memory_diagnostics import memory_snapshot
 
 # Above this share of the grid, a disconnected piece is a limb rather
 # than carving debris and dropping it silently hides a broken mesh.
@@ -65,8 +67,7 @@ def largest_component(occupied):
     labels, n = ndimage.label(occupied)
     if n <= 1:
         return occupied, 0
-    sizes = np.bincount(labels.ravel())
-    sizes[0] = 0
+    sizes = component_counts(labels, n)
     keep = int(np.argmax(sizes))
     return labels == keep, int(occupied.sum() - sizes[keep])
 
@@ -127,13 +128,17 @@ def mesh_from_grid(occupied, x_mm, y_mm, z_mm, voxel_mm,
     # 0.5 on its way to zero, and the soles of the feet come out as an
     # open hole (measured: euler 15, watertight False).
     pad = int(np.ceil(3.0 * max(field_sigma, 0.0))) + 1
-    field = np.pad(occupied.astype(np.float32), pad, mode="constant", constant_values=0.0)
+    field_shape = tuple(size + 2 * pad for size in occupied.shape)
+    check_grid_size(field_shape, "padded STL field")
+    field = np.zeros(field_shape, dtype=np.float32)
+    field[pad:-pad, pad:-pad, pad:-pad] = occupied
     if field_sigma > 0:
-        field = ndimage.gaussian_filter(field, sigma=field_sigma)
+        ndimage.gaussian_filter(field, sigma=field_sigma, output=field)
 
     verts, faces, _normals, _values = measure.marching_cubes(
         field, level=0.5, spacing=(voxel_mm, voxel_mm, voxel_mm)
     )
+    del field, _normals, _values
     # Undo the pad, then place the grid back in world millimetres.
     verts -= pad * voxel_mm
     verts += np.array([x_mm[0], y_mm[0], z_mm[0]], dtype=verts.dtype)
@@ -239,4 +244,6 @@ def main():
 
 
 if __name__ == "__main__":
+    memory_snapshot("stl:start")
     main()
+    memory_snapshot("stl:complete")

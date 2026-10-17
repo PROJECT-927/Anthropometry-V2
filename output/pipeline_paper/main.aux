@@ -1,0 +1,192 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand*\HyPL@Entry[1]{}
+\HyPL@Entry{0<</S/D>>}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\citation{laurentini1994visual}
+\citation{loper2015smpl}
+\citation{varol2018bodynet}
+\citation{lugaresi2019mediapipe}
+\citation{mediapipeguide}
+\citation{schonemann1966generalized}
+\citation{savitzky1964smoothing}
+\citation{graham1972efficient}
+\citation{fitzgibbon1999direct}
+\citation{ramanujan1914modular}
+\citation{rother2004grabcut}
+\citation{lorensen1987marching}
+\citation{taubin1995signal}
+\citation{jcgm2008}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work and Methodological Position}{2}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Measurement Definitions and Camera Model}{3}{section.3}\protected@file@percent }
+\newlabel{sec:measurement_model}{{3}{3}{Measurement Definitions and Camera Model}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Measurands and surrogate outputs}{3}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Perspective formation and weak-perspective reduction}{3}{subsection.3.2}\protected@file@percent }
+\newlabel{eq:pinhole}{{3.1}{3}{Perspective formation and weak-perspective reduction}{equation.3.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Stature calibration and shared error}{3}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}What two extents do and do not determine}{4}{subsection.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Pipeline Architecture and Data Flow}{4}{section.4}\protected@file@percent }
+\newlabel{sec:system_pipeline}{{4}{4}{Pipeline Architecture and Data Flow}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Inputs, Assumptions, and Executable Data Flow}{4}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Perception, Pose Normalization, and Metric Coordinates}{4}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Silhouette Extraction and Boundary Conditioning}{4}{subsection.5.1}\protected@file@percent }
+\newlabel{subsec:segmentation}{{5.1}{4}{Silhouette Extraction and Boundary Conditioning}{subsection.5.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Implemented geometric branches. The profile carve supplies unrounded chest geometry and a separately rounded display volume; waist and hip use the corrected conventional hull. Profile failure routes chest and display to the corrected conventional hull. Shoulder and hip-to-ankle outputs are derived directly from masks/landmarks and are omitted from this volume diagram.}}{5}{figure.1}\protected@file@percent }
+\newlabel{fig:pipeline_flow}{{1}{5}{Implemented geometric branches. The profile carve supplies unrounded chest geometry and a separately rounded display volume; waist and hip use the corrected conventional hull. Profile failure routes chest and display to the corrected conventional hull. Shoulder and hip-to-ankle outputs are derived directly from masks/landmarks and are omitted from this volume diagram}{figure.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Implemented Data Flow and Measurement Provenance}}{6}{table.1}\protected@file@percent }
+\newlabel{tab:branch_provenance}{{1}{6}{Implemented Data Flow and Measurement Provenance}{table.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Notation and Coordinate Conventions}}{6}{table.2}\protected@file@percent }
+\newlabel{tab:notation}{{2}{6}{Notation and Coordinate Conventions}{table.2}{}}
+\newlabel{eq:mask}{{5.1}{6}{Silhouette Extraction and Boundary Conditioning}{equation.5.1}{}}
+\citation{rother2004grabcut}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Optional appearance-based segmentation paths}{7}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Landmark Localization and Weighted Similarity Normalization}{7}{subsection.5.3}\protected@file@percent }
+\newlabel{subsec:procrustes}{{5.3}{7}{Landmark Localization and Weighted Similarity Normalization}{subsection.5.3}{}}
+\newlabel{eq:procrustes_objective}{{5.4}{8}{Landmark Localization and Weighted Similarity Normalization}{equation.5.4}{}}
+\newlabel{eq:svd_cov}{{5.5}{8}{Landmark Localization and Weighted Similarity Normalization}{equation.5.5}{}}
+\newlabel{eq:rotation}{{5.6}{8}{Landmark Localization and Weighted Similarity Normalization}{equation.5.6}{}}
+\newlabel{eq:procrustes_scale_trans}{{5.7}{8}{Landmark Localization and Weighted Similarity Normalization}{equation.5.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Derivation of the weighted Procrustes solution}{8}{subsection.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Metric Calibration and Discrete Body Coordinates}{8}{subsection.5.5}\protected@file@percent }
+\newlabel{subsec:calibration}{{5.5}{8}{Metric Calibration and Discrete Body Coordinates}{subsection.5.5}{}}
+\newlabel{eq:scale_front}{{5.9}{8}{Metric Calibration and Discrete Body Coordinates}{equation.5.9}{}}
+\newlabel{eq:centerline}{{5.10}{8}{Metric Calibration and Discrete Body Coordinates}{equation.5.10}{}}
+\newlabel{eq:projection_coordinates}{{5.11}{8}{Metric Calibration and Discrete Body Coordinates}{equation.5.11}{}}
+\newlabel{eq:scale_prop}{{5.12}{9}{Metric Calibration and Discrete Body Coordinates}{equation.5.12}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Volumetric Reconstruction and Profile Carving}{9}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Conventional Hull and Coarse-to-Fine Domain Selection}{9}{subsection.6.1}\protected@file@percent }
+\newlabel{subsec:carving}{{6.1}{9}{Conventional Hull and Coarse-to-Fine Domain Selection}{subsection.6.1}{}}
+\newlabel{eq:cartesian_carve}{{6.1}{9}{Conventional Hull and Coarse-to-Fine Domain Selection}{equation.6.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Profile Core Estimation, Rejection, and Interpolation}{9}{subsection.6.2}\protected@file@percent }
+\newlabel{eq:depth_rejection1}{{6.3}{9}{Profile Core Estimation, Rejection, and Interpolation}{equation.6.3}{}}
+\newlabel{eq:depth_rejection2}{{6.4}{9}{Profile Core Estimation, Rejection, and Interpolation}{equation.6.4}{}}
+\newlabel{eq:sg_fit}{{6.5}{10}{Profile Core Estimation, Rejection, and Interpolation}{equation.6.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Local polynomial filters as explicit linear operators}{10}{subsection.6.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Asymmetric Occupancy and Columnwise Thickness Prior}{10}{subsection.6.4}\protected@file@percent }
+\newlabel{eq:asymmetric_carve}{{6.6}{10}{Asymmetric Occupancy and Columnwise Thickness Prior}{equation.6.6}{}}
+\newlabel{eq:depth_narrowing}{{6.7}{10}{Asymmetric Occupancy and Columnwise Thickness Prior}{equation.6.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5}Component Cleaning and Extent Regularization}{11}{subsection.6.5}\protected@file@percent }
+\newlabel{subsec:extent_reg}{{6.5}{11}{Component Cleaning and Extent Regularization}{subsection.6.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Anatomical Placement and Waist Shape Correction}{11}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Torso Isolation, Slice Levels, and Conditional Depth Caps}{11}{subsection.7.1}\protected@file@percent }
+\newlabel{subsec:anatomical_levels}{{7.1}{11}{Torso Isolation, Slice Levels, and Conditional Depth Caps}{subsection.7.1}{}}
+\newlabel{eq:waist_height}{{7.1}{11}{Torso Isolation, Slice Levels, and Conditional Depth Caps}{equation.7.1}{}}
+\newlabel{eq:chest_height}{{7.2}{11}{Torso Isolation, Slice Levels, and Conditional Depth Caps}{equation.7.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Waist Correction: Curvature Estimate and Actual Voxel Operator}{12}{subsection.7.2}\protected@file@percent }
+\newlabel{subsec:waist_correction}{{7.2}{12}{Waist Correction: Curvature Estimate and Actual Voxel Operator}{subsection.7.2}{}}
+\newlabel{eq:waist_curvature}{{7.4}{12}{Waist Correction: Curvature Estimate and Actual Voxel Operator}{equation.7.4}{}}
+\newlabel{eq:theta_arc}{{7.5}{12}{Waist Correction: Curvature Estimate and Actual Voxel Operator}{equation.7.5}{}}
+\newlabel{eq:sagitta}{{7.6}{12}{Waist Correction: Curvature Estimate and Actual Voxel Operator}{equation.7.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Cross-Section Geometry and Measurement Extraction}{13}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Cross-Section Conditioning and Convex Hull Extraction}{13}{subsection.8.1}\protected@file@percent }
+\newlabel{subsec:shape_regularization}{{8.1}{13}{Cross-Section Conditioning and Convex Hull Extraction}{subsection.8.1}{}}
+\newlabel{subsec:girth_extraction}{{8.1}{13}{Cross-Section Conditioning and Convex Hull Extraction}{subsection.8.1}{}}
+\newlabel{eq:disk_radius}{{8.1}{13}{Cross-Section Conditioning and Convex Hull Extraction}{equation.8.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Morphology and distance-transform implementation}{13}{subsection.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Centered Algebraic Conic Fit and Perimeter Evaluation}{13}{subsection.8.3}\protected@file@percent }
+\newlabel{subsec:conic_fit}{{8.3}{13}{Centered Algebraic Conic Fit and Perimeter Evaluation}{subsection.8.3}{}}
+\citation{fitzgibbon1999direct}
+\newlabel{eq:conic_normal_equations}{{8.6}{14}{Centered Algebraic Conic Fit and Perimeter Evaluation}{equation.8.6}{}}
+\newlabel{eq:ramanujan}{{8.10}{14}{Centered Algebraic Conic Fit and Perimeter Evaluation}{equation.8.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}Shoulder Arc, Fallback Measurements, and Inseam Proxy}{14}{subsection.8.4}\protected@file@percent }
+\newlabel{subsec:shoulder_arc}{{8.4}{14}{Shoulder Arc, Fallback Measurements, and Inseam Proxy}{subsection.8.4}{}}
+\newlabel{eq:shoulder_arc}{{8.12}{15}{Shoulder Arc, Fallback Measurements, and Inseam Proxy}{equation.8.12}{}}
+\newlabel{subsec:linear_measurements}{{8.4}{15}{Shoulder Arc, Fallback Measurements, and Inseam Proxy}{equation.8.12}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.5}Shoulder-tip fallback localization}{15}{subsection.8.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}Display Geometry, Mesh Export, and Output Provenance}{15}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}Display Regularization and Triangle-Mesh Export}{15}{subsection.9.1}\protected@file@percent }
+\newlabel{subsec:mesh_export}{{9.1}{15}{Display Regularization and Triangle-Mesh Export}{subsection.9.1}{}}
+\citation{taubin1995signal}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.2}Surface smoothing and geometrical consistency}{16}{subsection.9.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.3}Diagnostics, Outputs, and Reproducibility Contract}{16}{subsection.9.3}\protected@file@percent }
+\newlabel{subsec:reliability_flags}{{9.3}{16}{Diagnostics, Outputs, and Reproducibility Contract}{subsection.9.3}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Implemented Two-Branch Anthropometry Pipeline}}{17}{algorithm.1}\protected@file@percent }
+\newlabel{alg:implemented_pipeline}{{1}{17}{Diagnostics, Outputs, and Reproducibility Contract}{algorithm.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {10}Local Sensitivity and Uncertainty Accounting}{17}{section.10}\protected@file@percent }
+\newlabel{subsec:uncertainty_budget}{{10}{17}{Local Sensitivity and Uncertainty Accounting}{section.10}{}}
+\newlabel{eq:total_quadrature}{{10.1}{17}{Local Sensitivity and Uncertainty Accounting}{equation.10.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.1}Calibration endpoint sensitivity}{17}{subsection.10.1}\protected@file@percent }
+\newlabel{eq:scale_uncertainty_impl}{{10.2}{17}{Calibration endpoint sensitivity}{equation.10.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.2}Boundary-to-perimeter sensitivity}{18}{subsection.10.2}\protected@file@percent }
+\newlabel{eq:ramanujan_partial_a}{{10.3}{18}{Boundary-to-perimeter sensitivity}{equation.10.3}{}}
+\newlabel{eq:ramanujan_partial_b}{{10.4}{18}{Boundary-to-perimeter sensitivity}{equation.10.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.3}Conic coefficient sensitivity}{18}{subsection.10.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.4}Waist-curvature sensitivity}{18}{subsection.10.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.5}Depth-cap sensitivity and linear-output approximation}{19}{subsection.10.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.6}Systematic errors outside the local budget}{19}{subsection.10.6}\protected@file@percent }
+\newlabel{subsec:systematic_errors}{{10.6}{19}{Systematic errors outside the local budget}{subsection.10.6}{}}
+\newlabel{eq:boundary_bias}{{10.12}{19}{Systematic errors outside the local budget}{equation.10.12}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {11}Pilot Evaluation and Reported Observations}{19}{section.11}\protected@file@percent }
+\newlabel{sec:pilot}{{11}{19}{Pilot Evaluation and Reported Observations}{section.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {11.1}Evidence provenance and acquisition}{19}{subsection.11.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {11.2}Error definitions and pilot accuracy}{20}{subsection.11.2}\protected@file@percent }
+\newlabel{eq:error_metrics}{{11.1}{20}{Error definitions and pilot accuracy}{equation.11.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Historical pilot tape comparisons. All dimensional values are in cm. Local interval widths are the reported sensitivity outputs, not established confidence limits.}}{20}{table.3}\protected@file@percent }
+\newlabel{tab:pilot_measurements}{{3}{20}{Historical pilot tape comparisons. All dimensional values are in cm. Local interval widths are the reported sensitivity outputs, not established confidence limits}{table.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Pilot aggregate errors as reported in the source manuscript. Small rounding differences can arise when recomputing from the displayed two-decimal site values.}}{20}{table.4}\protected@file@percent }
+\newlabel{tab:aggregate_error}{{4}{20}{Pilot aggregate errors as reported in the source manuscript. Small rounding differences can arise when recomputing from the displayed two-decimal site values}{table.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {11.3}Segmentation behavior and repeated-run reproducibility}{21}{subsection.11.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Reported foreground fractions of the learned-mask and classical GrabCut paths. Large foreground fractions identify a failure on the S2 captures; these fractions alone are not segmentation ground truth.}}{21}{table.5}\protected@file@percent }
+\newlabel{tab:segmentation_comparison}{{5}{21}{Reported foreground fractions of the learned-mask and classical GrabCut paths. Large foreground fractions identify a failure on the S2 captures; these fractions alone are not segmentation ground truth}{table.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {11.4}Shoulder-definition comparison}{21}{subsection.11.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Historical shoulder predictions under different measurement definitions. Values are in cm.}}{21}{table.6}\protected@file@percent }
+\newlabel{tab:shoulder_comparison}{{6}{21}{Historical shoulder predictions under different measurement definitions. Values are in cm}{table.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {11.5}Stature perturbation and mesh consistency}{21}{subsection.11.5}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Reported output sensitivity to stature input on S3. Values and total spreads are in cm.}}{22}{table.7}\protected@file@percent }
+\newlabel{tab:stature_pert}{{7}{22}{Reported output sensitivity to stature input on S3. Values and total spreads are in cm}{table.7}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Reported S3 mesh-section comparison. The mesh and measurement sections come from different processing paths.}}{22}{table.8}\protected@file@percent }
+\newlabel{tab:mesh_slice}{{8}{22}{Reported S3 mesh-section comparison. The mesh and measurement sections come from different processing paths}{table.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {11.6}Coverage of local sensitivity intervals}{22}{subsection.11.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {12}Implementation Audit, Limitations, and Validation Requirements}{22}{section.12}\protected@file@percent }
+\newlabel{sec:discussion}{{12}{22}{Implementation Audit, Limitations, and Validation Requirements}{section.12}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.1}Conic sign discrepancy and consequences for existing results}{22}{subsection.12.1}\protected@file@percent }
+\newlabel{subsec:conic_audit}{{12.1}{22}{Conic sign discrepancy and consequences for existing results}{subsection.12.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.2}Other implementation limitations}{23}{subsection.12.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.3}Limits of the available evidence}{23}{subsection.12.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.4}Experiments needed for a journal submission}{23}{subsection.12.4}\protected@file@percent }
+\gdef \LT@i {\LT@entry 
+    {1}{165.6447pt}\LT@entry 
+    {1}{276.6107pt}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.5}Extensions kept separate from the implemented method}{24}{subsection.12.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {13}Conclusion}{24}{section.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {A}Executable Modules, Parameters, and Reproduction}{24}{appendix.A}\protected@file@percent }
+\newlabel{app:reproduction}{{A}{24}{Executable Modules, Parameters, and Reproduction}{appendix.A}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {9}{Module responsibilities in the inspected historical source.}}{24}{table.9}\protected@file@percent }
+\newlabel{tab:modules}{{9}{24}{Module responsibilities in the inspected historical source}{table.9}{}}
+\gdef \LT@ii {\LT@entry 
+    {1}{145.72786pt}\LT@entry 
+    {1}{105.89418pt}\LT@entry 
+    {1}{202.63338pt}}
+\@writefile{lot}{\contentsline {table}{\numberline {10}{Core parameter values and their interpretation.}}{25}{table.10}\protected@file@percent }
+\newlabel{tab:parameters}{{10}{25}{Core parameter values and their interpretation}{table.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.1}Command-line reproduction}{26}{subsection.A.1}\protected@file@percent }
+\bibcite{laurentini1994visual}{1}
+\bibcite{loper2015smpl}{2}
+\bibcite{varol2018bodynet}{3}
+\bibcite{lugaresi2019mediapipe}{4}
+\bibcite{mediapipeguide}{5}
+\bibcite{schonemann1966generalized}{6}
+\bibcite{savitzky1964smoothing}{7}
+\bibcite{graham1972efficient}{8}
+\bibcite{fitzgibbon1999direct}{9}
+\bibcite{ramanujan1914modular}{10}
+\bibcite{rother2004grabcut}{11}
+\bibcite{lorensen1987marching}{12}
+\bibcite{taubin1995signal}{13}
+\bibcite{jcgm2008}{14}
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.2}Deterministic verification checks}{27}{subsection.A.2}\protected@file@percent }
+\gdef \@abspage@last{27}

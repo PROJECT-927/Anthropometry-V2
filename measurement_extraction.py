@@ -32,7 +32,8 @@ import numpy as np
 import cv2
 
 from visual_hull import slice_at_height
-from waist_correction import trace_torso_boundary, validate_ratios, find_shoulder_tips
+from waist_correction import (trace_torso_boundary, validate_ratios, find_shoulder_tips,
+                              WaistCorrectionError)
 
 # noqa: re-exported for pipeline.py's convenience
 __all__ = [
@@ -578,7 +579,7 @@ def measure_inseam(hip_y_mm, ankle_y_mm):
     return float(ankle_y_mm - hip_y_mm)
 
 
-def _torso_bounds_at(mask, y_mm, top_row, scale_mm_per_px, center_x_px, band_mm=40.0, percentile=15.0):
+def _torso_bounds_at(mask, y_mm, top_row, scale_mm_per_px, center_x_px, band_mm=40.0, percentile=15.0, view_name=None):
     """
     Torso half-widths at a specific height, from either the front mask
     (giving X bounds) or the side mask (giving Z bounds) -- built on the
@@ -599,7 +600,11 @@ def _torso_bounds_at(mask, y_mm, top_row, scale_mm_per_px, center_x_px, band_mm=
     """
     y0 = max(0.0, y_mm - band_mm)
     y1 = y_mm + band_mm
-    trace = trace_torso_boundary(mask, y0, y1, top_row, scale_mm_per_px, center_x_px)
+    context = f"{view_name} view at y={y_mm:.0f}mm" if view_name else f"y={y_mm:.0f}mm"
+    try:
+        trace = trace_torso_boundary(mask, y0, y1, top_row, scale_mm_per_px, center_x_px)
+    except WaistCorrectionError as error:
+        raise MeasurementError(f"Torso boundary trace ({context}): {error}") from error
     left = float(np.percentile(trace["half_width_left_mm"], percentile))
     right = float(np.percentile(trace["half_width_right_mm"], percentile))
 
@@ -615,7 +620,7 @@ def _torso_bounds_at(mask, y_mm, top_row, scale_mm_per_px, center_x_px, band_mm=
     # the cause is visible.
     if left <= 0.0 or right <= 0.0:
         raise MeasurementError(
-            f"Torso boundary trace at y={y_mm:.0f}mm crossed the centreline "
+            f"Torso boundary trace ({context}) crossed the centreline "
             f"(left={-left:.0f}mm, right={right:.0f}mm) -- the traced edge is "
             f"following a limb, not the torso, so this height is unusable."
         )
@@ -781,8 +786,8 @@ def extract_measurements(front_mask, side_mask, hull, waist_correction, landmark
         return False
 
     def torso_bounds(y_mm, label):
-        x_lo, x_hi = _torso_bounds_at(front_mask, y_mm, front_top_row, front_scale_mm_per_px, front_center_x_px)
-        z_lo, z_hi = _torso_bounds_at(side_mask, y_mm, side_top_row, side_scale_mm_per_px, side_center_x_px)
+        x_lo, x_hi = _torso_bounds_at(front_mask, y_mm, front_top_row, front_scale_mm_per_px, front_center_x_px, view_name="front")
+        z_lo, z_hi = _torso_bounds_at(side_mask, y_mm, side_top_row, side_scale_mm_per_px, side_center_x_px, view_name="side")
         x_bounds = (x_lo * torso_margin, x_hi * torso_margin)
         z_bounds = (z_lo * torso_margin, z_hi * torso_margin)
         depth_before = z_bounds[1] - z_bounds[0]
@@ -803,7 +808,8 @@ def extract_measurements(front_mask, side_mask, hull, waist_correction, landmark
         # across. Z is left unclipped: this grid's depth at this row is
         # already the body core, so there is nothing to cap.
         chest_x_lo, chest_x_hi = _torso_bounds_at(
-            front_mask, chest_y_mm, front_top_row, front_scale_mm_per_px, front_center_x_px
+            front_mask, chest_y_mm, front_top_row, front_scale_mm_per_px, front_center_x_px,
+            view_name="front",
         )
         chest_x = (chest_x_lo * torso_margin, chest_x_hi * torso_margin)
         depth_cap_removed_mm["chest"] = 0.0

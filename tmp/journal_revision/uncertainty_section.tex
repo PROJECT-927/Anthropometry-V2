@@ -1,0 +1,68 @@
+\subsection{Analytical Five-Term Uncertainty Budget}
+\label{subsec:uncertainty_budget}
+For measurement $C=f(\mathbf x)$ and input covariance $\mathbf\Sigma_x$, first-order propagation is $\operatorname{Var}(C)\simeq\mathbf J_f\mathbf\Sigma_x\mathbf J_f^\top$. The implementation simplifies this to a root-sum-of-squares sensitivity budget,
+\begin{equation}
+\delta=\sqrt{\delta_s^2+\delta_b^2+\delta_c^2+\delta_e^2+\delta_d^2}.
+\label{eq:total_quadrature}
+\end{equation}
+This assumes independent contributions even though calibration, boundary, curvature, and ellipse residuals can originate in the same masks. The following equations describe the actual budget and its approximations. No coverage multiplier or calibrated error distribution is applied, so $\hat C\pm\delta$ is not established as a $95\%$ confidence interval despite that phrase in the historical console output.
+
+\subsubsection{Calibration endpoint sensitivity}
+The assumed endpoint positional scale is $\sigma_{\rm px}=1.5$\,px. It is a fixed modeling parameter rather than a standard deviation estimated for each learned mask. Independent top/bottom endpoint perturbations give $\sigma_{L_v}=\sqrt2\sigma_{\rm px}$ and $r_v=\sqrt2\sigma_{\rm px}/L_v$. The implemented girth term is
+\begin{equation}
+\delta_s=C\sqrt{r_f^2+r_s^2}.
+\label{eq:scale_uncertainty_impl}
+\end{equation}
+This assigns full relative girth sensitivity to each view's scale. A more specific ellipse model with $a\propto s_f$ and $b\propto s_s$ would instead use $\delta_{s,\rm axes}^2=(P_a a r_f)^2+(P_b b r_s)^2$, subject to axis orientation and correspondence. This refinement is not substituted into the reported experiments. A supplied-stature uncertainty $\sigma_H$ would contribute a common term approximately $(C\sigma_H/H)^2$; it is absent from Eq.~\eqref{eq:scale_uncertainty_impl} and must not be counted independently twice.
+
+\subsubsection{Boundary-to-perimeter sensitivity}
+For $Q=(3a+b)(a+3b)$, differentiating Eq.~\eqref{eq:ramanujan} gives
+\begin{align}
+P_a&=\pi\left(3-\frac{3a+5b}{\sqrt Q}\right),\label{eq:ramanujan_partial_a}\\
+P_b&=\pi\left(3-\frac{5a+3b}{\sqrt Q}\right).\label{eq:ramanujan_partial_b}
+\end{align}
+Using $\bar s=(s_f+s_s)/2$, the code sets both semiaxis perturbations to $\sigma_{\rm axis}=\sigma_{\rm px}\bar s$, hence
+\begin{equation}
+\delta_b=\sigma_{\rm axis}\sqrt{P_a^2+P_b^2}.
+\end{equation}
+This is an equal-axis independent-noise approximation, not a propagation of every contour pixel. It omits correlated contour displacement and systematic boundary bias. The latter produces the separate first-order circumference shift $2\pi b_{\rm px}s$ in Eq.~\eqref{eq:boundary_bias} under uniform physical offset.
+
+\subsubsection{Conic coefficient sensitivity}
+For algebraic residuals $\mathbf r=\mathbf M\boldsymbol\phi+\mathbf1$, $n>5$ vertices give
+\begin{equation}
+\hat\sigma_r^2=\frac{\mathbf r^\top\mathbf r}{n-5},\qquad
+\mathbf\Sigma_\phi=\hat\sigma_r^2(\mathbf M^\top\mathbf M)^{-1}.
+\end{equation}
+The coefficient-to-perimeter Jacobian is estimated by central differences,
+\begin{equation}
+J_i\simeq\frac{P(\boldsymbol\phi+\epsilon_i\mathbf e_i)-P(\boldsymbol\phi-\epsilon_i\mathbf e_i)}{2\epsilon_i},
+\end{equation}
+with $\epsilon_i=\max(10^{-4}|\phi_i|,10^{-10})$, followed by
+\begin{equation}
+\delta_e=\sqrt{\max(\mathbf J\mathbf\Sigma_\phi\mathbf J^\top,0)}.
+\end{equation}
+A missing covariance, including an exactly five-point fit, currently returns zero; invalid perturbed conics leave the corresponding derivative at zero. Those are software fallbacks, not evidence of zero uncertainty. Moreover, hull vertices are selected from noisy predictors, so the fixed-design, independent-residual assumptions behind ordinary least-squares covariance are approximate. A small $\delta_e$ cannot establish that the ellipse matches anatomical shape.
+
+\subsubsection{Waist-curvature sensitivity}
+If a parabola-fit coefficient covariance is available, the code uses $\sigma_\kappa=2\sqrt{\operatorname{Var}(\alpha)}$. It differentiates the area surrogate $A_{\rm miss}(\kappa,L)$ numerically with $L$ fixed, combines the two sides, and converts area sensitivity to a circumference sensitivity using an equivalent circle:
+\begin{equation}
+\delta_c=\sqrt{\frac\pi{A_{\rm corr}}}
+\sqrt{\sum_{j\in\{L,R\}}\left(\frac{\partial A_{{\rm miss},j}}{\partial\kappa_j}\sigma_{\kappa_j}\right)^2}.
+\end{equation}
+The finite-difference step is $\max(10^{-3}|\kappa|,10^{-9})$. This is not the derivative of the full voxel deletion and conic-fitting chain. The surrogate omits the $40\%$ width clamp, prominence gating, and discrete changes in the enclosing region. In addition, the historical curvature-propagation routine retrieves the trace's narrowest-row index, while the default applied correction uses the proportional-waist index. Their mismatch must be resolved and the results recomputed before presenting this term as a complete propagation of the applied correction.
+
+\subsubsection{Depth-cap sensitivity and linear-output approximation}
+For removed depth $\Delta D>0$, the code uses
+\begin{equation}
+\delta_d=|P_b|\Delta D/2,
+\end{equation}
+treating the capped depth as the minor-axis dimension. This is a displacement-based allowance for reliance on a prior, not a variance estimated from independent observations. Axis rotation can weaken that correspondence. No analogous quantified term currently accounts for a profile depth interpolated across an occluded chest band; that limitation is reported in a log advisory.
+
+For a linear value $L$, the implementation reports
+\begin{equation}
+\delta_{\rm lin}=\sqrt{(Lr_f)^2+2(\sigma_{\rm px}s_f)^2}.
+\end{equation}
+It applies this expression both to the hip-to-ankle proxy and to shoulder output, including when shoulder is a two-view arc. In the latter case it omits the profile and arc-model sensitivities. A branch-consistent shoulder-arc budget would require, at minimum, $\operatorname{Var}(S)\simeq(P_a\sigma_W/4)^2+(P_b\sigma_D/4)^2$ plus covariance, stature, endpoint-placement, and model terms. That is a proposed correction, not the budget used for the existing results.
+
+The budget is consequently a conditional local sensitivity report. It excludes shape nonidentifiability, capture bias, stature misreporting, shoulder definition mismatch, tape repeatability, and much of occlusion interpolation error. The observed coverage of $2/10$ reference values is consistent with these omissions and does not validate a nominal confidence level. Geometric admissible intervals, local numerical sensitivity, and empirically calibrated measurement error should be reported separately.
+

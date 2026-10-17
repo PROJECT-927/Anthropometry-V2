@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-17",
+  "source_manuscript": "C:\\Users\\SUMANTH S SHETTY\\Documents\\Anthropometry\\ideas\\combined_anthropometry_paper.tex",
+  "source_sha256": "c6ca543949667f93511fc06c9eb29fcdfc5325b8480c0057c159cd398e876b69",
+  "code_basis": "C:\\Users\\SUMANTH S SHETTY\\Documents\\Anthropometry",
+  "source_files": {
+    "pipeline.py": "76aa8b9170264f1bb2c6d43b03cb09d3620b8c2b1bcc989ede09963bb2366e97",
+    "mediapipe_silhouette.py": "8c02dc636e37117714c76ae4e2f07993702e4cb0044fe940f6ebdcd98fdf00e1",
+    "pose_normalization.py": "ef2cb5927814f34644461c00ccf98c4d3ad00d7b0d4393c8abd9e26a70711f27",
+    "visual_hull.py": "8ac89032400016a34a6dd8498d2063e7d3aade5f5f3380d9341a4f2726e78834",
+    "profile_carve.py": "0fe4b09e7304b7cdaee554603998ed08be1b0b33953b882b674af6b7574b6e38",
+    "waist_correction.py": "32cdf21fcce5f20cc99eb38c37ce83be6eb7287551618239c9cd31520cec2489",
+    "measurement_extraction.py": "3b2d3d5e101c4b2505ec85a617283a0423c9c3993e763ab06582e8b5002f5df0",
+    "uncertainty_propagation.py": "0a73a6a0d0646f167ecae67debd993efc020cc5a2826689d563e99e01fb09899",
+    "export_stl.py": "99e5abcd9331691c881a1b59de8e2638ef804c49e08ae54c1e74cbe42bb18b56",
+    "requirements.txt": "23d2ab4c798a564639c6cba8a20b75f4319311e05805ed167249c27f210058fa",
+    "pose_landmarker_heavy.task": "64437af838a65d18e5ba7a0d39b465540069bc8aae8308de3e318aad31fcbc7b"
+  },
+  "notes": [
+    "Full LaTeX document with inline bibliography and no external assets.",
+    "Pipeline-focused standalone draft prepared at author request.",
+    "Historical experimental observations preserved and labeled, not independently re-evaluated.",
+    "Original manuscript and application source code unchanged."
+  ],
+  "output": "Standalone pipeline-only manuscript",
+  "main_tex_sha256": "4fd4ebe0380bf728deb3dca06fd404818501c76165391b620665b4acafcce543",
+  "compiled_pdf_sha256": "b2e49d36aa158b65d87b74bb250f8d28fe9a3a60b12136de97daa951d417adc5"
+}

@@ -19,9 +19,9 @@ of-feet pixel span. Front and side photos generally aren't taken from
 the same camera distance, so each view gets its own scale factor -- the
 one thing tying them together metrically is the shared true height.
 
-Carving is fully vectorized (meshgrid + fancy indexing) rather than a
-Python triple-loop, which would not finish in reasonable time at
-millions of voxels. It runs in two passes, per the plan's "hierarchical
+Carving samples two small 2D projection tables and combines them directly
+into a boolean 3D grid. No dense 3D coordinate arrays are needed.
+It runs in two passes, per the plan's "hierarchical
 voxel grid" optimization:
     1. Coarse pass over the full plausible volume (e.g. 10mm voxels)
        to find the hull's bounding box cheaply.
@@ -39,6 +39,8 @@ import numpy as np
 import cv2
 from scipy import ndimage
 from scipy.signal import savgol_filter
+
+from voxel_memory import check_grid_size, component_counts
 
 
 class VisualHullError(RuntimeError):
@@ -95,6 +97,7 @@ def body_center_x(mask, top_y, bottom_y):
 def _sample_mask(mask, rows, cols):
     """Vectorized nearest-pixel mask lookup; out-of-bounds -> empty."""
     H, W = mask.shape[:2]
+    rows, cols = np.broadcast_arrays(rows, cols)
     rows_i = np.round(rows).astype(np.int64)
     cols_i = np.round(cols).astype(np.int64)
     valid = (rows_i >= 0) & (rows_i < H) & (cols_i >= 0) & (cols_i < W)
@@ -114,17 +117,17 @@ def _carve_grid(front_mask, side_mask, x_range, y_range, z_range, voxel_mm,
     if len(xs) == 0 or len(ys) == 0 or len(zs) == 0:
         raise VisualHullError("Empty voxel range requested.")
 
-    X, Y, Z = np.meshgrid(xs, ys, zs, indexing="ij")  # each (nx, ny, nz)
-
-    row_f = top_f + Y / scale_f
-    col_f = cx_f + X / scale_f
-    occ_f = _sample_mask(front_mask, row_f, col_f)
-
-    row_s = top_s + Y / scale_s
-    col_s = cx_s + Z / scale_s
-    occ_s = _sample_mask(side_mask, row_s, col_s)
-
-    occupied = occ_f & occ_s
+    # Front projection depends only on (X,Y); side only on (Y,Z).
+    # Sample those two 2D tables once, then combine directly into the boolean
+    # result. No dense 3D floating-point coordinates or lookup arrays needed.
+    ny, nz = len(ys), len(zs)
+    check_grid_size((len(xs), ny, nz), "visual hull")
+    occ_f = _sample_mask(front_mask, top_f + ys[None, :] / scale_f,
+                         cx_f + xs[:, None] / scale_f)
+    occ_s = _sample_mask(side_mask, top_s + ys[:, None] / scale_s,
+                         cx_s + zs[None, :] / scale_s)
+    occupied = np.empty((len(xs), ny, nz), dtype=bool)
+    np.logical_and(occ_f[:, :, None], occ_s[None, :, :], out=occupied)
     return occupied, xs, ys, zs
 
 
@@ -291,7 +294,7 @@ def remove_small_components(occupied, min_fraction=0.02):
     labeled, n = ndimage.label(occupied, structure=np.ones((3, 3, 3)))
     if n <= 1:
         return occupied, 0
-    sizes = ndimage.sum(occupied, labeled, range(1, n + 1))
+    sizes = component_counts(labeled, n)[1:]
     total = float(sizes.sum())
     keep_labels = [i + 1 for i, s in enumerate(sizes) if s >= min_fraction * total]
     kept = np.isin(labeled, keep_labels)
@@ -494,7 +497,8 @@ def cap_depth_to_width(hull, y0_mm, y1_mm, max_ratio=DEPTH_TO_WIDTH_RATIO,
             new_z_lo = center - max(new_z_neg, 0.0)
             new_z_hi = center + max(new_z_pos, 0.0)
 
-            this_blob_mask = (blob["labeled_array"] == blob["label"])
+            row_labels, _ = ndimage.label(occ[:, iy, :], structure=np.ones((3, 3)))
+            this_blob_mask = (row_labels == blob["label"])
             row_slice = corrected[:, iy, :]
             keep = this_blob_mask & (z_mm[None, :] >= new_z_lo) & (z_mm[None, :] <= new_z_hi)
             row_slice[this_blob_mask] = False
@@ -521,7 +525,7 @@ def keep_largest_3d_component(occupied):
     labeled, n = ndimage.label(occupied, structure=np.ones((3, 3, 3)))
     if n <= 1:
         return occupied
-    sizes = ndimage.sum(occupied, labeled, range(1, n + 1))
+    sizes = component_counts(labeled, n)[1:]
     largest_label = 1 + int(np.argmax(sizes))
     return (labeled == largest_label)
 
@@ -545,7 +549,6 @@ def _row_blobs(occ_row, x_mm, z_mm):
         ix, iz = np.where(labeled == lab)
         blobs.append({
             "label": lab,
-            "labeled_array": labeled,
             "cx_mm": float(x_mm[ix].mean()),
             "cz_mm": float(z_mm[iz].mean()),
             "x_lo": float(x_mm[ix].min()), "x_hi": float(x_mm[ix].max()),
@@ -562,7 +565,8 @@ def _track_blobs_over_height(occ, x_mm, z_mm, max_jump_mm=60.0):
     however many separate blobs actually exist at a given height (1 for
     torso, 2 for legs/feet, up to 3 once arms have separated) -- a fixed
     left/right assumption doesn't hold body-wide, since the body's own
-    topology changes with height.
+    topology changes with height. Tracks retain only scalar statistics and
+    component IDs; label images are recomputed per row when applying bounds.
     """
     ny = occ.shape[1]
     tracks = []
@@ -635,7 +639,10 @@ def smooth_hull_extents(hull, min_track_rows=5, window=15, polyorder=3, max_jump
             new_z_lo = cz[i] - max(float(z_neg[i]), 0.0)
             new_z_hi = cz[i] + max(float(z_pos[i]), 0.0)
 
-            this_blob_mask = (blob["labeled_array"] == blob["label"])
+            # Re-label just this row instead of retaining int32 labels for
+            # every row in every track (formerly ~4 bytes per grid cell).
+            row_labels, _ = ndimage.label(occ[:, iy, :], structure=np.ones((3, 3)))
+            this_blob_mask = (row_labels == blob["label"])
             row_slice = corrected[:, iy, :]
 
             keep = this_blob_mask & (

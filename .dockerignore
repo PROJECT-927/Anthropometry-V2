@@ -8,6 +8,7 @@ venv/
 .venv/
 .test_venv/
 runs/
+memory_profiles/
 photoset/
 sample/
 dataset/

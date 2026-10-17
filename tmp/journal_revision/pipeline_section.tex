@@ -1,0 +1,360 @@
+%==============================================================================
+\section{Two-View Pipeline: Mathematical Formulation and Implementation}
+\label{sec:system_pipeline}
+%==============================================================================
+
+\subsection{Inputs, Assumptions, and Executable Data Flow}
+The implementation accepts a frontal RGB photograph $I_f$, a profile RGB photograph $I_s$, and stature $H$ supplied in centimeters. We write $H_{\mathrm{mm}}=10H$ for the internal metric anchor. Both photographs must include the crown and feet. The geometry assumes approximately orthogonal views, negligible lens distortion, approximately weak-perspective projection, and sufficiently similar posture between captures. Independent stature scaling compensates for different image magnifications, but cannot compensate for posture change, camera pitch, or perspective depth variation. Tight clothing and unobstructed torso boundaries are acquisition requirements rather than properties guaranteed by segmentation.
+
+The executable has a learned perception stage followed by deterministic geometric processing: pretrained MediaPipe models supply masks and image landmarks; no regressor maps these observations directly to anthropometric dimensions. Elliptical sections, anthropometric height fractions, depth caps, and morphological rounding remain explicit shape assumptions. Accordingly, ``deterministic'' describes repeated computation under a fixed software/model/backend configuration; it does not imply an entirely learning-free or prior-free instrument.
+
+The runtime maintains two reconstruction branches. The conventional two-view hull is cleaned, regularized, and waist-corrected, and supplies waist and hip sections. An independent profile carve supplies the chest section and the display volume. The chest measurement uses the \emph{unrounded} profile carve because its section extraction subsequently performs its own rounding. The display volume undergoes a separate whole-body rounding procedure before export. If profile carving fails, the chest measurement and display fall back to the waist-corrected conventional hull. Table~\ref{tab:branch_provenance} records this distinction; a displayed mesh is therefore not the unique volume from which every reported quantity is extracted.
+
+\begin{table*}[!t]
+\caption{Implemented Data Flow and Measurement Provenance}
+\label{tab:branch_provenance}
+\centering\small
+\begin{tabular}{p{2.2cm}p{5.7cm}p{7.7cm}}
+\toprule
+Output & Source & Processing and fallback \\
+\midrule
+Chest & Unrounded profile carve & Frontal torso clipping, section closing/opening, convex hull, conic fit, perimeter. Uses corrected conventional hull if profile carve fails. \\
+Waist and hip & Conventional hull with waist correction & Torso clipping in both axes, conditional depth cap, section closing/opening, convex hull, conic fit, perimeter. \\
+Shoulder & Frontal/profile mask traces & Half-ellipse perimeter; if invalid, silhouette shoulder tips when reliable, otherwise landmark chord. \\
+Inseam proxy & Normalized frontal landmarks & Vertical hip-to-ankle separation; no crotch landmark is detected. \\
+Display mesh & Rounded profile carve & Whole-body rounding and junction repair; corrected conventional hull if profile carve fails. Separate marching-cubes export. \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table}[!t]
+\caption{Notation and Coordinate Conventions}
+\label{tab:notation}
+\centering\small
+\begin{tabular}{lp{5.7cm}}
+\toprule
+Symbol & Definition \\
+\midrule
+$H,H_{\mathrm{mm}}$ & Supplied stature in cm and internal stature in mm \\
+$\mathcal M_f,\mathcal M_s$ & Normalized binary masks, indexed as $\mathcal M[v,u]$ \\
+$L_v,s_v,c_x^v$ & Foreground height in px, scale in mm/px, horizontal origin in px \\
+$(X,Y,Z)$ & Lateral, crown-downward, and sagittal coordinates in mm \\
+$h$ & Voxel spacing in mm; default $2$ \\
+$\mathcal O_{ijk}$ & Occupancy at $(x_i,y_j,z_k)$ \\
+$Y_{\rm sh},Y_w,Y_{\rm hip}$ & Shoulder, waist, and hip locations measured downward from crown \\
+$a,b$ & Fitted ellipse semiaxes in mm, ordered $a\ge b>0$ \\
+$\boldsymbol\phi$ & Five conic coefficients; distinct from semiaxes \\
+$\delta_s,\delta_b,\delta_c,\delta_e,\delta_d$ & Reported local uncertainty components in mm \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Silhouette Extraction and Boundary Conditioning}
+\label{subsec:segmentation}
+The default extractor converts OpenCV BGR input to contiguous RGB and runs the heavy pose landmarker in single-image mode, requesting one person and a segmentation probability map. Detection and pose-presence thresholds are both $0.5$. There is no temporal averaging between the two photographs. Before inference, the right edge is replicated to pad the image width to a multiple of four; the probability map is cropped back afterward. This is an implementation workaround for the inspected runtime's segmentation-buffer alignment failure, not an anatomical transformation. Padding avoids rescaling existing input pixels.
+
+Let $p[v,u]$ denote the returned person-probability map, bilinearly resized to the padded input dimensions if necessary. The binary mask is
+\begin{equation}
+\mathcal M=\Phi_{\rm hole}\!\left(\Phi_{\rm cc}\!\left(\mathbb I[p>0.5]\right)\right).
+\label{eq:mask}
+\end{equation}
+Here $\Phi_{\rm cc}$ retains the largest 8-connected foreground component. For hole filling, connected components of the complementary mask that touch an image border are classified as exterior background; an enclosed component is filled only when its area is less than $0.02$ times the foreground area. This preserves large inter-limb gaps. A missing pose, missing probability map, or foreground fraction below $0.02$ produces an explicit failure. These checks detect empty or implausibly small masks, not all segmentation errors.
+
+An optional outward dilation is implemented but set to zero. A systematic inward boundary displacement cannot be treated as zero-mean fitting noise: it shifts multiple widths in the same direction. The reported repeated-run audit establishes reproducibility for the tested setup, not agreement with a manually annotated anatomical contour or invariance across hardware. The classical GrabCut and landmark-prior/GrabCut alternatives remain selectable baselines and are not executed in the default path.
+
+\subsection{Landmark Localization and Weighted Similarity Normalization}
+\label{subsec:procrustes}
+Landmarks are inferred in a second pose pass using a silhouette bounding-box crop with a $15\%$ margin. If the crop's largest dimension is below $1024$ pixels, it is enlarged to that target with bicubic interpolation; it is not downscaled otherwise. A detected normalized location $(\xi_i,\eta_i)$ in a resized crop of dimensions $(W_r,H_r)$ is mapped back by
+\begin{equation}
+\mathbf p_i=\left(x_0+\frac{W_r\xi_i}{\gamma},\;y_0+\frac{H_r\eta_i}{\gamma}\right)^\top,
+\end{equation}
+where $(x_0,y_0)$ is the crop origin and $\gamma$ its enlargement factor. The fit uses bilateral shoulders, hips, and ankles. Elbows and wrists are detected for subsequent guards but do not determine the global transform. The runtime rejects detections when more than three requested landmarks have visibility below $0.3$.
+
+For each paired level, the canonical target preserves the detected Euclidean pair distance and mean vertical coordinate while making the pair horizontal. Shoulder and hip midpoint abscissae determine a common spine abscissa; the ankle target is centered on the same line while retaining stance breadth. Image-left/image-right ordering is preserved to avoid a reflected target when anatomical left appears on the opposite image side. One global similarity transform cannot independently articulate limbs or guarantee that every target is reached.
+
+The estimated transform minimizes
+\begin{equation}
+\min_{\sigma>0,\,\mathbf R\in SO(2),\,\mathbf t}
+\sum_{i=1}^{6}w_i\|\sigma\mathbf R\mathbf p_i+\mathbf t-\mathbf q_i\|^2,
+\label{eq:procrustes_objective}
+\end{equation}
+with $w_i$ proportional to visibility clipped to $[0.05,1]$ and normalized to unit sum. Writing weighted means as $\bar{\mathbf p},\bar{\mathbf q}$, form
+\begin{equation}
+\mathbf K=\sum_iw_i(\mathbf p_i-\bar{\mathbf p})(\mathbf q_i-\bar{\mathbf q})^\top
+=\mathbf U\mathbf\Sigma\mathbf V^\top.
+\label{eq:svd_cov}
+\end{equation}
+The solution is
+\begin{align}
+\mathbf S&=\operatorname{diag}(1,\det(\mathbf V\mathbf U^\top)),\nonumber\\
+\mathbf R&=\mathbf V\mathbf S\mathbf U^\top,\label{eq:rotation}\\
+\sigma&=\frac{\operatorname{tr}(\mathbf\Sigma\mathbf S)}{\sum_iw_i\|\mathbf p_i-\bar{\mathbf p}\|^2},\label{eq:procrustes_scale_trans}\\
+\mathbf t&=\bar{\mathbf q}-\sigma\mathbf R\bar{\mathbf p}.\nonumber
+\end{align}
+A near-zero source spread uses unit scale. Fits exceeding $35^\circ$ rotation or leaving $\sigma\in[0.6,1.6]$ are rejected. The mask is warped into its original-size canvas using bilinear interpolation and rethresholded at $0.5$; all retained landmarks receive the same mapping. Scale calibration uses the resulting mask, not the prewarp mask. Border clipping after the warp can corrupt stature calibration and should be checked during acquisition. This operation corrects image-plane lean only; it neither estimates 3D joint pose nor removes yaw or camera perspective.
+
+\subsection{Metric Calibration and Discrete Body Coordinates}
+\label{subsec:calibration}
+For view $v\in\{f,s\}$, let $v^{\rm top}$ and $v^{\rm bot}$ be the first and last nonempty rows. The inclusive foreground span and scale are
+\begin{equation}
+L_v=v^{\rm bot}-v^{\rm top}+1,\qquad s_v=\frac{H_{\rm mm}}{L_v}.
+\label{eq:scale_front}
+\end{equation}
+The horizontal origin is the mean midpoint of nonempty rows $\mathcal V$,
+\begin{equation}
+c_x^v=\frac{1}{|\mathcal V|}\sum_{r\in\mathcal V}\frac{u_{\min}(r)+u_{\max}(r)}{2}.
+\label{eq:centerline}
+\end{equation}
+This assigns equal weight to each row rather than each foreground pixel. It reduces area weighting by broad arms, but remains sensitive to asymmetric silhouettes.
+
+The crown-downward convention is
+\begin{align}
+u_f&=c_x^f+X/s_f,&v_f&=v_f^{\rm top}+Y/s_f,\nonumber\\
+u_s&=c_x^s+Z/s_s,&v_s&=v_s^{\rm top}+Y/s_s.
+\label{eq:projection_coordinates}
+\end{align}
+Mask lookup rounds to the nearest integer pixel and assigns zero outside the image. Occupancy is stored with array order $(X,Y,Z)$; an OpenCV contour on an $XZ$ slice instead returns $(\text{column},\text{row})=(Z\text{-index},X\text{-index})$, which must be reversed when recovering metric points.
+
+For a fixed continuous geometry, a common stature error gives
+\begin{equation}
+\frac{\Delta C}{C}\simeq\frac{\Delta H}{H}.
+\label{eq:scale_prop}
+\end{equation}
+This is a local scaling relation, not an exact homogeneity claim for the executable: voxel spacing and several filter bands remain fixed in physical units, and row rounding and conditional branches can change under rescaling. The same supplied $H$ calibrates both views, so stature reporting error is a \emph{shared} systematic contribution, not two independent calibration noises.
+
+\subsection{Conventional Hull and Coarse-to-Fine Domain Selection}
+\label{subsec:carving}
+The conventional orthographic carve is
+\begin{equation}
+\mathcal O_0(X,Y,Z)=\mathcal M_f[v_f(Y),u_f(X)]\wedge\mathcal M_s[v_s(Y),u_s(Z)].
+\label{eq:cartesian_carve}
+\end{equation}
+The initial domain spans the silhouette extrema in $X$ and $Z$ with $30$\,mm margins, and $0\le Y<H_{\rm mm}$. A $10$\,mm coarse grid is sampled first. Its occupied bounding box is enlarged by one coarse-grid cell on each side, and a $2$\,mm fine grid is evaluated throughout that box. This is bounding-box refinement, not an octree or refinement of individual active cells. An empty pass or nonpositive grid spacing raises an error. Features narrower than the coarse spacing can be missed, so the coarse pass is a computational heuristic rather than a certified conservative bound for arbitrary silhouettes.
+
+At a fixed height, let frontal runs be $\mathcal R_f=\{r_1,\ldots,r_n\}$ and profile runs $\mathcal R_s=\{q_1,\ldots,q_m\}$. Then
+\begin{equation}
+\mathcal O_0(Y)=\bigcup_{i=1}^n\bigcup_{j=1}^m(r_i\times q_j).
+\end{equation}
+Thus every frontal run is paired with every profile run. This creates up to $nm$ rectangular regions without anatomical correspondence. A forward arm can generate a torso-wide slab at its depth, and a merged profile can assign full torso depth to a thin limb. This is an ambiguity of the available silhouettes; the following asymmetric rule suppresses particular artifacts by imposing additional assumptions.
+
+\subsection{Profile Core Estimation, Rejection, and Interpolation}
+For every row between the first and last occupied profile rows, the widest horizontal run defines endpoints $\ell_r,u_r$. Missing runs yield invalid endpoints. Set $d_r=u_r-\ell_r$, $c_r=(u_r+\ell_r)/2$, and compute medians $\widetilde d,\widetilde c$ over finite values. A row is rejected when
+\begin{equation}
+d_r>1.8\widetilde d
+\label{eq:depth_rejection1}
+\end{equation}
+or
+\begin{equation}
+|c_r-\widetilde c|>\max(6\operatorname{MAD}(c),40\text{ px}),
+\label{eq:depth_rejection2}
+\end{equation}
+or when the endpoints are invalid. The median absolute deviation is used without a Gaussian-consistency factor. The rejection mask is dilated by a flat structuring element of length $51$ rows, expanding an isolated rejected row by approximately $25$ rows on either side. This is distinct from a $51$-row margin on \emph{each} side.
+
+Each endpoint trace is linearly interpolated from the accepted rows; values outside their span are clamped to the nearest accepted endpoint. The interpolated endpoints then undergo independent $101$-row median filters and cubic Savitzky--Golay smoothing with a maximum odd window of $61$ rows. Short signals reduce the window or bypass smoothing. No accepted rows is a fatal profile-carve failure. These windows are in image rows, so their physical smoothing bandwidth depends on the profile scale.
+
+For completeness, a Savitzky--Golay estimate at sample $j$ is the intercept of the local polynomial least-squares fit
+\begin{equation}
+\min_{\beta_0,\ldots,\beta_p}\sum_{r=-q}^{q}\left(f_{j+r}-\sum_{t=0}^{p}\beta_t r^t\right)^2,
+\label{eq:sg_fit}
+\end{equation}
+with $p=3$. Smoothing suppresses local boundary excursions but can also attenuate genuine anatomical maxima. Consequently, interpolation through an arm-occluded chest band cannot be described as recovering observed chest depth. Its provenance is retained as a Boolean flag on the metric height grid.
+
+\subsection{Asymmetric Occupancy and Columnwise Thickness Prior}
+Let $\zeta_{\rm lo}(Y),\zeta_{\rm hi}(Y)$ be the filtered profile endpoints transformed by Eq.~\eqref{eq:projection_coordinates}. The initial asymmetric construction is
+\begin{equation}
+\mathcal O_p(X,Y,Z)=\mathbb I[X\in\cup\mathcal R_f(Y)]\,
+\mathbb I[\zeta_{\rm lo}(Y)\le Z\le\zeta_{\rm hi}(Y)].
+\label{eq:asymmetric_carve}
+\end{equation}
+Every frontal run receives one depth interval rather than all profile runs. For each occupied $(X,Y)$, let $n_Y(X,Y)$ count samples in its contiguous vertical frontal run and let $T(X,Y)=hn_Y(X,Y)$. Define
+\begin{align}
+\Delta Z(X,Y)&=\min\{\zeta_{\rm hi}-\zeta_{\rm lo},T(X,Y)\},\label{eq:depth_narrowing}\\
+z_\pm(X,Y)&=\frac{\zeta_{\rm hi}+\zeta_{\rm lo}}{2}\pm\frac{\Delta Z(X,Y)}2.\nonumber
+\end{align}
+The final occupancy uses $z_-\le Z\le z_+$ in Eq.~\eqref{eq:asymmetric_carve}. Vertical runs are labeled independently at each $X$, preventing a horizontal arm attached to the torso from inheriting the entire torso's connected-component size. The rule is motivated by an approximately horizontal limb whose frontal vertical thickness approximates its diameter. For an oblique or vertical limb, that interpretation is weaker. The limb's unobserved sagittal location is placed at the core interval midpoint, another explicit assumption.
+
+The implementation fills the grid in chunks of $64$ $X$ columns to avoid several simultaneous full-volume comparison arrays. It preserves the frontal support wherever an interval contains a grid sample and removes the $n\times m$ pairing mechanism; it does \emph{not} prove exact anatomical part count or segmentation correctness. Interpolated/filtered profile intervals can extend beyond individual observed profile rows, so the profile carve is not necessarily a subset of the original two-mask intersection.
+
+\subsection{Component Cleaning and Extent Regularization}
+\label{subsec:extent_reg}
+The conventional hull first retains its largest 26-connected 3D component. This removes detached debris, but can also remove a genuinely disconnected limb created by segmentation or discretization. Each horizontal slice is then decomposed into 8-connected $XZ$ components. Components are tracked from crown downward by greedy nearest-centroid association with a maximum displacement of $60$\,mm between successive slices. This is a local association rule; no global assignment or anatomical identity model is solved.
+
+For tracks containing at least five slices, cubic Savitzky--Golay filters with maximum window $15$ smooth the $X,Z$ centroids and four directional half-extents. Negative filtered half-extents are clipped to zero. For the original component $S_j$ and smoothed extent rectangle $B_j$, the retained component is $S_j\cap B_j$. This operation removes occupancy but does not introduce voxels. A second largest-component pass follows. The implemented conventional sequence does not call every optional full-body depth-cap routine present in the module; the conditional \emph{measurement-level} cap is described below.
+
+\subsection{Torso Isolation, Slice Levels, and Conditional Depth Caps}
+\label{subsec:anatomical_levels}
+Torso tracing splits each mask row into horizontal runs. The widest run seeds the trace; subsequent rows select the run with midpoint closest to the previous selected midpoint. Left and right separation from peripheral foreground are recorded separately. Once a side separates, its first five rows are excluded; analysis starts after both applicable margins. Missing boundary rows are interpolated, and half-width traces are smoothed with a cubic, maximum-$21$-row Savitzky--Golay filter. Arms fused with the trunk remain ambiguous because no background gap identifies their boundary.
+
+Let normalized bilateral mean landmark rows yield $Y_{\rm sh},Y_{\rm hip},Y_{\rm ankle}$ through Eq.~\eqref{eq:projection_coordinates}. The requested waist location is
+\begin{equation}
+Y_w^*=Y_{\rm sh}+0.688(Y_{\rm hip}-Y_{\rm sh}),
+\label{eq:waist_height}
+\end{equation}
+and the nearest available torso-trace row defines $Y_w$. The fraction approximates $(0.818-0.620)/(0.818-0.530)$; these are anatomical proportions used as priors, not individually detected waist landmarks. Chest is placed at
+\begin{equation}
+Y_{\rm ch}=Y_{\rm sh}+0.35(Y_w-Y_{\rm sh}),
+\label{eq:chest_height}
+\end{equation}
+and hip uses the hip landmark level. Neither operation searches for the fullest chest or maximum buttock girth. The code still computes a narrowest-width waist candidate to obtain the trace, but the default reported waist uses Eq.~\eqref{eq:waist_height}.
+
+To obtain clipping bounds at target $Y$, each side's smoothed half-width is summarized by its $15$th percentile over $[Y-40,Y+40]$\,mm. If these values are $q_L,q_R>0$, the unexpanded interval is $[-q_L,q_R]$. A nonpositive half-width rejects the trace. Girth clipping intervals are expanded by a factor $1.15$ about the origin; the shoulder arc uses unexpanded intervals. Percentile filtering rejects short protrusions but can underestimate smoothly changing true breadth.
+
+For waist, hip, and the conventional chest fallback, a depth cap is considered when a side-view elbow or wrist lies within $90$\,mm of the target level. If side landmarks are unavailable, the code conservatively considers the cap; the available-landmark test cannot exclude every possible upper-arm overlap. With $W=x_+-x_-$, $D=z_+-z_-$, and $z_c=(z_++z_-)/2$, the cap is
+\begin{equation}
+D_c=\min(D,0.75W),\qquad [z_-,z_+]\leftarrow[z_c-D_c/2,z_c+D_c/2].
+\end{equation}
+It is an anthropometric fallback rather than observed depth. Removed depth is retained for uncertainty propagation; removal exceeding $1\%$ of the precap depth generates an advisory. Chest on the profile branch receives frontal clipping only, since its depth is already supplied by the filtered core profile.
+
+\subsection{Waist Correction: Curvature Estimate and Actual Voxel Operator}
+\label{subsec:waist_correction}
+A silhouette intersection already preserves visible waist indentations. What is absent is the unobserved relationship between those frontal indentations and intermediate cross-sectional directions. The additional waist carve is therefore a heuristic shape prior, not a recovery theorem for hidden concavity.
+
+For each smoothed half-width trace $w(Y)$, the waist index is refined to a local minimum within $\pm15$ samples. Walking outward while width rises locates enclosing endpoints $Y_0,Y_1$ and $L=Y_1-Y_0$. A parabola $w(Y)\simeq\alpha(Y-Y_w)^2+\beta(Y-Y_w)+\gamma$ is fitted over this region. The graph curvature is
+\begin{equation}
+\kappa_{\rm graph}(Y_w)=\frac{2\alpha}{(1+\beta^2)^{3/2}},
+\label{eq:waist_curvature}
+\end{equation}
+whereas the code uses $\kappa=|2\alpha|$, appropriate only near a small-slope minimum. Prominence below $2$\,mm, nonpositive $L$, or $\kappa<10^{-6}$\,mm$^{-1}$ suppresses correction. Otherwise,
+\begin{align}
+R_c&=1/\kappa,\quad r=\operatorname{clip}(L/(2R_c),-0.999,0.999),\nonumber\\
+\theta&=2\arcsin r,\label{eq:theta_arc}\\
+d&=\min\left\{\frac{R_c}{2}\left(1-\cos\frac\theta2\right),\;0.40w_{\rm local}\right\},
+\label{eq:sagitta}
+\end{align}
+where $w_{\rm local}$ is the minimum of the endpoint and local waist half-widths. The standard circular sagitta is $R_c(1-\cos(\theta/2))$; the implemented factor $1/2$ is an attenuation heuristic. We retain it to describe the evaluated code rather than silently changing the algorithm.
+
+The actual voxel removal spans approximately $\pm15$\,mm about the waist. For $n$ included rows indexed $j=1,\ldots,n$, the sampled Hann weights are $\omega_j=\tfrac12[1-\cos(2\pi j/(n+1))]$. At a row, let $z_h$ be the largest absolute occupied depth coordinate, bounded below by $1$\,mm. The depth taper is
+\begin{equation}
+t(z)=\cos\!\left[\operatorname{clip}\left(\frac{\pi z}{2z_h},-\frac\pi2,\frac\pi2\right)\right].
+\end{equation}
+Within a torso interval expanded by $1.2$, the left occupied edge is shifted inward by $\omega_jd_Lt(z)$ and the right edge by $\omega_jd_Rt(z)$. Voxels outside that torso interval are retained. Only deletions are permitted. The exact section area change is counted as
+\begin{equation}
+\Delta A_{\rm voxel}=h^2(N_{\rm before}-N_{\rm after}).
+\end{equation}
+The separately reported surrogate $A_{\rm miss}=dL-\tfrac12d^2\tan(\theta/2)$ is not the integral of this $XZ$ deletion operator: its $L$ was measured along the vertical profile. It is retained as a diagnostic/uncertainty approximation, not equated with the measured transverse area deficit.
+
+\subsection{Cross-Section Conditioning and Convex Hull Extraction}
+\label{subsec:shape_regularization}
+\label{subsec:girth_extraction}
+At a nominated level, the nearest grid slice is selected, with location error at most $h/2$ when the requested level lies inside the regular grid. The section is clipped to torso intervals, closed with an OpenCV elliptical kernel of nominal radius $4$\,mm (rounded to grid samples), and reduced to its largest 8-connected component if multiple components remain. Closing bridges thin reconstruction slits; it can add section pixels, so the entire measurement preprocessing is not an antiextensive operator.
+
+The surviving section is opened with an elliptical kernel of radius
+\begin{equation}
+r_{\rm mm}=0.9\min(W/2,D/2),\qquad
+r_{\rm px}=\max\{2,\operatorname{round}(r_{\rm mm}/h)\}.
+\label{eq:disk_radius}
+\end{equation}
+Here $W,D$ are the occupied coordinate spans of that clipped section. Opening rounds rectangular corners and removes occupancy relative to its own input, but the chosen radius is an unvalidated shape prior. OpenCV's rasterized elliptical kernel is not identical to the Euclidean distance-transform opening used on the display branch. Neither operator establishes that a human cross-section is elliptical.
+
+External contours are extracted with all boundary samples retained. The largest-area contour is converted from grid indices to $(X,Z)$ millimeters. Graham scan removes duplicates, chooses the bottommost anchor, sorts by polar angle, discards nearer collinear points, and pops non-left turns using
+\begin{equation}
+\operatorname{cross}(\mathbf a,\mathbf b,\mathbf c)
+=(b_x-a_x)(c_z-a_z)-(b_z-a_z)(c_x-a_x).
+\end{equation}
+The resulting convex polygon costs $\mathcal O(n\log n)$ for $n$ boundary samples. Interior concavities are discarded deliberately. At least five hull vertices are required for the following five-parameter fit; raw rectangular sections alone have only four.
+
+\subsection{Centered Algebraic Conic Fit and Perimeter Evaluation}
+Let hull vertices be $\mathbf p_i=(x_i,z_i)$ and $\bar{\mathbf p}=n^{-1}\sum_i\mathbf p_i$. In centered coordinates $(\tilde x_i,\tilde z_i)=\mathbf p_i-\bar{\mathbf p}$, fit
+\begin{equation}
+A\tilde x^2+B\tilde x\tilde z+C\tilde z^2+D\tilde x+E\tilde z+1=0.
+\end{equation}
+For $\boldsymbol\phi=(A,B,C,D,E)^\top$, each row of the design matrix is
+\begin{equation}
+\mathbf M_i=(\tilde x_i^2,\tilde x_i\tilde z_i,\tilde z_i^2,\tilde x_i,\tilde z_i),
+\end{equation}
+and the implemented solver evaluates
+\begin{equation}
+(\mathbf M^\top\mathbf M)\boldsymbol\phi=-\mathbf M^\top\mathbf 1
+\label{eq:conic_normal_equations}
+\end{equation}
+using a linear solve. Centering avoids placing the fixed constant term at a boundary point and improves the coordinate origin, but does not eliminate ill-conditioning. Normal equations square the design matrix condition number; a QR/SVD least-squares solver would be a numerical improvement requiring separate evaluation. This is a fixed-constant unconstrained conic fit, not the ellipse-constrained generalized eigenproblem of Fitzgibbon \emph{et al.}~\cite{fitzgibbon1999direct}; invalid fitted conics are rejected afterward.
+
+Write
+\begin{equation}
+\mathbf Q=\begin{pmatrix}A&B/2\\B/2&C\end{pmatrix},\qquad
+\mathbf l=(D,E)^\top.
+\end{equation}
+The local center and translated constant are
+\begin{equation}
+\boldsymbol\mu=-\tfrac12\mathbf Q^{-1}\mathbf l,\qquad
+F=\tfrac14\mathbf l^\top\mathbf Q^{-1}\mathbf l-1.
+\end{equation}
+Completing the square gives $(\mathbf u-\boldsymbol\mu)^\top\mathbf Q(\mathbf u-\boldsymbol\mu)=F$. If $\lambda_1,\lambda_2$ are eigenvalues of $\mathbf Q$, the geometrically correct axis lengths are $\sqrt{F/\lambda_i}$. The inspected historical implementation instead evaluates
+\begin{equation}
+F_{\rm impl}=-1-\frac{AE^2+CD^2-BDE}{4AC-B^2},
+\end{equation}
+whereas completing the square requires $F=-1+(AE^2+CD^2-BDE)/(4AC-B^2)$. The signs differ unless the linear-term contribution vanishes. Both the fit and coefficient-to-perimeter uncertainty helper use $F_{\rm impl}$. This is an implementation discrepancy requiring correction and recomputation before submission; the retained experimental tables must not be attributed to a corrected implementation. A near-zero discriminant $4AC-B^2$ relative to $A^2+B^2+C^2$, a singular solve, zero eigenvalue, or nonpositive $F_{\rm impl}/\lambda_i$ triggers failure. The center in body coordinates is $\bar{\mathbf p}+\boldsymbol\mu$, and eigenvectors give ellipse orientation. Sorting the implemented lengths gives $a\ge b>0$.
+
+The reported circumference is
+\begin{equation}
+P(a,b)\simeq\pi\left[3(a+b)-\sqrt{(3a+b)(a+3b)}\right].
+\label{eq:ramanujan}
+\end{equation}
+Its approximation error relative to the exact ellipse integral is distinct from the generally much larger error of assuming an ellipse. For reproducible numerical comparison, the exact expression is $4a\,E(1-b^2/a^2)$, where $E(m)=\int_0^{\pi/2}\sqrt{1-m\sin^2t}\,dt$ uses the parameter convention. The implementation does not enforce the fitted ellipse to lie inside the processed section or the observed bounding box. Thus section opening may remove voxels while a subsequently fitted ellipse still extends beyond them.
+
+The stored fit score is $[n^{-1}\sum_i(\mathbf M_i\boldsymbol\phi+1)^2]^{1/2}$, an \emph{algebraic} residual. It is dimensionless under this normalized conic equation, despite the historical output key \texttt{rms\_residual\_mm}. It is not a Euclidean point-to-ellipse distance or an anthropometric accuracy estimate. Hull vertices are equally weighted; no arc-length weighting or robust outlier estimator is used.
+
+\subsection{Shoulder Arc, Fallback Measurements, and Inseam Proxy}
+\label{subsec:shoulder_arc}
+The proposed tailoring shoulder quantity models an across-back path, distinct from biacromial breadth. The acromion proxy is $0.818H_{\rm mm}$ \emph{above the floor}, hence the code samples
+\begin{equation}
+Y_{\rm ac}=(1-0.818)H_{\rm mm}=0.182H_{\rm mm}
+\end{equation}
+in the crown-downward frame. Frontal and profile torso traces at this level yield unexpanded $W,D$. A valid slice with $D/W\le0.60$ gives
+\begin{equation}
+S_{\rm arc}=\tfrac12P(W/2,D/2).
+\label{eq:shoulder_arc}
+\end{equation}
+This assumes acromion endpoints correspond to the transverse extrema of a symmetric horizontal ellipse. A true posterior surface path on a 3D upper back need not lie on that plane or equal half its perimeter; the two tape comparisons support a preliminary approximation, not anatomical equivalence for all shoulder definitions.
+
+If tracing fails or the ratio exceeds $0.60$, the code uses silhouette shoulder tips if both sides have a sufficiently clear taper, otherwise the frontal Euclidean distance between normalized shoulder landmarks times $s_f$. The latter is a 2D projected chord, not a reconstructed 3D biacromial distance. The runtime's historical method label \texttt{biacromial\_fallback} can also cover a successful tip-based fallback; the method and diagnostic flags should therefore be interpreted together.
+
+\label{subsec:linear_measurements}
+The implemented ``inseam'' is
+\begin{equation}
+L_{\rm hip\text{-}ankle}=Y_{\rm ankle}-Y_{\rm hip}.
+\end{equation}
+It is a hip-to-ankle vertical proxy. Hip landmarks do not locate the crotch and ankle landmarks do not locate a garment hem; no tape-ground-truth claim is made for true inseam.
+
+\subsection{Display Regularization and Triangle-Mesh Export}
+\label{subsec:mesh_export}
+Whole-body display rounding is independent of the three measurement sections. Torso, head, and legs are opened in $XZ$ slices. Approximately horizontal limbs are additionally opened in $YZ$ slices, then unioned with the $XZ$ result. Limb regions are seeded where column thickness is below $0.5$ times core depth and grown while that ratio remains below $0.85$; regions smaller than $2000$\,mm$^2$ in the frontal grid are excluded. Each component's radius is $0.9$ times its smaller half-dimension, with a two-voxel minimum. Distance-transform opening is applied within a padded component bounding box, and a component whose opening becomes empty is retained to avoid removing crown/sole tips.
+
+Junction repair closes the rounded volume at nominal radii $20,40,60,100$\,mm, in that order, and intersects each result with the unrounded profile carve. It stops at a single component or when detached residue is at most $0.5\%$. These are voxelized chessboard-distance closings, not Euclidean spherical closings. Repair can restore voxels removed by rounding but cannot extend beyond the profile carve used as its mask. It cannot establish agreement with the original profile silhouette where that carve used interpolated depth.
+
+Mesh export is a separate command. It retains the largest voxel component, warns when discarded mass exceeds $1\%$, and zero-pads the grid by $\lceil3\sigma_g\rceil+1$ samples. A Gaussian-smoothed occupancy field with default $\sigma_g=1$ voxel is triangulated at isovalue $0.5$ with spacing $h$. Padding and origin offsets are undone, and vertices are mapped by
+\begin{equation}
+(x,y,z)\mapsto(x,z,y_{\max}-y)
+\end{equation}
+to a floor-referenced $Z$-up frame. The largest mesh component is retained, winding is inverted for a watertight mesh with negative signed volume, and $12$ Taubin smoothing iterations precede optional decimation to $150\,000$ faces. These operations alter the exported surface; smoothing does not mathematically guarantee preservation of all girths. Watertightness, connectivity, and section discrepancies must be measured on the final mesh. Since chest, waist, hip, and display have different provenance, mesh-section agreement is an independent consistency check rather than an identity.
+
+\subsection{Diagnostics, Outputs, and Reproducibility Contract}
+\label{subsec:reliability_flags}
+The driver writes normalized masks, an intermediate conventional hull, a display-oriented corrected volume, and a measurement JSON file. The JSON includes section levels, ellipse centers/axes/orientations, girths, local uncertainty values, depth-cap indicators, shoulder method, and linear estimates. Internally, advisory strings record proportional chest height, profile interpolation, conditional depth removal, shoulder fallback, and ratio checks. In the inspected historical driver most advisory \emph{strings} are printed to the log rather than serialized in JSON; preserving the log is therefore required to retain that provenance. Waist/hip $[0.65,0.95]$, waist/chest $[0.70,0.90]$, and waist/stature $[0.42,0.58]$ are advisory ratio bands, not validated classifiers of anatomical abnormality.
+
+With $N=N_XN_YN_Z$ samples, a dense Boolean hull requires approximately $N$ bytes, excluding coordinate arrays, labels, and temporaries. Conventional full-volume floating-point coordinate arrays can each require $8N$ bytes; the profile chunking reduces temporary comparisons but not dense output storage. Runtime and peak memory must be measured rather than inferred from voxel count alone. A reproducibility release should retain input hashes (subject to consent), model hash, exact source revision, dependency versions, backend, supplied stature, grid spacings, filter settings, all diagnostics, and failure outcomes. The current dependency specification does not pin all numerical and perception libraries. The manuscript's repeated-mask result is consequently evidence for its tested environment only.
+
+\begin{algorithm}[!t]
+\caption{Implemented Two-Branch Anthropometry Pipeline}
+\label{alg:implemented_pipeline}
+\begin{algorithmic}[1]
+\REQUIRE Frontal/profile photographs, explicit stature $H$
+\ENSURE Measurements, local uncertainty budget, diagnostics, saved volumes
+\FOR{each photograph}
+\STATE Segment; clean mask; infer cropped pose landmarks.
+\STATE Fit guarded similarity transform; warp mask and landmarks.
+\ENDFOR
+\STATE Calibrate normalized masks independently using $10H/L_v$.
+\STATE Construct coarse/fine conventional hull; clean and smooth extents.
+\STATE Select proportional waist; apply heuristic waist carve.
+\STATE Attempt profile-core carve; retain interpolation provenance.
+\STATE Use unrounded profile carve for chest when successful.
+\STATE Use corrected conventional hull for waist/hip and chest fallback.
+\STATE Clip and condition each section; fit conic; evaluate perimeter.
+\STATE Compute shoulder arc or flagged fallback; hip-to-ankle proxy.
+\STATE Propagate implemented local uncertainties; record diagnostics.
+\STATE Round profile carve separately for display, or use fallback volume.
+\STATE Save outputs; export mesh separately when requested.
+\end{algorithmic}
+\end{algorithm}
+

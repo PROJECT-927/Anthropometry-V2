@@ -1,0 +1,85 @@
+% Standalone document: upload this entire file as main.tex in an empty Overleaf project.
+% No external images, bibliography database, custom class, or included .tex files are required.
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=24mm]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{array,booktabs,longtable,tabularx}
+\usepackage{graphicx}
+\usepackage{algorithm,algorithmic}
+\usepackage{microtype}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{3em}
+\setlength{\parskip}{0.3em}
+\setlength{\parindent}{1.2em}
+\renewcommand{\arraystretch}{1.16}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\numberwithin{equation}{section}
+\newcommand{\R}{\mathbb R}
+\newcommand{\indic}{\mathbb I}
+\title{A Geometrically Explicit Two-View Anthropometry Pipeline:\\
+Mathematical Foundations, Detailed Implementation,\\
+and Preliminary Measurement Evaluation}
+\author{Author details to be completed}
+\date{Manuscript draft, 17 October 2026}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Estimating body dimensions from two photographs requires both image interpretation and explicit geometric assumptions. This paper presents a complete implementation account of a frontal/profile anthropometry pipeline using self-reported stature as its metric anchor. Pretrained perception produces binary silhouettes and pose landmarks; subsequent processing comprises weighted similarity normalization, independent per-view scaling, conventional visual-hull reconstruction, an asymmetric profile carve, anatomical-level selection, cross-sectional morphology, convex-hull extraction, algebraic conic fitting, and analytical ellipse-perimeter evaluation. The implementation maintains distinct volumes for chest measurement, waist/hip measurement, and visualization, and these branches are specified separately. We derive the camera approximations, Procrustes solution, filtering operators, conic-to-ellipse conversion, perimeter sensitivities, and mesh-coordinate transformations required to reproduce the computation. A five-component local sensitivity budget is analyzed alongside its omitted systematic errors. Previously reported pilot observations on three adult male subjects contain ten tape-referenced measurements, with aggregate mean absolute error approximately $2.69$\,cm and mean absolute percentage error $3.39\%$; only two reference values lie inside the reported local sensitivity intervals. These historical observations are not a new validation of a corrected implementation. A source audit identifies a conic-recovery sign discrepancy, inconsistent waist-curvature indexing, and a shoulder uncertainty approximation requiring correction and re-evaluation. The contribution is a transparent engineering and mathematical specification of the implemented pipeline, its assumptions, its fallback paths, and the evidence still required for validated anthropometric use.
+\end{abstract}
+
+\noindent\textbf{Keywords:} anthropometry; silhouettes; visual hull; pose normalization; ellipse fitting; uncertainty propagation; reproducible implementation.
+
+\section{Introduction}
+Remote apparel sizing and body-shape assessment motivate estimating anthropometric dimensions from ordinary photographs. A photograph, however, provides image coordinates rather than metric body dimensions. The visible outline also mixes anatomical shape with clothing, pose, perspective, segmentation error, and occluding limbs. An implementable measurement method must explain how these effects are handled, what assumptions complete the missing geometry, and when a numerical output is supported by observation rather than a fallback prior.
+
+Two orthogonal views offer a practical acquisition compromise. At a selected level they provide a frontal breadth and a profile depth. These measurements constrain the outer support of a section but do not uniquely determine its complete contour. A pipeline that fits an ellipse consequently introduces a cross-sectional model; a pipeline that interpolates an occluded chest depth introduces a vertical smoothness model. Such assumptions can be useful, but their effect should be visible in the method and its diagnostics.
+
+This paper documents a particular executable system in sufficient detail to distinguish its mathematical model from its software behavior. Learned models are used for person segmentation and landmark localization. The downstream measurement mapping is explicit and deterministic under a fixed implementation environment; no learned regressor predicts girths or fits a statistical body mesh. This distinction does not make the method prior-free: stature fractions, depth-to-width caps, morphological rounding, and elliptical measurements all impose structure on the inferred body.
+
+The main engineering issue is the relationship between the two silhouettes. A conventional two-view carve pairs every frontal run with every profile run at the same level. Without part correspondence, a profile arm can be replicated across torso breadth, or torso depth can be assigned to a thin horizontal limb. The implemented profile branch instead uses frontal topology and one robust profile core interval per height, with an additional columnwise thickness limit. The second issue is measurement definition. A straight shoulder chord and an across-back tailoring path are different quantities, and a hip-to-ankle vertical span is not a detected crotch-to-hem inseam. Both distinctions must be preserved in validation.
+
+The paper makes four contributions. First, it supplies a complete data-flow specification with the distinct chest, waist/hip, and display branches. Second, it derives the mathematical operations and records numerical settings, image/grid conventions, and conditional fallbacks. Third, it examines the implemented local uncertainty budget without assigning an unsupported confidence level. Fourth, it reports the limitations of the available pilot evidence and identifies mathematical implementation discrepancies that must be resolved before making stronger performance claims. The constituent methods are established; the claimed contribution is their explicit integration and analysis for this pipeline.
+
+\section{Related Work and Methodological Position}
+Shape-from-silhouette reconstructs the intersection of viewing volumes consistent with image masks. Laurentini's visual-hull formulation establishes the geometric basis of this approach~\cite{laurentini1994visual}. A silhouette supplies support constraints, but cannot reveal surfaces hidden from every contour. The present two-view implementation uses weak-perspective back-projection rather than calibrated perspective cones and therefore relies on a more restrictive acquisition model.
+
+Statistical body representations such as SMPL~\cite{loper2015smpl} and learned volumetric methods such as BodyNet~\cite{varol2018bodynet} provide other ways to complete unobserved shape. Their prior information and learned mapping differ from the explicit ellipse, smoothness, and morphological assumptions used here. This paper does not claim that geometric methods are uniformly more accurate or that learned methods cannot express uncertainty; those comparisons require matched datasets and measurement definitions.
+
+The perception stage uses MediaPipe's pretrained pose and segmentation capabilities~\cite{lugaresi2019mediapipe,mediapipeguide}. The pose-normalization solver is a weighted similarity version of the orthogonal Procrustes problem~\cite{schonemann1966generalized}. Savitzky--Golay filters supply local polynomial regularization~\cite{savitzky1964smoothing}; Graham scan supplies planar convex-hull reduction~\cite{graham1972efficient}. Although ellipse fitting is a mature field~\cite{fitzgibbon1999direct}, the inspected implementation uses a centered, fixed-constant conic fit and post-fit validity tests rather than the constrained fit in that reference. Ramanujan's perimeter approximation is used only after the ellipse axes have been recovered~\cite{ramanujan1914modular}.
+
+The optional GrabCut baseline uses foreground/background appearance and graph-cut regularization~\cite{rother2004grabcut}. Marching cubes converts occupancy to a surface representation~\cite{lorensen1987marching}, followed by Taubin-style surface smoothing~\cite{taubin1995signal}. Neither meshing nor smoothing is an independent source of anatomical evidence. Finally, first-order uncertainty propagation follows the general covariance principle used in measurement science~\cite{jcgm2008}; satisfying that algebraic principle does not by itself establish that the modeled inputs include every important source of error.
+
+\section{Measurement Definitions and Camera Model}
+\label{sec:measurement_model}
+\subsection{Measurands and surrogate outputs}
+The primary scalar outputs are chest, waist, and hip ellipse perimeters at algorithmically selected levels. Their intended physical references are tape circumferences, but agreement requires the same posture, breathing state, landmark level, tape path, and garment condition. The implemented hip level comes from pose landmarks, not a search for maximum buttock circumference; chest and waist use fixed fractions of the shoulder-to-hip span. A discrepancy in level definition cannot be repaired by more accurate perimeter arithmetic alone.
+
+The shoulder output is preferably an elliptical half-perimeter intended to approximate an across-back path. Its fallbacks are projected silhouette-tip breadth or projected shoulder-landmark distance. The output called inseam in the historical software is a hip-to-ankle vertical span. These quantities must carry method metadata because they are not interchangeable measurands. A successful fallback means that a number was obtained, not that the original physical measurement was recovered.
+
+\subsection{Perspective formation and weak-perspective reduction}
+In a camera coordinate frame, a pinhole camera maps a point $(x_c,y_c,z_c)$ by
+\begin{equation}
+u=f_x\frac{x_c}{z_c}+c_u,\qquad v=f_y\frac{y_c}{z_c}+c_v,
+\label{eq:pinhole}
+\end{equation}
+where focal lengths are in pixels. If subject depth is $z_c=z_0+\Delta z$ with $|\Delta z|\ll z_0$, expansion gives
+\begin{equation}
+\frac{1}{z_c}=\frac{1}{z_0}\left(1-\frac{\Delta z}{z_0}+\mathcal O\left(\frac{\Delta z^2}{z_0^2}\right)\right).
+\end{equation}
+Weak perspective retains the common scale $f/z_0$ and neglects the depth-dependent terms. The relative magnification difference at depth offset $\Delta z$ is approximately $-\Delta z/z_0$. Thus independent stature calibration can remove a common magnification difference between images, but cannot simultaneously correct the magnification of all body surfaces within one image.
+
+The runtime does not estimate camera intrinsics, lens distortion, camera pitch, or view azimuth. Images are treated as approximately front and side with square-pixel metric scaling. Capture should therefore use the full body, limited camera tilt, substantial camera distance, a stable stance, and arms sufficiently separated from the measured trunk boundaries. These are protocol requirements. The available data do not establish a single camera distance that guarantees a specified centimeter-level error for all bodies and lenses.
+
+\subsection{Stature calibration and shared error}
+Let $L_f,L_s$ be the inclusive mask heights in pixels. Scales are $s_f=10H/L_f$ and $s_s=10H/L_s$ in mm/px. If reported stature is $H+\Delta H$ and image masks are fixed, all continuous metric coordinates share the same first-order relative error $\Delta H/H$. The two scales therefore have a common stature-error component even when their segmentation endpoint errors are independent. This dependence matters when forming a measurement covariance.
+
+The coordinate convention used throughout is $X$ lateral, $Y$ downward from the crown, and $Z$ sagittal depth. A floor-referenced anatomical height $h_a$ corresponds to crown-downward coordinate $Y=10H-h_a$. In particular, a stature fraction $0.818$ above the floor corresponds to $0.182$ below the crown. Keeping these conventions explicit prevents the same anthropometric fraction from being applied to opposite ends of the body.
+
+\subsection{What two extents do and do not determine}
+Let a section occupy a rectangle of measured width $W$ and depth $D$. Both an ellipse with semiaxes $(W/2,D/2)$ and that rectangle have the same orthogonal extents, but their perimeters differ. The rectangle has perimeter $2(W+D)$, while the ellipse has a smaller perimeter determined by an additional shape assumption. This example suffices to explain why the pipeline must regularize and fit a section rather than claim that its circumference is directly observed. General extremal-perimeter theory, multi-view linear programs, and harmonic identifiability are outside the scope of this implementation paper.
+

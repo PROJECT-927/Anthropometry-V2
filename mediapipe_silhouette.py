@@ -45,9 +45,6 @@ import os
 
 import cv2
 import numpy as np
-import mediapipe as mp
-from mediapipe.tasks import python as mp_python
-from mediapipe.tasks.python import vision as mp_vision
 
 from pose_normalization import _get_pose_model_path
 
@@ -94,6 +91,8 @@ _DETECTOR = None
 
 def _detector():
     """Create the landmarker once; it is stateless in IMAGE mode and reusable."""
+    from mediapipe.tasks import python as mp_python
+    from mediapipe.tasks.python import vision as mp_vision
     global _DETECTOR
     if _DETECTOR is None:
         options = mp_vision.PoseLandmarkerOptions(
@@ -150,6 +149,7 @@ def extract_silhouette(image_bgr, threshold=MASK_THRESHOLD,
     to be a standing subject -- callers must not receive an empty mask that
     silently produces nonsense measurements downstream.
     """
+    import mediapipe as mp
     if image_bgr is None or image_bgr.size == 0:
         raise SilhouetteError("Empty image passed to extract_silhouette.")
 
@@ -340,6 +340,7 @@ def extract_silhouette_landmark_prior(image_bgr, pad_fraction=PRIOR_PAD_FRACTION
                                       grabcut_iters=5, debug=False,
                                       debug_path="debug_landmark_prior.png"):
     """Landmark body -> padded trimap -> GrabCut. Deterministic."""
+    import mediapipe as mp
     if image_bgr is None or image_bgr.size == 0:
         raise SilhouetteError("Empty image passed to extract_silhouette_landmark_prior.")
 
