@@ -1,0 +1,80 @@
+{
+  "version": "integrated-candidates-v3.0",
+  "attempt_id": "BodyM-A-071",
+  "evidence_class": "retrospective_external_scan_target_prediction",
+  "input_mode": "silhouettes",
+  "height_cm": 170.6,
+  "status": "rejected",
+  "reason": "input_mask_border_contact",
+  "policy": {
+    "version": "integrated-candidates-v3.0",
+    "candidate_selection": "report_all_named_candidates_no_oracle_selection",
+    "base_waist_deletion": false,
+    "base_section_opening": false,
+    "base_section_closing": false,
+    "whole_volume_component_deletion": false,
+    "whole_volume_extent_smoothing": false,
+    "conditional_depth_cap": false,
+    "front_torso_clip_multiplier": 1.15,
+    "fragment_rejection_fraction": 0.01,
+    "mask_threshold": 0.5,
+    "minimum_frame_foreground_fraction": 0.02,
+    "silhouette_level_fractions_from_crown": {
+      "shoulder": 0.182,
+      "hip": 0.47,
+      "ankle": 0.961
+    },
+    "waist_shoulder_hip_fraction": 0.688,
+    "chest_shoulder_waist_fraction": 0.35,
+    "profile_membership_epsilon_over_h": 1e-08,
+    "sensitivity": "unavailable_not_calibrated; no legacy RSS",
+    "supplied_mask_preprocessing": "grayscale>127; nonempty/border guard only; no component removal or hole filling",
+    "integrated_outputs": "chest, waist proxy, hip girth candidates only; shoulder specified separately not run",
+    "display_export": "not executed; measurements do not depend on a mesh"
+  },
+  "stages": [
+    {
+      "stage": "front_supplied_mask",
+      "elapsed_seconds": 0.002279300009831786
+    },
+    {
+      "stage": "side_supplied_mask",
+      "elapsed_seconds": 0.0015505000483244658
+    }
+  ],
+  "inputs": {
+    "front_sha256": "7fcea1484899cecf121683136cceb2416ed0710151d231d37a55de3a76b0f8b4",
+    "side_sha256": "567eddc04e3d338d4432eade7914631fcddbe00ed40ef673c14f669717b218e9"
+  },
+  "runtime_environment": {
+    "python": "3.12.9",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel"
+  },
+  "sections": {},
+  "physical_uncertainty": {
+    "available": false,
+    "value_mm": null,
+    "reason": "not_calibrated"
+  },
+  "exception_type": "ValueError",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\SUMANTH S SHETTY\\Documents\\GitHub\\Anthropometry-V2\\output\\pdf\\pipeline_journal_review\\integrated\\run_pipeline.py\", line 173, in execute\n    side,side_info=stage('side_supplied_mask',lambda:silhouette_view(args.side))\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\SUMANTH S SHETTY\\Documents\\GitHub\\Anthropometry-V2\\output\\pdf\\pipeline_journal_review\\integrated\\run_pipeline.py\", line 160, in stage\n    try:return fn()\n               ^^^^\n  File \"C:\\Users\\SUMANTH S SHETTY\\Documents\\GitHub\\Anthropometry-V2\\output\\pdf\\pipeline_journal_review\\integrated\\run_pipeline.py\", line 173, in <lambda>\n    side,side_info=stage('side_supplied_mask',lambda:silhouette_view(args.side))\n                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\SUMANTH S SHETTY\\Documents\\GitHub\\Anthropometry-V2\\output\\pdf\\pipeline_journal_review\\integrated\\run_pipeline.py\", line 137, in silhouette_view\n    if border(mask):raise ValueError('input_mask_border_contact')\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: input_mask_border_contact\n",
+  "elapsed_seconds": 0.3507168999640271,
+  "process_memory": {
+    "available": true,
+    "peak_working_set_bytes": 111861760,
+    "peak_pagefile_bytes": 1163489280,
+    "method": "Windows GetProcessMemoryInfo; process lifetime"
+  },
+  "source_hashes": {
+    "source\\measurement_extraction.py": "8446152e67b02c29049372fda83788fb054627e7006a3fe24ae3881da52279a7",
+    "source\\mediapipe_silhouette.py": "37812ef74ca6456276878ca68afcf7b85a23977d8413936c8979613d98743014",
+    "source\\pose_normalization.py": "ef2cb5927814f34644461c00ccf98c4d3ad00d7b0d4393c8abd9e26a70711f27",
+    "source\\profile_carve.py": "bc17a726abfd73f266700dec8771d0ad46bf4a4aaa0b5c896b9eae370b292cc7",
+    "source\\visual_hull.py": "1972bbf492accaa17c42bc43823896a31a6762b51ed65d5e7f8a009474293227",
+    "source\\voxel_memory.py": "403fd1d30370d991d90fb1b280aa7b31d575da9b633ee866c408c134c0387e4a",
+    "source\\waist_correction.py": "32cdf21fcce5f20cc99eb38c37ce83be6eb7287551618239c9cd31520cec2489"
+  },
+  "candidate_module_sha256": "f21dca3207f1456ea112def5ca7642d4bfd3e1352d9295753642655a0ea3383b",
+  "driver_sha256": "9a856c4ecf00e65e95bbd7192f27c412de42fad1b7179bba89da3c4bf278c944"
+}

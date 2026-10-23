@@ -1,0 +1,902 @@
+{
+  "scope": "Direct 2D known ellipse/box sections with fixed morphology; not perception, full hull pipeline, or human accuracy",
+  "design": "Exactly32 fixed cases; closing4mm on/off, opening fractions0/.25/.5/.9, h2/4mm; fraction0 bypasses opening",
+  "truth": "Ellipse exact 4aE(1-b^2/a^2), box exact 4(a+b), a160mm,b100mm",
+  "python": "3.12.9",
+  "numpy": "2.5.2",
+  "opencv": "5.0.0",
+  "all_cases": [
+    {
+      "shape": "ellipse",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.0,
+      "opening_bypassed": true,
+      "radius_mm": 0.0,
+      "closing_4mm": false,
+      "input_voxels": 12553,
+      "processed_voxels": 12553,
+      "true_perimeter_mm": 827.7255214445767,
+      "fitted_perimeter_mm": 826.7519349018605,
+      "error_mm": -0.9735865427161343,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 60,
+      "axes_mm": [
+        159.82137043015524,
+        99.87034991651961
+      ],
+      "scaled_condition": 2.7130526708467704
+    },
+    {
+      "shape": "ellipse",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.0,
+      "opening_bypassed": true,
+      "radius_mm": 0.0,
+      "closing_4mm": true,
+      "input_voxels": 12553,
+      "processed_voxels": 12553,
+      "true_perimeter_mm": 827.7255214445767,
+      "fitted_perimeter_mm": 826.7519349018605,
+      "error_mm": -0.9735865427161343,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 60,
+      "axes_mm": [
+        159.82137043015524,
+        99.87034991651961
+      ],
+      "scaled_condition": 2.7130526708467704
+    },
+    {
+      "shape": "ellipse",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.25,
+      "opening_bypassed": false,
+      "radius_mm": 25.0,
+      "closing_4mm": false,
+      "input_voxels": 12553,
+      "processed_voxels": 12539,
+      "true_perimeter_mm": 827.7255214445767,
+      "fitted_perimeter_mm": 826.3596132023048,
+      "error_mm": -1.3659082422718711,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 50,
+      "axes_mm": [
+        159.72536433882726,
+        99.84850585187516
+      ],
+      "scaled_condition": 2.9218250436330093
+    },
+    {
+      "shape": "ellipse",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.25,
+      "opening_bypassed": false,
+      "radius_mm": 25.0,
+      "closing_4mm": true,
+      "input_voxels": 12553,
+      "processed_voxels": 12539,
+      "true_perimeter_mm": 827.7255214445767,
+      "fitted_perimeter_mm": 826.3596132023048,
+      "error_mm": -1.3659082422718711,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 50,
+      "axes_mm": [
+        159.72536433882726,
+        99.84850585187516
+      ],
+      "scaled_condition": 2.9218250436330093
+    },
+    {
+      "shape": "ellipse",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.5,
+      "opening_bypassed": false,
+      "radius_mm": 50.0,
+      "closing_4mm": false,
+      "input_voxels": 12553,
+      "processed_voxels": 12539,
+      "true_perimeter_mm": 827.7255214445767,
+      "fitted_perimeter_mm": 826.3759691943833,
+      "error_mm": -1.3495522501933692,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 50,
+      "axes_mm": [
+        159.7336254493424,
+        99.84402176056669
+      ],
+      "scaled_condition": 2.9170173452221047
+    },
+    {
+      "shape": "ellipse",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.5,
+      "opening_bypassed": false,
+      "radius_mm": 50.0,
+      "closing_4mm": true,
+      "input_voxels": 12553,
+      "processed_voxels": 12539,
+      "true_perimeter_mm": 827.7255214445767,
+      "fitted_perimeter_mm": 826.3759691943833,
+      "error_mm": -1.3495522501933692,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 50,
+      "axes_mm": [
+        159.7336254493424,
+        99.84402176056669
+      ],
+      "scaled_condition": 2.9170173452221047
+    },
+    {
+      "shape": "ellipse",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.9,
+      "opening_bypassed": false,
+      "radius_mm": 90.0,
+      "closing_4mm": false,
+      "input_voxels": 12553,
+      "processed_voxels": 11573,
+      "true_perimeter_mm": 827.7255214445767,
+      "fitted_perimeter_mm": 782.807979684196,
+      "error_mm": -44.917541760380686,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 58,
+      "axes_mm": [
+        144.9740720291802,
+        102.36275471211259
+      ],
+      "scaled_condition": 2.636443306762595
+    },
+    {
+      "shape": "ellipse",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.9,
+      "opening_bypassed": false,
+      "radius_mm": 90.0,
+      "closing_4mm": true,
+      "input_voxels": 12553,
+      "processed_voxels": 11573,
+      "true_perimeter_mm": 827.7255214445767,
+      "fitted_perimeter_mm": 782.807979684196,
+      "error_mm": -44.917541760380686,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 58,
+      "axes_mm": [
+        144.9740720291802,
+        102.36275471211259
+      ],
+      "scaled_condition": 2.636443306762595
+    },
+    {
+      "shape": "ellipse",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.0,
+      "opening_bypassed": true,
+      "radius_mm": 0.0,
+      "closing_4mm": false,
+      "input_voxels": 3131,
+      "processed_voxels": 3131,
+      "true_perimeter_mm": 827.7255214445767,
+      "fitted_perimeter_mm": 824.9914151611874,
+      "error_mm": -2.734106283389224,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 36,
+      "axes_mm": [
+        159.3861408805147,
+        99.77786713897049
+      ],
+      "scaled_condition": 3.1333255446970725
+    },
+    {
+      "shape": "ellipse",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.0,
+      "opening_bypassed": true,
+      "radius_mm": 0.0,
+      "closing_4mm": true,
+      "input_voxels": 3131,
+      "processed_voxels": 3131,
+      "true_perimeter_mm": 827.7255214445767,
+      "fitted_perimeter_mm": 824.9914151611874,
+      "error_mm": -2.734106283389224,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 36,
+      "axes_mm": [
+        159.3861408805147,
+        99.77786713897049
+      ],
+      "scaled_condition": 3.1333255446970725
+    },
+    {
+      "shape": "ellipse",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.25,
+      "opening_bypassed": false,
+      "radius_mm": 25.0,
+      "closing_4mm": false,
+      "input_voxels": 3131,
+      "processed_voxels": 3125,
+      "true_perimeter_mm": 827.7255214445767,
+      "fitted_perimeter_mm": 823.5741390866548,
+      "error_mm": -4.151382357921875,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 38,
+      "axes_mm": [
+        158.9067116323129,
+        99.86647926775257
+      ],
+      "scaled_condition": 3.8171095571989424
+    },
+    {
+      "shape": "ellipse",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.25,
+      "opening_bypassed": false,
+      "radius_mm": 25.0,
+      "closing_4mm": true,
+      "input_voxels": 3131,
+      "processed_voxels": 3125,
+      "true_perimeter_mm": 827.7255214445767,
+      "fitted_perimeter_mm": 823.5741390866548,
+      "error_mm": -4.151382357921875,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 38,
+      "axes_mm": [
+        158.9067116323129,
+        99.86647926775257
+      ],
+      "scaled_condition": 3.8171095571989424
+    },
+    {
+      "shape": "ellipse",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.5,
+      "opening_bypassed": false,
+      "radius_mm": 50.0,
+      "closing_4mm": false,
+      "input_voxels": 3131,
+      "processed_voxels": 3125,
+      "true_perimeter_mm": 827.7255214445767,
+      "fitted_perimeter_mm": 824.265976573381,
+      "error_mm": -3.4595448711957033,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 34,
+      "axes_mm": [
+        159.4284735536732,
+        99.4589226121904
+      ],
+      "scaled_condition": 3.3880422089416635
+    },
+    {
+      "shape": "ellipse",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.5,
+      "opening_bypassed": false,
+      "radius_mm": 50.0,
+      "closing_4mm": true,
+      "input_voxels": 3131,
+      "processed_voxels": 3125,
+      "true_perimeter_mm": 827.7255214445767,
+      "fitted_perimeter_mm": 824.265976573381,
+      "error_mm": -3.4595448711957033,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 34,
+      "axes_mm": [
+        159.4284735536732,
+        99.4589226121904
+      ],
+      "scaled_condition": 3.3880422089416635
+    },
+    {
+      "shape": "ellipse",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.9,
+      "opening_bypassed": false,
+      "radius_mm": 90.0,
+      "closing_4mm": false,
+      "input_voxels": 3131,
+      "processed_voxels": 2929,
+      "true_perimeter_mm": 827.7255214445767,
+      "fitted_perimeter_mm": 789.9515913100921,
+      "error_mm": -37.773930134484544,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 26,
+      "axes_mm": [
+        147.25077317762694,
+        102.15607828506668
+      ],
+      "scaled_condition": 2.586082027187053
+    },
+    {
+      "shape": "ellipse",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.9,
+      "opening_bypassed": false,
+      "radius_mm": 90.0,
+      "closing_4mm": true,
+      "input_voxels": 3131,
+      "processed_voxels": 2929,
+      "true_perimeter_mm": 827.7255214445767,
+      "fitted_perimeter_mm": 789.9515913100921,
+      "error_mm": -37.773930134484544,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 26,
+      "axes_mm": [
+        147.25077317762694,
+        102.15607828506668
+      ],
+      "scaled_condition": 2.586082027187053
+    },
+    {
+      "shape": "box",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.0,
+      "opening_bypassed": true,
+      "radius_mm": 0.0,
+      "closing_4mm": false,
+      "input_voxels": 16261,
+      "processed_voxels": 16261,
+      "true_perimeter_mm": 1040.0,
+      "fitted_perimeter_mm": null,
+      "error_mm": null,
+      "accepted": false,
+      "failure_reason": "fewer_than_five_hull_vertices",
+      "hull_vertex_count": 4
+    },
+    {
+      "shape": "box",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.0,
+      "opening_bypassed": true,
+      "radius_mm": 0.0,
+      "closing_4mm": true,
+      "input_voxels": 16261,
+      "processed_voxels": 16261,
+      "true_perimeter_mm": 1040.0,
+      "fitted_perimeter_mm": null,
+      "error_mm": null,
+      "accepted": false,
+      "failure_reason": "fewer_than_five_hull_vertices",
+      "hull_vertex_count": 4
+    },
+    {
+      "shape": "box",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.25,
+      "opening_bypassed": false,
+      "radius_mm": 25.0,
+      "closing_4mm": false,
+      "input_voxels": 16261,
+      "processed_voxels": 16113,
+      "true_perimeter_mm": 1040.0,
+      "fitted_perimeter_mm": 1089.1083697381423,
+      "error_mm": 49.1083697381423,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 20,
+      "axes_mm": [
+        184.65496534503976,
+        161.63636847177892
+      ],
+      "scaled_condition": 13.68610008447303
+    },
+    {
+      "shape": "box",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.25,
+      "opening_bypassed": false,
+      "radius_mm": 25.0,
+      "closing_4mm": true,
+      "input_voxels": 16261,
+      "processed_voxels": 16113,
+      "true_perimeter_mm": 1040.0,
+      "fitted_perimeter_mm": 1089.1083697381423,
+      "error_mm": 49.1083697381423,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 20,
+      "axes_mm": [
+        184.65496534503976,
+        161.63636847177892
+      ],
+      "scaled_condition": 13.68610008447303
+    },
+    {
+      "shape": "box",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.5,
+      "opening_bypassed": false,
+      "radius_mm": 50.0,
+      "closing_4mm": false,
+      "input_voxels": 16261,
+      "processed_voxels": 15665,
+      "true_perimeter_mm": 1040.0,
+      "fitted_perimeter_mm": 1000.9754789734009,
+      "error_mm": -39.02452102659913,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 28,
+      "axes_mm": [
+        177.44140325809516,
+        140.07892831369207
+      ],
+      "scaled_condition": 6.3616247757881235
+    },
+    {
+      "shape": "box",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.5,
+      "opening_bypassed": false,
+      "radius_mm": 50.0,
+      "closing_4mm": true,
+      "input_voxels": 16261,
+      "processed_voxels": 15665,
+      "true_perimeter_mm": 1040.0,
+      "fitted_perimeter_mm": 1000.9754789734009,
+      "error_mm": -39.02452102659913,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 28,
+      "axes_mm": [
+        177.44140325809516,
+        140.07892831369207
+      ],
+      "scaled_condition": 6.3616247757881235
+    },
+    {
+      "shape": "box",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.9,
+      "opening_bypassed": false,
+      "radius_mm": 90.0,
+      "closing_4mm": false,
+      "input_voxels": 16261,
+      "processed_voxels": 14425,
+      "true_perimeter_mm": 1040.0,
+      "fitted_perimeter_mm": 902.9071799539469,
+      "error_mm": -137.09282004605313,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 52,
+      "axes_mm": [
+        164.91108020040397,
+        120.78698887114525
+      ],
+      "scaled_condition": 4.2896200639519275
+    },
+    {
+      "shape": "box",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.9,
+      "opening_bypassed": false,
+      "radius_mm": 90.0,
+      "closing_4mm": true,
+      "input_voxels": 16261,
+      "processed_voxels": 14425,
+      "true_perimeter_mm": 1040.0,
+      "fitted_perimeter_mm": 902.9071799539469,
+      "error_mm": -137.09282004605313,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 52,
+      "axes_mm": [
+        164.91108020040397,
+        120.78698887114525
+      ],
+      "scaled_condition": 4.2896200639519275
+    },
+    {
+      "shape": "box",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.0,
+      "opening_bypassed": true,
+      "radius_mm": 0.0,
+      "closing_4mm": false,
+      "input_voxels": 4131,
+      "processed_voxels": 4131,
+      "true_perimeter_mm": 1040.0,
+      "fitted_perimeter_mm": null,
+      "error_mm": null,
+      "accepted": false,
+      "failure_reason": "fewer_than_five_hull_vertices",
+      "hull_vertex_count": 4
+    },
+    {
+      "shape": "box",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.0,
+      "opening_bypassed": true,
+      "radius_mm": 0.0,
+      "closing_4mm": true,
+      "input_voxels": 4131,
+      "processed_voxels": 4131,
+      "true_perimeter_mm": 1040.0,
+      "fitted_perimeter_mm": null,
+      "error_mm": null,
+      "accepted": false,
+      "failure_reason": "fewer_than_five_hull_vertices",
+      "hull_vertex_count": 4
+    },
+    {
+      "shape": "box",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.25,
+      "opening_bypassed": false,
+      "radius_mm": 25.0,
+      "closing_4mm": false,
+      "input_voxels": 4131,
+      "processed_voxels": 4083,
+      "true_perimeter_mm": 1040.0,
+      "fitted_perimeter_mm": 1093.4452661694365,
+      "error_mm": 53.445266169436536,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 12,
+      "axes_mm": [
+        181.15526067075345,
+        166.75004760302465
+      ],
+      "scaled_condition": 11.96914179443904
+    },
+    {
+      "shape": "box",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.25,
+      "opening_bypassed": false,
+      "radius_mm": 25.0,
+      "closing_4mm": true,
+      "input_voxels": 4131,
+      "processed_voxels": 4083,
+      "true_perimeter_mm": 1040.0,
+      "fitted_perimeter_mm": 1093.4452661694365,
+      "error_mm": 53.445266169436536,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 12,
+      "axes_mm": [
+        181.15526067075345,
+        166.75004760302465
+      ],
+      "scaled_condition": 11.96914179443904
+    },
+    {
+      "shape": "box",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.5,
+      "opening_bypassed": false,
+      "radius_mm": 50.0,
+      "closing_4mm": false,
+      "input_voxels": 4131,
+      "processed_voxels": 3983,
+      "true_perimeter_mm": 1040.0,
+      "fitted_perimeter_mm": 1017.9934081445099,
+      "error_mm": -22.006591855490115,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 20,
+      "axes_mm": [
+        176.08389910999534,
+        147.3132637868279
+      ],
+      "scaled_condition": 7.166430984998875
+    },
+    {
+      "shape": "box",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.5,
+      "opening_bypassed": false,
+      "radius_mm": 50.0,
+      "closing_4mm": true,
+      "input_voxels": 4131,
+      "processed_voxels": 3983,
+      "true_perimeter_mm": 1040.0,
+      "fitted_perimeter_mm": 1017.9934081445099,
+      "error_mm": -22.006591855490115,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 20,
+      "axes_mm": [
+        176.08389910999534,
+        147.3132637868279
+      ],
+      "scaled_condition": 7.166430984998875
+    },
+    {
+      "shape": "box",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.9,
+      "opening_bypassed": false,
+      "radius_mm": 90.0,
+      "closing_4mm": false,
+      "input_voxels": 4131,
+      "processed_voxels": 3667,
+      "true_perimeter_mm": 1040.0,
+      "fitted_perimeter_mm": 908.7425166268554,
+      "error_mm": -131.25748337314462,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 24,
+      "axes_mm": [
+        164.5856903297589,
+        123.18506258729926
+      ],
+      "scaled_condition": 4.009307308077847
+    },
+    {
+      "shape": "box",
+      "a_mm": 160.0,
+      "b_mm": 100.0,
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.9,
+      "opening_bypassed": false,
+      "radius_mm": 90.0,
+      "closing_4mm": true,
+      "input_voxels": 4131,
+      "processed_voxels": 3667,
+      "true_perimeter_mm": 1040.0,
+      "fitted_perimeter_mm": 908.7425166268554,
+      "error_mm": -131.25748337314462,
+      "accepted": true,
+      "failure_reason": null,
+      "hull_vertex_count": 24,
+      "axes_mm": [
+        164.5856903297589,
+        123.18506258729926
+      ],
+      "scaled_condition": 4.009307308077847
+    }
+  ],
+  "aggregates": [
+    {
+      "shape": "ellipse",
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.0,
+      "attempts": 2,
+      "failures": 0,
+      "error_range_mm": [
+        -0.9735865427161343,
+        -0.9735865427161343
+      ]
+    },
+    {
+      "shape": "ellipse",
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.25,
+      "attempts": 2,
+      "failures": 0,
+      "error_range_mm": [
+        -1.3659082422718711,
+        -1.3659082422718711
+      ]
+    },
+    {
+      "shape": "ellipse",
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.5,
+      "attempts": 2,
+      "failures": 0,
+      "error_range_mm": [
+        -1.3495522501933692,
+        -1.3495522501933692
+      ]
+    },
+    {
+      "shape": "ellipse",
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.9,
+      "attempts": 2,
+      "failures": 0,
+      "error_range_mm": [
+        -44.917541760380686,
+        -44.917541760380686
+      ]
+    },
+    {
+      "shape": "ellipse",
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.0,
+      "attempts": 2,
+      "failures": 0,
+      "error_range_mm": [
+        -2.734106283389224,
+        -2.734106283389224
+      ]
+    },
+    {
+      "shape": "ellipse",
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.25,
+      "attempts": 2,
+      "failures": 0,
+      "error_range_mm": [
+        -4.151382357921875,
+        -4.151382357921875
+      ]
+    },
+    {
+      "shape": "ellipse",
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.5,
+      "attempts": 2,
+      "failures": 0,
+      "error_range_mm": [
+        -3.4595448711957033,
+        -3.4595448711957033
+      ]
+    },
+    {
+      "shape": "ellipse",
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.9,
+      "attempts": 2,
+      "failures": 0,
+      "error_range_mm": [
+        -37.773930134484544,
+        -37.773930134484544
+      ]
+    },
+    {
+      "shape": "box",
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.0,
+      "attempts": 2,
+      "failures": 2,
+      "error_range_mm": null
+    },
+    {
+      "shape": "box",
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.25,
+      "attempts": 2,
+      "failures": 0,
+      "error_range_mm": [
+        49.1083697381423,
+        49.1083697381423
+      ]
+    },
+    {
+      "shape": "box",
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.5,
+      "attempts": 2,
+      "failures": 0,
+      "error_range_mm": [
+        -39.02452102659913,
+        -39.02452102659913
+      ]
+    },
+    {
+      "shape": "box",
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.9,
+      "attempts": 2,
+      "failures": 0,
+      "error_range_mm": [
+        -137.09282004605313,
+        -137.09282004605313
+      ]
+    },
+    {
+      "shape": "box",
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.0,
+      "attempts": 2,
+      "failures": 2,
+      "error_range_mm": null
+    },
+    {
+      "shape": "box",
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.25,
+      "attempts": 2,
+      "failures": 0,
+      "error_range_mm": [
+        53.445266169436536,
+        53.445266169436536
+      ]
+    },
+    {
+      "shape": "box",
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.5,
+      "attempts": 2,
+      "failures": 0,
+      "error_range_mm": [
+        -22.006591855490115,
+        -22.006591855490115
+      ]
+    },
+    {
+      "shape": "box",
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.9,
+      "attempts": 2,
+      "failures": 0,
+      "error_range_mm": [
+        -131.25748337314462,
+        -131.25748337314462
+      ]
+    }
+  ],
+  "attempt_count": 32,
+  "invalid_fit_count": 4,
+  "all_tests_passed": true,
+  "interpretation": "Errors include grid, morphology, convexification, conic model and perimeter approximation. This does not isolate anatomical waist benefit or set parameters from human data."
+}

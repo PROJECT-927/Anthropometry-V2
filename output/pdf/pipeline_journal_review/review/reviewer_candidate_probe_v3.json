@@ -1,0 +1,141 @@
+{
+  "scope": "Independent hash/plan/attempt/failure audit and eight deterministic zero-noise cases reproduced; synthetic geometry only.",
+  "freeze_utc": "2026-10-21T15:37:28.150565+00:00",
+  "plan_sha256": "68d830573d9dc18138064a7b924e0ae888ffb52b75893a51b1b96e6ed32ca69d",
+  "source_hashes_match": true,
+  "attempt_count": 598,
+  "selected_cases": [
+    {
+      "attempt_id": "test-0-15-1-0-direct_known_section",
+      "result_reproduced": true
+    },
+    {
+      "attempt_id": "test-0-15-1-0-two_axis_projected_occupancy",
+      "result_reproduced": true
+    },
+    {
+      "attempt_id": "test-2-55-2-0-direct_known_section",
+      "result_reproduced": true
+    },
+    {
+      "attempt_id": "test-2-55-2-0-two_axis_projected_occupancy",
+      "result_reproduced": true
+    },
+    {
+      "attempt_id": "test-5-80-4-0-direct_known_section",
+      "result_reproduced": true
+    },
+    {
+      "attempt_id": "test-5-80-4-0-two_axis_projected_occupancy",
+      "result_reproduced": true
+    },
+    {
+      "attempt_id": "test-8-55-2-0-direct_known_section",
+      "result_reproduced": true
+    },
+    {
+      "attempt_id": "test-8-55-2-0-two_axis_projected_occupancy",
+      "result_reproduced": true
+    }
+  ],
+  "test_summary": [
+    {
+      "entry": "direct_known_section",
+      "candidate": "fixed_constant_no_morph",
+      "attempts": 243,
+      "failures": 0,
+      "mae_vs_continuous_section_mm": 42.15379403371183,
+      "max_abs_error_mm": 684.4532676020581
+    },
+    {
+      "entry": "direct_known_section",
+      "candidate": "fixed_constant_uniform_no_morph",
+      "attempts": 243,
+      "failures": 0,
+      "mae_vs_continuous_section_mm": 11.778866206356492,
+      "max_abs_error_mm": 40.30989579086054
+    },
+    {
+      "entry": "direct_known_section",
+      "candidate": "constrained_no_morph",
+      "attempts": 243,
+      "failures": 0,
+      "mae_vs_continuous_section_mm": 14.223677457447868,
+      "max_abs_error_mm": 46.78029293329132
+    },
+    {
+      "entry": "direct_known_section",
+      "candidate": "width_depth_axis_aligned",
+      "attempts": 243,
+      "failures": 0,
+      "mae_vs_continuous_section_mm": 25.077166144586535,
+      "max_abs_error_mm": 92.06171352189631
+    },
+    {
+      "entry": "direct_known_section",
+      "candidate": "unrounded_convex_diagnostic",
+      "attempts": 243,
+      "failures": 0,
+      "mae_vs_continuous_section_mm": 6.021175829205581,
+      "max_abs_error_mm": 15.26517149237634
+    },
+    {
+      "entry": "direct_known_section",
+      "candidate": "historical_opening_0p9_corrected_fit",
+      "attempts": 243,
+      "failures": 153,
+      "mae_vs_continuous_section_mm": 62.54233712375991,
+      "max_abs_error_mm": 225.35379087561944
+    },
+    {
+      "entry": "two_axis_projected_occupancy",
+      "candidate": "fixed_constant_no_morph",
+      "attempts": 243,
+      "failures": 243,
+      "mae_vs_continuous_section_mm": null,
+      "max_abs_error_mm": null
+    },
+    {
+      "entry": "two_axis_projected_occupancy",
+      "candidate": "fixed_constant_uniform_no_morph",
+      "attempts": 243,
+      "failures": 0,
+      "mae_vs_continuous_section_mm": 155.9475634549002,
+      "max_abs_error_mm": 283.33195099737804
+    },
+    {
+      "entry": "two_axis_projected_occupancy",
+      "candidate": "constrained_no_morph",
+      "attempts": 243,
+      "failures": 0,
+      "mae_vs_continuous_section_mm": 128.80262768041413,
+      "max_abs_error_mm": 252.92055917960192
+    },
+    {
+      "entry": "two_axis_projected_occupancy",
+      "candidate": "width_depth_axis_aligned",
+      "attempts": 243,
+      "failures": 0,
+      "mae_vs_continuous_section_mm": 25.077166144586535,
+      "max_abs_error_mm": 92.06171352189631
+    },
+    {
+      "entry": "two_axis_projected_occupancy",
+      "candidate": "unrounded_convex_diagnostic",
+      "attempts": 243,
+      "failures": 0,
+      "mae_vs_continuous_section_mm": 206.60254432859475,
+      "max_abs_error_mm": 372.0
+    },
+    {
+      "entry": "two_axis_projected_occupancy",
+      "candidate": "historical_opening_0p9_corrected_fit",
+      "attempts": 243,
+      "failures": 0,
+      "mae_vs_continuous_section_mm": 58.982863674455515,
+      "max_abs_error_mm": 148.49869967916948
+    }
+  ],
+  "noise_scope": "One deterministic random field per nonzero-noise configuration; no repeatability interval or variance calibration",
+  "interpretation": "Direct-contour and two-axis reconstruction differ materially. Solver stability and broad synthetic evaluation do not resolve anthropometric utility, and a comparator spread is not a physical confidence interval."
+}

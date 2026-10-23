@@ -1,0 +1,785 @@
+[
+  {
+    "index": 1,
+    "subject_id": "-JtWlHEvrLPWagPaAhm0eQ_UKMSg8By1yoe-SkdrKSs",
+    "height_cm": 160.9,
+    "photo_id": "00e11c860f7b081a01e9c7f04405c40f",
+    "result_file": "runs_bodym\\001\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 2,
+    "subject_id": "1T9SoRhbCpQ0zXf4Le6WjwTOPdfnmEDebvWaECZg_HM",
+    "height_cm": 170.7,
+    "photo_id": "83200b70fa7c69f212c5a19377a21058",
+    "result_file": "runs_bodym\\002\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 3,
+    "subject_id": "2LAYE-qYtPZMSeH-gUgP-H4o-WRPzC0Cg9Nf5_AkLBE",
+    "height_cm": 179.7,
+    "photo_id": "153710e4668b168cb601ded5b7415507",
+    "result_file": "runs_bodym\\003\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 4,
+    "subject_id": "3KCeTD5hLgY5qDa-Dhg0lcrnsRM_EndCLV4DMSOQfQM",
+    "height_cm": 176.1,
+    "photo_id": "02503c788e19cba858da656130d86478",
+    "result_file": "runs_bodym\\004\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 5,
+    "subject_id": "3beF_SfHubarfkfoyCeA6EDR7UqE8j-bgj4bzBFzGFM",
+    "height_cm": 179.7,
+    "photo_id": "0a61f2df7743db47dcbe5c9d0579e7ab",
+    "result_file": "runs_bodym\\005\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 6,
+    "subject_id": "59bc275a681516389ccf40e1",
+    "height_cm": 172.1,
+    "photo_id": "027727b5f7ac827caed03e932871d1aa",
+    "result_file": "runs_bodym\\006\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 7,
+    "subject_id": "59bc275c681516389ccf41b3",
+    "height_cm": 168.55,
+    "photo_id": "035083a3b377f339f5cd8e699f516b7c",
+    "result_file": "runs_bodym\\007\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 8,
+    "subject_id": "59bc275c681516389ccf41b9",
+    "height_cm": 172.5,
+    "photo_id": "00aefca158a6b773b8c466c9b715ac25",
+    "result_file": "runs_bodym\\008\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 9,
+    "subject_id": "59bc275f681516389ccf42e9",
+    "height_cm": 168.5,
+    "photo_id": "1a7cef1e42678cf622cd26af55fe47fb",
+    "result_file": "runs_bodym\\009\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 10,
+    "subject_id": "59bc275f681516389ccf42ec",
+    "height_cm": 161.0,
+    "photo_id": "18f185b407818f8299c115eaf6b7ff51",
+    "result_file": "runs_bodym\\010\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 11,
+    "subject_id": "59bc275f681516389ccf42f8",
+    "height_cm": 168.2,
+    "photo_id": "00e25ccd07165abbd859a16bbc569282",
+    "result_file": "runs_bodym\\011\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 12,
+    "subject_id": "59bc2760681516389ccf4304",
+    "height_cm": 146.4,
+    "photo_id": "019b87b3ffb4b3c50efee461335ea9bf",
+    "result_file": "runs_bodym\\012\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 13,
+    "subject_id": "59bc2761681516389ccf435d",
+    "height_cm": 184.9,
+    "photo_id": "01efe9423b11496832f46a87e9d30366",
+    "result_file": "runs_bodym\\013\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 14,
+    "subject_id": "59bc2761681516389ccf438a",
+    "height_cm": 158.0,
+    "photo_id": "08319b4397090ed675ef926bae1d349b",
+    "result_file": "runs_bodym\\014\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 15,
+    "subject_id": "59bc2763681516389ccf445b",
+    "height_cm": 163.8,
+    "photo_id": "11677eada1036437abb6be3cd1a7a816",
+    "result_file": "runs_bodym\\015\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 16,
+    "subject_id": "59bc2764681516389ccf44a5",
+    "height_cm": 167.5,
+    "photo_id": "021f0b002928eadc35cfa7486ec81d54",
+    "result_file": "runs_bodym\\016\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 17,
+    "subject_id": "59bc2764681516389ccf44b8",
+    "height_cm": 175.55,
+    "photo_id": "162b6144df5eff838c1a4ae576b4d90c",
+    "result_file": "runs_bodym\\017\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 18,
+    "subject_id": "59bc2766681516389ccf4570",
+    "height_cm": 165.1,
+    "photo_id": "025c2688a684e2e84dbcfd4d40a7e396",
+    "result_file": "runs_bodym\\018\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 19,
+    "subject_id": "59bc2766681516389ccf4576",
+    "height_cm": 173.2,
+    "photo_id": "0761d2558ec0bbad0d6645e18a7fd80d",
+    "result_file": "runs_bodym\\019\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 20,
+    "subject_id": "59bc2767681516389ccf45e6",
+    "height_cm": 173.0,
+    "photo_id": "2947a2a776c51657a8956f92382e8d49",
+    "result_file": "runs_bodym\\020\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 21,
+    "subject_id": "59bc2769681516389ccf46e3",
+    "height_cm": 174.9,
+    "photo_id": "07ab35c36779bc36114e8317f5f002d2",
+    "result_file": "runs_bodym\\021\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 22,
+    "subject_id": "59bc276c681516389ccf47c0",
+    "height_cm": 164.6,
+    "photo_id": "0daaffd773d74477861012c9bcaf24a4",
+    "result_file": "runs_bodym\\022\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 23,
+    "subject_id": "59bc276f681516389ccf48d4",
+    "height_cm": 167.8,
+    "photo_id": "00faad24b3376fd9f864a8d4555bf0f1",
+    "result_file": "runs_bodym\\023\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 24,
+    "subject_id": "5a1c4633e7cb790004827642",
+    "height_cm": 158.0,
+    "photo_id": "a32ee410d093b47d1b29574593513f6e",
+    "result_file": "runs_bodym\\024\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 25,
+    "subject_id": "5a1e03cb9f17b800040cc77c",
+    "height_cm": 172.5,
+    "photo_id": "1547df04711bc7bd3bf59a4445fae4cf",
+    "result_file": "runs_bodym\\025\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 26,
+    "subject_id": "6JfuBS-duD_BLzV6gxsQjcPc7gv6mgQBTuNzdnp6gfA",
+    "height_cm": 159.0,
+    "photo_id": "0b53e8be10e3d2bd06af556014131b73",
+    "result_file": "runs_bodym\\026\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 27,
+    "subject_id": "6PTzEsHtIS7BmBGKDa9YNJNB__vpQwsxFrKi3EF_d2Q",
+    "height_cm": 177.9,
+    "photo_id": "00f29ea96c690cb73496ebc2448bf7bc",
+    "result_file": "runs_bodym\\027\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 28,
+    "subject_id": "6Xz1aGZP_g084xrBEy0UYJjzozZhj3G1wx_cFS9q-UM",
+    "height_cm": 163.0,
+    "photo_id": "0bff2fdfd1411af75d9688cc5d48a3bb",
+    "result_file": "runs_bodym\\028\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 29,
+    "subject_id": "6c5kXvps2J7p2W5vbM6bRw4exDRtp97Tv83Egk9jzqY",
+    "height_cm": 179.1,
+    "photo_id": "0fff8ba1e2b76cf9359ef14d353841dd",
+    "result_file": "runs_bodym\\029\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 30,
+    "subject_id": "6xSAqvQy_Z-Us1pkj_VDz5A-AZaIveMqaVDT-zuO-nE",
+    "height_cm": 170.6,
+    "photo_id": "0efe86c2b6f82177781784eb6907e14f",
+    "result_file": "runs_bodym\\030\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 31,
+    "subject_id": "7Grk1NNK3XYiCjt1lfobViSPIzrXCiOADVp7vvhCa_k",
+    "height_cm": 154.7,
+    "photo_id": "0048f0d9a4d0ca697e31077bab7b2471",
+    "result_file": "runs_bodym\\031\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 32,
+    "subject_id": "7JBr5FGDywYl_kllq0_0fRMFWzDU0TB94LSGzryaPLo",
+    "height_cm": 173.2,
+    "photo_id": "20192a081a6e6cc01e7388070cd12441",
+    "result_file": "runs_bodym\\032\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 33,
+    "subject_id": "95mZGlSSMrgK7GkSX_xfx_jAMlgsojYhlbOIhxdGoVE",
+    "height_cm": 167.45,
+    "photo_id": "0ee7cb2c87559c63b733fb88f57f38fb",
+    "result_file": "runs_bodym\\033\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 34,
+    "subject_id": "9T0rg9AnasRkTw_sUPRRI-9rcZNFxv71DT1dMqY8UGA",
+    "height_cm": 161.95,
+    "photo_id": "0d89f5b1adb8b5c0d52fead18a8aca86",
+    "result_file": "runs_bodym\\034\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 35,
+    "subject_id": "Ajn0E-3juN47I6dkxaN3TiP_VVDioqI5OEBdFop48tI",
+    "height_cm": 165.9,
+    "photo_id": "00112158c308d48307e95b841f678df8",
+    "result_file": "runs_bodym\\035\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 36,
+    "subject_id": "Cax6OW9AlHPd_6hLl6_uFfnwE8q7Egg8BjEolbgvVqo",
+    "height_cm": 180.45,
+    "photo_id": "06e1a904f76eb330225be20b8896972c",
+    "result_file": "runs_bodym\\036\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 37,
+    "subject_id": "DF_TvDglB-jDlNiMHqrOyzMLB4dvQwkwFp_WEpXc5Yg",
+    "height_cm": 167.85,
+    "photo_id": "057714b6cae8d7c10f52ada5dcf87056",
+    "result_file": "runs_bodym\\037\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 38,
+    "subject_id": "DSgq40EMwRGMB0PcvBnYuRxMM3haDvyMyOM5emZTbB0",
+    "height_cm": 166.85,
+    "photo_id": "05e6cba79cce9273404142a8c45564e3",
+    "result_file": "runs_bodym\\038\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 39,
+    "subject_id": "Dx8-J4Z8XqOxz0bbQgMaajF0hI9-OhZMt6igruDAvLE",
+    "height_cm": 174.5,
+    "photo_id": "0679805fc75d38aa1a8e3b304c6db9fc",
+    "result_file": "runs_bodym\\039\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 40,
+    "subject_id": "EA_ePbfS4QaBH-Goq7gIxT4wTt6OdOWHVXUMRurUSxQ",
+    "height_cm": 173.0,
+    "photo_id": "09c62f1ac6fd201afa468632995b7a89",
+    "result_file": "runs_bodym\\040\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 41,
+    "subject_id": "Emel-lHVBvlLuD5uIvHVc3k8-1jsv0Uad9NRjsjrkKQ",
+    "height_cm": 164.5,
+    "photo_id": "1fb38847bcbf1b78b9770616cfdf417e",
+    "result_file": "runs_bodym\\041\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 42,
+    "subject_id": "EnjthWFE8xVHewrQK033alOt-MyRDjAZtl5pq1xPYsA",
+    "height_cm": 175.5,
+    "photo_id": "1b7afbc07bc3b7e225b07b92a0b52a35",
+    "result_file": "runs_bodym\\042\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 43,
+    "subject_id": "F8uj6alzF3nazjTnSgq_DWDsiCHc0WnYGNyVOMEf-8A",
+    "height_cm": 170.9,
+    "photo_id": "0aad7e8a4987342302961aa4cc0ccbed",
+    "result_file": "runs_bodym\\043\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 44,
+    "subject_id": "FIIb7-8bRielrHf2Yyd4Ewsa2KkKE8SGWBdSJqNzRpY",
+    "height_cm": 174.0,
+    "photo_id": "4e6f5e0f0e38530305898f08a7e12c6b",
+    "result_file": "runs_bodym\\044\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 45,
+    "subject_id": "FLwFwR5T23HdtLz-oF94PDLDwiA_nRFAPzX_S2sfhqM",
+    "height_cm": 175.55,
+    "photo_id": "11da4b528ccf6923acb9faa614831898",
+    "result_file": "runs_bodym\\045\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 46,
+    "subject_id": "HC9keb0Y_wT4x2j4Bc4Ij0wPaCLz38ymDpqm142_UiQ",
+    "height_cm": 181.5,
+    "photo_id": "0504905b9f4ea1cdb2a4fe44e706d260",
+    "result_file": "runs_bodym\\046\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 47,
+    "subject_id": "IZ-j_GhGEb5TfReZc6gnNP-wrj-HzuULnZsrpr1chvg",
+    "height_cm": 188.9,
+    "photo_id": "0e1feec79f9b76f07be4038822c0286a",
+    "result_file": "runs_bodym\\047\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 48,
+    "subject_id": "IjWPiWUM9mg0EKc9pJsq_32y48utYeL2wrEnFBTvNCw",
+    "height_cm": 171.6,
+    "photo_id": "004e3469daa569584c9d56200fb93374",
+    "result_file": "runs_bodym\\048\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 49,
+    "subject_id": "JQdy-88z-nwoTsWK0MBddftPtzxSNC6pxN7Iel4oScQ",
+    "height_cm": 167.05,
+    "photo_id": "13e5b6e8a3d1358d89216bf3757f646b",
+    "result_file": "runs_bodym\\049\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 50,
+    "subject_id": "Luz-tgL7-IvsYF7B2jmP36yy-bWaWFK9po3PvES8iWY",
+    "height_cm": 186.5,
+    "photo_id": "3bf17d50d9a42c0a7e417210849efda8",
+    "result_file": "runs_bodym\\050\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 51,
+    "subject_id": "LzH7czr0Gmn0o3HS12dEELqX8o51tta9kRPflhvjwsY",
+    "height_cm": 181.0,
+    "photo_id": "01f677be480a55c0d93ab446ec22270c",
+    "result_file": "runs_bodym\\051\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 52,
+    "subject_id": "Mrq4MhWptluvgMB-LCjGQl950hLNxVxQhBbzo--Il5E",
+    "height_cm": 180.0,
+    "photo_id": "0d3cd4eb2251604e10d7c05d1b1c1b38",
+    "result_file": "runs_bodym\\052\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 53,
+    "subject_id": "NUDNE9WoUBzxlMEe1LQa4gz-xUGpIFbXnDs2eW3NJhI",
+    "height_cm": 182.55,
+    "photo_id": "1f97f4aaee7b564c6d1089a61f29706b",
+    "result_file": "runs_bodym\\053\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 54,
+    "subject_id": "PIZ1cRaUw7gN2AHaIaE6UPVAnuAq-6LR04I9pkj6FLo",
+    "height_cm": 174.0,
+    "photo_id": "06e8b5f8ea5aa29958fdb640f8a568aa",
+    "result_file": "runs_bodym\\054\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 55,
+    "subject_id": "PThSjJ6NWmj_q2nU966OHPowwt2HsvtPWtw7O1ZAAGE",
+    "height_cm": 173.5,
+    "photo_id": "09c87c6611ab8539765390f57440d885",
+    "result_file": "runs_bodym\\055\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 56,
+    "subject_id": "RdU37isT98Jr1e9DqgrjHCl5gBYI1lDJtt7n7QdhFr4",
+    "height_cm": 158.1,
+    "photo_id": "05d0675bdef881dd918f023dd82d1d3f",
+    "result_file": "runs_bodym\\056\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 57,
+    "subject_id": "RiUtVC888GhxiPPvh_EVBY5JLaXi5qWWK94tkNVeHbY",
+    "height_cm": 168.05,
+    "photo_id": "1c8e217df737d8bfbf795c9d6bf84da4",
+    "result_file": "runs_bodym\\057\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 58,
+    "subject_id": "SJ47wUVOSH7IsveBnaFMvOhunNN_vK-Q0JxKIYsBDBA",
+    "height_cm": 155.6,
+    "photo_id": "0c6df6504cf85d2ff1471fe3dbe87edf",
+    "result_file": "runs_bodym\\058\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 59,
+    "subject_id": "T0RAtMAIV4dHp9mMak8ATuW4pS1rKNvU6xM6sCxbBSw",
+    "height_cm": 171.4,
+    "photo_id": "037011efaa50680c6a2b79c6a6ed86a4",
+    "result_file": "runs_bodym\\059\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 60,
+    "subject_id": "TlIG_3sXZLuH7T9nQMivDNnzJn4fFYQy1P0KqC3ldUQ",
+    "height_cm": 163.2,
+    "photo_id": "0b0955e1ca4b09d0e0fb101a0985a7c0",
+    "result_file": "runs_bodym\\060\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 61,
+    "subject_id": "Ukvlhaesp0m8DIMdAx9QT2HPOrNbrOsz88AuMsOveXc",
+    "height_cm": 166.95,
+    "photo_id": "08ec8983b4f66bd41b1acf0c72181f53",
+    "result_file": "runs_bodym\\061\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 62,
+    "subject_id": "_HHaGa0t2JffDt5OlyfmnroNlgj2vxmp2_MlA7uarDU",
+    "height_cm": 169.5,
+    "photo_id": "07cef07cafff0a43440b664809454ab9",
+    "result_file": "runs_bodym\\062\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 63,
+    "subject_id": "_UIZN2KX9YMinrn-UkUP23ta1UIIA6CSbAKoPgiIMcg",
+    "height_cm": 162.05,
+    "photo_id": "0413e188cdb7a8a356b8e7dcd67a22a2",
+    "result_file": "runs_bodym\\063\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 64,
+    "subject_id": "a0iE7PPHJxEy8GXFpMtwTdy5QNfOL8F8oB1XDoNi7jI",
+    "height_cm": 166.2,
+    "photo_id": "004a5121131d22f1c1d9f63828442577",
+    "result_file": "runs_bodym\\064\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 65,
+    "subject_id": "aiwELnE51kqXxPdv9JD6ywIiY_pXUPkPf9VgdYfyLnM",
+    "height_cm": 184.4,
+    "photo_id": "069110c97a0e41150a796b102ea2fc34",
+    "result_file": "runs_bodym\\065\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 66,
+    "subject_id": "an68KPiV2AF5miGBG1uFJ5V62AqEkVCvmv_4UhvMmk0",
+    "height_cm": 162.85,
+    "photo_id": "16dfeb0ff6997b07fc7841ffeaae6b00",
+    "result_file": "runs_bodym\\066\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 67,
+    "subject_id": "c1EhFyDUVoxhuK5HC1z-Dkdeo8qB5g4ilw93VZpVnZQ",
+    "height_cm": 162.35,
+    "photo_id": "07beb83affc32a5080972259ffc434de",
+    "result_file": "runs_bodym\\067\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 68,
+    "subject_id": "c7wfAQy-k3zLcCoh_C4htlLYfc9ErocIM0P3ZVahwfQ",
+    "height_cm": 197.5,
+    "photo_id": "0dfcc3866428b4409512b5f91e9ded58",
+    "result_file": "runs_bodym\\068\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 69,
+    "subject_id": "fH5Ar9JCMOjv0J61UJlT-PnhGh6R2Z3xWHFldJ7I8a8",
+    "height_cm": 165.4,
+    "photo_id": "182b8943058392a126b787009fbdf889",
+    "result_file": "runs_bodym\\069\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 70,
+    "subject_id": "fKDrVNXxjZ9Y9A-iLCwppvYitS4zHXPB8Oa-W523kXQ",
+    "height_cm": 167.25,
+    "photo_id": "225b58cb755f97a3f659250aa272be8c",
+    "result_file": "runs_bodym\\070\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 71,
+    "subject_id": "fUgWXoKIlc4DVwm0UIqSDLRA9WtjI5dhoo7OyzMvf2g",
+    "height_cm": 170.6,
+    "photo_id": "03b72c7a6c098a3bf74b6c8b374862d7",
+    "result_file": "runs_bodym\\071\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 72,
+    "subject_id": "ftFYU5abWvEf6thIXIS7EffZUYReS67iNXOtogArIfw",
+    "height_cm": 170.3,
+    "photo_id": "0d2d987fe919761f3513d598e2a54e3f",
+    "result_file": "runs_bodym\\072\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 73,
+    "subject_id": "gD2OOnNahi2AAnxxi2yPYSQOqv0U4Zv7NddwYPxp-mU",
+    "height_cm": 191.65,
+    "photo_id": "2808bd97b6db9ede24687e7e6db454b6",
+    "result_file": "runs_bodym\\073\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 74,
+    "subject_id": "gfOnViSX9AGNiNRSILjuf5pri_P9P7f3ss5RgKIN364",
+    "height_cm": 154.45,
+    "photo_id": "1b292812faf2544b1a7e7dc20b0d342e",
+    "result_file": "runs_bodym\\074\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 75,
+    "subject_id": "hjG7-UJ-SuVAgiJ3WEgKdS2nc7fAwQ7iXJCP5oS9omg",
+    "height_cm": 169.0,
+    "photo_id": "1cc4c9db30ca3fb1a124b6e0f0b58ce3",
+    "result_file": "runs_bodym\\075\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 76,
+    "subject_id": "hxcg4D8WS1gANJ0diT0DL3bgOCwJB70sxMQ14rlbKVQ",
+    "height_cm": 182.6,
+    "photo_id": "00fc44412bca19f9f1990cf79c47adef",
+    "result_file": "runs_bodym\\076\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 77,
+    "subject_id": "iQA_dPlcY3Q8dzvohahJMX2HDG83FzUr9y0WX054FmU",
+    "height_cm": 167.15,
+    "photo_id": "0ad031e1f4a0f6901f0b7547e5716a8a",
+    "result_file": "runs_bodym\\077\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 78,
+    "subject_id": "kFu9zeGv2zVM4-Io14cPZ5XJIpp9KpjnRnO-u52-qFk",
+    "height_cm": 175.0,
+    "photo_id": "059cc8bb024e0461a6b7e5fb5ac44d0a",
+    "result_file": "runs_bodym\\078\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 79,
+    "subject_id": "nREZ8AObIzCmwqwrD7QUBTNcuxc9yDGm6YPIgAmaw6o",
+    "height_cm": 171.25,
+    "photo_id": "168ba8a45eac2b8b8eacc5d8609edd37",
+    "result_file": "runs_bodym\\079\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 80,
+    "subject_id": "pIAoqmGOHu9eodV7_u2NEqTY5uM_26Y7OvSyWYABzjo",
+    "height_cm": 182.6,
+    "photo_id": "0b822daba6492d4ba392b4cecf7b2bec",
+    "result_file": "runs_bodym\\080\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 81,
+    "subject_id": "pKKAZWxojdBbyA2c8wfgdxHnCNqVypehWNiBlKx-iLM",
+    "height_cm": 154.2,
+    "photo_id": "00eb5c77f79af6aea1fcf21184c1bf52",
+    "result_file": "runs_bodym\\081\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 82,
+    "subject_id": "pdCgKful2WPOp1lYfGfHxhfjqK0cHU5DxC-WsJHAqvc",
+    "height_cm": 174.2,
+    "photo_id": "309a6d9e3d918059bc0b730dc044af54",
+    "result_file": "runs_bodym\\082\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 83,
+    "subject_id": "qR6MuUrdeXdoHbvy6y-uc78PRQe1wUvQ0AB2O80PIx8",
+    "height_cm": 165.45,
+    "photo_id": "0a15c19f92b0471622bc7251d9e1a603",
+    "result_file": "runs_bodym\\083\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 84,
+    "subject_id": "thfv460GhSp05FB-peSpPMszbaqWGijDJhyy_bx40sA",
+    "height_cm": 172.75,
+    "photo_id": "018cc7c1e78ba95c88795704e0dae997",
+    "result_file": "runs_bodym\\084\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 85,
+    "subject_id": "wrHSTkProLSpm66reKuVm14kgLBncEgmjCPQeMDe6_g",
+    "height_cm": 163.75,
+    "photo_id": "13df1e0f9737c8b5fff70c7914322252",
+    "result_file": "runs_bodym\\085\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  },
+  {
+    "index": 86,
+    "subject_id": "x-kSccAgyNrinXkHgp3Q4l7OpcnL3kxfpT0n4D5Wxzw",
+    "height_cm": 189.5,
+    "photo_id": "27e60a00b7345af4663d9dfa473e0124",
+    "result_file": "runs_bodym\\086\\result.json",
+    "status": "rejected",
+    "reason": "input_mask_border_contact"
+  },
+  {
+    "index": 87,
+    "subject_id": "zd7KNStAd0g52jsmg9UjyqwiBNNr86naOoQvuxEctpQ",
+    "height_cm": 172.0,
+    "photo_id": "20aa75de1f51616798f339898110cc9e",
+    "result_file": "runs_bodym\\087\\result.json",
+    "status": "computed_candidate_set",
+    "reason": null
+  }
+]

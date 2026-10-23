@@ -1,0 +1,42 @@
+{
+  "scope": "descriptive retrospective external BodyM TestA scan-target prediction; perception bypassed; allselectedsubjects retained; sites not pooled as independent",
+  "subjects_attempted": 87,
+  "status_counts": {
+    "computed_candidate_set": 57,
+    "rejected": 30
+  },
+  "top_failure_reasons": {
+    "input_mask_border_contact": 30
+  },
+  "audit": "cohortmapping/uniqueIDs, fixedsourcehashes, perresultdriver/source/inputhashes, finitepositiveallsubjectreferences checked",
+  "paired_classification_tolerance_mm": 1e-08,
+  "reference_file_sha256": "fdf4fe74bbf66d57bc9ad1727cebf437650ebe830569c15c911fc933752d74c5",
+  "per_level_activation": {
+    "chest": {
+      "available_level_ablations": 57,
+      "cap_changed_sections": 45,
+      "cap_active_after_clip_sections": 45,
+      "filter_changed_sections": 50,
+      "cap_changed_voxels_total": 40445
+    },
+    "waist": {
+      "available_level_ablations": 57,
+      "cap_changed_sections": 4,
+      "cap_active_after_clip_sections": 4,
+      "filter_changed_sections": 51,
+      "cap_changed_voxels_total": 2433
+    },
+    "hip": {
+      "available_level_ablations": 57,
+      "cap_changed_sections": 18,
+      "cap_active_after_clip_sections": 18,
+      "filter_changed_sections": 51,
+      "cap_changed_voxels_total": 5105
+    }
+  },
+  "runtime_seconds": {
+    "median": 2.3148300000466406,
+    "max": 4.553125699982047
+  },
+  "peak_working_set_bytes_max": 964603904
+}

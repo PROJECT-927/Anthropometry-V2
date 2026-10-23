@@ -1,0 +1,1049 @@
+{
+  "source": "https://amazon-bodym.s3.us-west-2.amazonaws.com/testA/",
+  "files": [
+    {
+      "file": "mask/00e11c860f7b081a01e9c7f04405c40f.png",
+      "bytes": 5369,
+      "sha256": "bb0bd3fac81ca2c93403eede28f07bb2c8b7600c77cfc4b5f8930ccb4a1e2169",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/00e11c860f7b081a01e9c7f04405c40f.png",
+      "bytes": 4298,
+      "sha256": "a0469274e332ff36c5c1369f9ca30c203645bfaa5f38d7656377514d11949aa5",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/83200b70fa7c69f212c5a19377a21058.png",
+      "bytes": 5507,
+      "sha256": "bf2bfb74ce68f2231b8472261d9cd9ecb99d04b648abadcb5a9afedb8c19fabf",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/83200b70fa7c69f212c5a19377a21058.png",
+      "bytes": 4685,
+      "sha256": "f8268e34730364e3cd519a56a5a1fb885323f14c91d3b02916aa511dc8c8c151",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/153710e4668b168cb601ded5b7415507.png",
+      "bytes": 5495,
+      "sha256": "627b179e426baa0a960dad77ed7597ea8d87a875d4f6ca041a2b48fbad3e66f3",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/153710e4668b168cb601ded5b7415507.png",
+      "bytes": 4404,
+      "sha256": "a012ae22bd28202a6a32f95389de4e33eded96b10d4980614f93ee95537cb525",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/02503c788e19cba858da656130d86478.png",
+      "bytes": 5847,
+      "sha256": "67f23577704780457f6566daba70e5852ff1675cc849956c48187304ffb55859",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/02503c788e19cba858da656130d86478.png",
+      "bytes": 4417,
+      "sha256": "2b190de4b9481b83014c5fc8aa735b63f99270c2033b59006f11b7506a1975bb",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0a61f2df7743db47dcbe5c9d0579e7ab.png",
+      "bytes": 5738,
+      "sha256": "c2a39c0efdf5231810c9800368cc7734669139584694d562608712f68a0e2c4b",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0a61f2df7743db47dcbe5c9d0579e7ab.png",
+      "bytes": 4261,
+      "sha256": "aa626f6507c40d778ae4beff68df5d14af5b2641b031352e45c636b60dd64299",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/027727b5f7ac827caed03e932871d1aa.png",
+      "bytes": 6120,
+      "sha256": "0bc3f7b9066df77d6bbcd63dfde8465dc585cdb62bbf7593b48347c582a559e9",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/027727b5f7ac827caed03e932871d1aa.png",
+      "bytes": 4367,
+      "sha256": "d4096bcbef2f7b96820ceefe13af6b545f0bd703ff1f4393f7a82c9d52d827fd",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/035083a3b377f339f5cd8e699f516b7c.png",
+      "bytes": 5910,
+      "sha256": "e68617cc137e36915b130d483761189dc171a2c4f356e3f4ab26b01c104d75e0",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/035083a3b377f339f5cd8e699f516b7c.png",
+      "bytes": 4500,
+      "sha256": "96c2d2250049c1c837fdc52075e6fb7a0ad4923191f5c71095217264a3f218f1",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/00aefca158a6b773b8c466c9b715ac25.png",
+      "bytes": 6187,
+      "sha256": "e61b13b2e570c83a4f770a462c3af6179902c6274d20f1e84eae6bcb37a1ac7d",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/00aefca158a6b773b8c466c9b715ac25.png",
+      "bytes": 4797,
+      "sha256": "d162c73a07567bb81cb73c57fdb4cbba1fecdf4cb7593081dac0857fea28a4f0",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/1a7cef1e42678cf622cd26af55fe47fb.png",
+      "bytes": 6115,
+      "sha256": "0d8ae2ed6b04a5c3bad9ef25deffea887617ac7b9272e7700592d33a77aaf968",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/1a7cef1e42678cf622cd26af55fe47fb.png",
+      "bytes": 4668,
+      "sha256": "b8464d80fd7ddadb7a02c270a05001d89493bf6dc1074119f349c0f2739af955",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/18f185b407818f8299c115eaf6b7ff51.png",
+      "bytes": 5217,
+      "sha256": "bee90cea9b0da2d50ea8616719074f1b1027970d592f9ef62a579a1d627cedca",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/18f185b407818f8299c115eaf6b7ff51.png",
+      "bytes": 4316,
+      "sha256": "478846293168334e54e43bba025362ac83323196fa54a7fc68b9b286c517230f",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/00e25ccd07165abbd859a16bbc569282.png",
+      "bytes": 5980,
+      "sha256": "45677c276aadd2a9e923ef30be8d906b3252fddeee890ecb16f962291b650b5b",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/00e25ccd07165abbd859a16bbc569282.png",
+      "bytes": 4296,
+      "sha256": "0b52667bf8dbf6d71489d1d47b54f52523ab27153eccdc31cde3e9e9e9f98bfd",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/019b87b3ffb4b3c50efee461335ea9bf.png",
+      "bytes": 5612,
+      "sha256": "e99d6dee822d525d5981e17d08520e5ad807519157c5f596b1677cd019579ede",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/019b87b3ffb4b3c50efee461335ea9bf.png",
+      "bytes": 4484,
+      "sha256": "5e16a7bc9d5cdf0379112db56be3e3d8fdf0347a9814b665795f5d4b67a6c84c",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/01efe9423b11496832f46a87e9d30366.png",
+      "bytes": 5706,
+      "sha256": "c3896397fccdad9c3285db1a2de60b9fcc971b83053cf88f8f338228fba8d0ac",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/01efe9423b11496832f46a87e9d30366.png",
+      "bytes": 4307,
+      "sha256": "f58687fd66ed0b8dac779ace00fd21fea3abe87561f47fbdc28108ebcb790133",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/08319b4397090ed675ef926bae1d349b.png",
+      "bytes": 5940,
+      "sha256": "422bc217ef42223841f8a2eeb5acc248356447feecbd8966930354bfe0dcfb66",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/08319b4397090ed675ef926bae1d349b.png",
+      "bytes": 4533,
+      "sha256": "6e75a8a5f946a2aa51c71e2a80ca2f38d81aaed93d0bc3afafa79e5f01f76f87",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/11677eada1036437abb6be3cd1a7a816.png",
+      "bytes": 5673,
+      "sha256": "4589a046d952d3e1fdf8b23bc0188c2ba526e0601f4af47b223724d4f4c06a24",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/11677eada1036437abb6be3cd1a7a816.png",
+      "bytes": 4075,
+      "sha256": "7d74ba1449d87af2895982872584d1ff19ca33d38bf1b5aeb3eab7f124ffb047",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/021f0b002928eadc35cfa7486ec81d54.png",
+      "bytes": 5898,
+      "sha256": "bef8390456346fed7ce3cb60b853e32bfa3411c9392325654ac9bd668b65a4c6",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/021f0b002928eadc35cfa7486ec81d54.png",
+      "bytes": 4474,
+      "sha256": "212db587f4b5b5d7764422236bef0c4d4c0eb9129dac6935c08ad28197c4e971",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/162b6144df5eff838c1a4ae576b4d90c.png",
+      "bytes": 5433,
+      "sha256": "237f8495f6207bc075fd7ded47467a6eba3a20006fad02e3b375634035210b6e",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/162b6144df5eff838c1a4ae576b4d90c.png",
+      "bytes": 4680,
+      "sha256": "976163e56b99ca3d0db786bf6fd7bf0144d061858582886818c00c9706b199a7",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/025c2688a684e2e84dbcfd4d40a7e396.png",
+      "bytes": 6256,
+      "sha256": "c6e4d33b3f23d57d466576b927be6339f08915b1c7ecf76527d0121a77f5b936",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/025c2688a684e2e84dbcfd4d40a7e396.png",
+      "bytes": 4841,
+      "sha256": "14b2849b47fc0ab017e08021fe6d1d4f2532881f4050b2335a5347fc69097b51",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0761d2558ec0bbad0d6645e18a7fd80d.png",
+      "bytes": 5083,
+      "sha256": "4e3b098e347f42157dc0c713494553e12fc165c7d64f4d6a7bde3df6af2801b1",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0761d2558ec0bbad0d6645e18a7fd80d.png",
+      "bytes": 4251,
+      "sha256": "ea4799f078d4c737b45a9fedd3321d7c167c6dec56084a30cf5ab631e2af5270",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/2947a2a776c51657a8956f92382e8d49.png",
+      "bytes": 5783,
+      "sha256": "a5315abb82e538b65b7ae8662ffb8a026fdb5d890b05ea572282eb8fabc63e0b",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/2947a2a776c51657a8956f92382e8d49.png",
+      "bytes": 4512,
+      "sha256": "d246ec4e4e019083e185d8a1f2eeb0c1fc94f55044fec3bf6c157c340205ca11",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/07ab35c36779bc36114e8317f5f002d2.png",
+      "bytes": 4751,
+      "sha256": "5e043253a217b59145c0f3b8e31ad0ae328c47c9fbb92d37379d35ebe2392b04",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/07ab35c36779bc36114e8317f5f002d2.png",
+      "bytes": 4514,
+      "sha256": "7b68ac779659b8e02708d4eb42852a4a514cdafb05e1a91a94572a13eec52a2e",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0daaffd773d74477861012c9bcaf24a4.png",
+      "bytes": 4864,
+      "sha256": "ac974c025f5445ad5e684818e46a28647bc3fb701b312c94d579e3e7cd0cb5c3",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0daaffd773d74477861012c9bcaf24a4.png",
+      "bytes": 4271,
+      "sha256": "bf271be7b18950bd185a1241f9739696d4d2477fcfb7694c4279cda7fbcd4d62",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/00faad24b3376fd9f864a8d4555bf0f1.png",
+      "bytes": 5186,
+      "sha256": "94b4117dffe5fdc799746e15f7ba8dc729af782c37fb6030bdc9721ab0b28689",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/00faad24b3376fd9f864a8d4555bf0f1.png",
+      "bytes": 4359,
+      "sha256": "654aac2a0c1410f6b13046028480c659b80aac896f169cd30043b890d264267e",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/a32ee410d093b47d1b29574593513f6e.png",
+      "bytes": 5528,
+      "sha256": "650cb8f5c588f75a073a0fe1584123df94c043012b83d0b89235bbb1f08b9d15",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/a32ee410d093b47d1b29574593513f6e.png",
+      "bytes": 4258,
+      "sha256": "dff4c0c118a668f08acde44625201bc0739c6a2980c7bb205586148ef787fb65",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/1547df04711bc7bd3bf59a4445fae4cf.png",
+      "bytes": 5534,
+      "sha256": "affdc713e5e87a58bd93c2d6ea1b7bd2ccb8aeb6f750018ad7c72fb9f0edcbea",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/1547df04711bc7bd3bf59a4445fae4cf.png",
+      "bytes": 4481,
+      "sha256": "c58d9b4064afb69bbcc28ad2d8e07a34dd40c92372ba8245b153b0cd66f08298",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0b53e8be10e3d2bd06af556014131b73.png",
+      "bytes": 5515,
+      "sha256": "f161d08243778837f50c2e33ea89c54721d990fb98c976c5544c1d097f8d7c05",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0b53e8be10e3d2bd06af556014131b73.png",
+      "bytes": 4371,
+      "sha256": "8376d29f996208efde53d48d520b5b3eadc93cd42748f97c3bfbc01bb4a89425",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/00f29ea96c690cb73496ebc2448bf7bc.png",
+      "bytes": 5135,
+      "sha256": "2ac40ae06ff0a3c42e36006acd6832df4d3b786efc9ba78396523bd5b2c95da2",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/00f29ea96c690cb73496ebc2448bf7bc.png",
+      "bytes": 4328,
+      "sha256": "8b57a1c462924ed9b79c86435f8dc05ce3664dcbfe740cc4f77295e589ed56b2",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0bff2fdfd1411af75d9688cc5d48a3bb.png",
+      "bytes": 5717,
+      "sha256": "46b6443b07e24c8bef307489e4e85f8c5c45c37f5ae3d7a0507b354c1b50e406",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0bff2fdfd1411af75d9688cc5d48a3bb.png",
+      "bytes": 4587,
+      "sha256": "c140741c16d2b0a5b4066fcbda5f121aa18e8e18c095f346a2b70734fc2f4a9f",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0fff8ba1e2b76cf9359ef14d353841dd.png",
+      "bytes": 4900,
+      "sha256": "20d0e305c8d6b91402da6ed55671c29df59c4d4e0a02f11855db2cbb4127a040",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0fff8ba1e2b76cf9359ef14d353841dd.png",
+      "bytes": 4341,
+      "sha256": "492da254eab068c57ab72d29db5fc373f9070f950189d735e7102389e7626410",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0efe86c2b6f82177781784eb6907e14f.png",
+      "bytes": 5122,
+      "sha256": "cb00251c6babe8f39277c55ff172c65151407c3c4a6ad3208e1babc4d655970f",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0efe86c2b6f82177781784eb6907e14f.png",
+      "bytes": 4142,
+      "sha256": "6298902cec111d0ee158909e0fcb936787dfdcecf573ec9445ccd025079a802d",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0048f0d9a4d0ca697e31077bab7b2471.png",
+      "bytes": 6474,
+      "sha256": "440e761311b5f9ff4c27ea552ac7a723bc8e9fa42abded9a23d009e876dc1da2",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0048f0d9a4d0ca697e31077bab7b2471.png",
+      "bytes": 5140,
+      "sha256": "4d5318bc9df371b7e0685474bc05ffdcf4f48122d4eaab0173185757d8a0fdba",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/20192a081a6e6cc01e7388070cd12441.png",
+      "bytes": 5802,
+      "sha256": "f5a6ae6a0a6c7619b4d12cfd367d7f0769ecb62218df8a833ecdd2123080c221",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/20192a081a6e6cc01e7388070cd12441.png",
+      "bytes": 4164,
+      "sha256": "7f8133dd91d22235f6408c38cf476c1325656831e1a75bfda8cd3585b1c91352",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0ee7cb2c87559c63b733fb88f57f38fb.png",
+      "bytes": 6285,
+      "sha256": "795740568fb3bff495401eceff707119176a560cd64908452398cafe3ded5aec",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0ee7cb2c87559c63b733fb88f57f38fb.png",
+      "bytes": 4295,
+      "sha256": "87ad8b70ec634ac25f687baf0309175d9d59edcd5959996435e07a388fce3250",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0d89f5b1adb8b5c0d52fead18a8aca86.png",
+      "bytes": 5740,
+      "sha256": "14cdbf66abe2f599bf15c329aa9bfedad0d9f1db5bdba4aea4e3a98601e102fb",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0d89f5b1adb8b5c0d52fead18a8aca86.png",
+      "bytes": 4459,
+      "sha256": "1444995a10d030fb1d401887cdc7af295295ee565170eec4ce5007ed4206fb73",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/00112158c308d48307e95b841f678df8.png",
+      "bytes": 6231,
+      "sha256": "7339dab4c661349acbf19a809208bc1a5e3f108b3989c7a6516f0f9fb7c68abf",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/00112158c308d48307e95b841f678df8.png",
+      "bytes": 4486,
+      "sha256": "6f6664dad0420be2e0b5c4422c88128060891684636221e3a1647c3cc5c66d52",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/06e1a904f76eb330225be20b8896972c.png",
+      "bytes": 5134,
+      "sha256": "f8d73a0f9cc2dd28521a97fe8c548a8f8903bc1597495734e994c605bb0dfbd6",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/06e1a904f76eb330225be20b8896972c.png",
+      "bytes": 4309,
+      "sha256": "aeb254f078dd972f0df03d855cd4874088061de835b655927a2f993e28907903",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/057714b6cae8d7c10f52ada5dcf87056.png",
+      "bytes": 6531,
+      "sha256": "4a1b7dfd037c42187149549999044ac34faf78ef9d1d09e0441b5ea32b60f945",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/057714b6cae8d7c10f52ada5dcf87056.png",
+      "bytes": 4674,
+      "sha256": "be9370a733f21cf809e05f23ca4688ec0acd3e8e6ec410cd66fc92bf2bc5504f",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/05e6cba79cce9273404142a8c45564e3.png",
+      "bytes": 5762,
+      "sha256": "b0b784dc00b18c68b09a55b949298a6dc464ab5eb6721fa6420b94c90c7604a8",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/05e6cba79cce9273404142a8c45564e3.png",
+      "bytes": 4474,
+      "sha256": "d1b1e06949412f59486e975234f64cc3f24c286ab8a1991b8edcd72d2cebff54",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0679805fc75d38aa1a8e3b304c6db9fc.png",
+      "bytes": 5456,
+      "sha256": "597d981375ed9a69ad4e2405b977593677fc2714d27d43c3e5411d29ebfa572e",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0679805fc75d38aa1a8e3b304c6db9fc.png",
+      "bytes": 4948,
+      "sha256": "97fde448da7888f701d5e3149a5399cdf09301c3801141b61d2f55183e9511bb",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/09c62f1ac6fd201afa468632995b7a89.png",
+      "bytes": 5508,
+      "sha256": "3263f9bdd8dbc19f79d2c7834fdc1eee7cd1d2fc0c722a480a9186afc50a70b4",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/09c62f1ac6fd201afa468632995b7a89.png",
+      "bytes": 4252,
+      "sha256": "46a0619ab47ce41614b050f4c02c9d21ddaf04e048ce48cfca27fcd730649a65",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/1fb38847bcbf1b78b9770616cfdf417e.png",
+      "bytes": 6007,
+      "sha256": "e000a3ef4d42d6fb9d7f9d7ace01e3657ac3d0638512d3f1e89a1ce6b89723fe",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/1fb38847bcbf1b78b9770616cfdf417e.png",
+      "bytes": 4348,
+      "sha256": "d521a4585d58fbbfab4c1e31abcec2a261b1336862e1269442d31ce40bc1dc02",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/1b7afbc07bc3b7e225b07b92a0b52a35.png",
+      "bytes": 5386,
+      "sha256": "58db5d6b5a9e5f7127c7c6f653c3fd7f820028e11bdaa4e721711b98f09ccb3a",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/1b7afbc07bc3b7e225b07b92a0b52a35.png",
+      "bytes": 4474,
+      "sha256": "d819df7cecd70d1bc4e0786f4a44ae1cdc7cd9a3c3476153373c3bc4b715ca1f",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0aad7e8a4987342302961aa4cc0ccbed.png",
+      "bytes": 5389,
+      "sha256": "7a38aea6d3912978699c42cba5f68bede5537fb8981db16984e47f2e2cf1b516",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0aad7e8a4987342302961aa4cc0ccbed.png",
+      "bytes": 4316,
+      "sha256": "9a33b8418b43f64adc116735188e92aab9f3f305593c851b7fba76811c449172",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/4e6f5e0f0e38530305898f08a7e12c6b.png",
+      "bytes": 5741,
+      "sha256": "b9183aa9be37ac8fc5fd960f882b04e18096433cc2d8f9ba977f1a9ae0f1733d",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/4e6f5e0f0e38530305898f08a7e12c6b.png",
+      "bytes": 4109,
+      "sha256": "8eaf607233a2120366a3197ee54bb464e71b15de3810f03c4e5c969b8912f021",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/11da4b528ccf6923acb9faa614831898.png",
+      "bytes": 6297,
+      "sha256": "728146a37f0b656ac63d2e12dbdba098a535f8832d95b65eea1764946155303f",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/11da4b528ccf6923acb9faa614831898.png",
+      "bytes": 4674,
+      "sha256": "cd4059e76c4fc6bbc71bd6c415f57e49e675e5a22636c9171bf8c78514097856",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0504905b9f4ea1cdb2a4fe44e706d260.png",
+      "bytes": 5699,
+      "sha256": "f0ebe69e401da4704d51e13c01fd4c6ead4b9a4bd1dc66b2661347d9853baf6e",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0504905b9f4ea1cdb2a4fe44e706d260.png",
+      "bytes": 4520,
+      "sha256": "507724dd4eeb65fed1ed1a20a4869517553c14c5e0b83ad009f7949bfc37baa8",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0e1feec79f9b76f07be4038822c0286a.png",
+      "bytes": 5382,
+      "sha256": "5f36ad591382c26d9a03edc24bfad241c0b06fa8c38b80ae5a49b7ae1e528c81",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0e1feec79f9b76f07be4038822c0286a.png",
+      "bytes": 4601,
+      "sha256": "8b31edb22b16705d9865a64b7b997eccc44e634274eb18d0877578efcffe9be7",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/004e3469daa569584c9d56200fb93374.png",
+      "bytes": 5675,
+      "sha256": "1aad34fa738ede40b578d3e56b25de54014541d576f46e7d2d9b5edad063589c",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/004e3469daa569584c9d56200fb93374.png",
+      "bytes": 4082,
+      "sha256": "07c45457803313a4b20d78c9695dcc1ba2cedea064322fa5836aabd273166405",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/13e5b6e8a3d1358d89216bf3757f646b.png",
+      "bytes": 6266,
+      "sha256": "7c8bae5d8812465f5ef89e55bb1ba595deaf31a5b90bb32f36e29059bf97e550",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/13e5b6e8a3d1358d89216bf3757f646b.png",
+      "bytes": 4326,
+      "sha256": "a4a0325e26116b2b4b16c9015060efd7d27a5717a0834d7ef68ed37ad0ef4847",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/3bf17d50d9a42c0a7e417210849efda8.png",
+      "bytes": 5650,
+      "sha256": "584e1ab35b35041bf4fed9c520b2c86feda3b858136a44d77d7a2c943a1b1db6",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/3bf17d50d9a42c0a7e417210849efda8.png",
+      "bytes": 4512,
+      "sha256": "4f6e67e83b55767e78a34fb5f147919d443ab6134572912b4196a76491077d2c",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/01f677be480a55c0d93ab446ec22270c.png",
+      "bytes": 5350,
+      "sha256": "a152428c1397b3c74110778401ec606eac9aca268b7726393eb5a3f82ccd2b98",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/01f677be480a55c0d93ab446ec22270c.png",
+      "bytes": 4464,
+      "sha256": "4e1f3b00bdd3b5f3de7c5d2680a32155578a75e47f0866578204cf69ca96b998",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0d3cd4eb2251604e10d7c05d1b1c1b38.png",
+      "bytes": 5589,
+      "sha256": "7889b425b32515ade42aa2ab2534cf02e68ad60dce1436517877150aca8dc13e",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0d3cd4eb2251604e10d7c05d1b1c1b38.png",
+      "bytes": 3972,
+      "sha256": "32fda1920f0349f60001e63af0cc9e6dd0f3a0ca6d1d78e67872b4a76e9357d1",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/1f97f4aaee7b564c6d1089a61f29706b.png",
+      "bytes": 5890,
+      "sha256": "0c73d232e512b0cee1c2433bd469605a8d76ffcbf3d2105f9e09a2e9884f2f46",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/1f97f4aaee7b564c6d1089a61f29706b.png",
+      "bytes": 4460,
+      "sha256": "e8314517e4f404f8efe0c4a92c73b8fdd1a62c2af05b485003375f4698298005",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/06e8b5f8ea5aa29958fdb640f8a568aa.png",
+      "bytes": 5651,
+      "sha256": "39dc35f236302cb2e0b9204b64c1b51bd2f71d72c09bc31c1b95b075ebc6e987",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/06e8b5f8ea5aa29958fdb640f8a568aa.png",
+      "bytes": 4375,
+      "sha256": "4b696ed2e8e0f2ce7a8c9a66ec1f9709619e514e51fef5365b79f02b37c4ad4f",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/09c87c6611ab8539765390f57440d885.png",
+      "bytes": 5415,
+      "sha256": "13df5b7156eaf8b8219e94fda015241b8521513947871796bb78264211f84bc9",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/09c87c6611ab8539765390f57440d885.png",
+      "bytes": 4165,
+      "sha256": "0db32ea483948dd4ac5ea5adb916fa3de23b481ecc2ab56a51f34006d9d47d79",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/05d0675bdef881dd918f023dd82d1d3f.png",
+      "bytes": 5697,
+      "sha256": "a5967935162ace0876800ffa59577638cc40e9a0d932ec1bae4928f224478331",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/05d0675bdef881dd918f023dd82d1d3f.png",
+      "bytes": 4671,
+      "sha256": "8901c3a30bc00ccac32b4e1a9937e683dee727dfc6aba0f2862675828268efdf",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/1c8e217df737d8bfbf795c9d6bf84da4.png",
+      "bytes": 5763,
+      "sha256": "bb3f597f70404a6fc8d1ec776b693f19eb955dc3e179de8c57812a12cbbfa12a",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/1c8e217df737d8bfbf795c9d6bf84da4.png",
+      "bytes": 4723,
+      "sha256": "65fdba7e3f402d6fb46043ce599b1dd210926292608c03b456afc4d209811b69",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0c6df6504cf85d2ff1471fe3dbe87edf.png",
+      "bytes": 5655,
+      "sha256": "f652388cd18e05c9c8f0b169ce85d42151cfb241858c6624bbfb339dc92abb5d",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0c6df6504cf85d2ff1471fe3dbe87edf.png",
+      "bytes": 4944,
+      "sha256": "c240ef3def3d5c6a2b2b3d6750cb9b9008d7d80834baee61fce3142a5b715023",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/037011efaa50680c6a2b79c6a6ed86a4.png",
+      "bytes": 6209,
+      "sha256": "5451898a40f8dee0270d5ad6fa146e46e59b8233ec8581ec724836af1e8769b6",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/037011efaa50680c6a2b79c6a6ed86a4.png",
+      "bytes": 4391,
+      "sha256": "573f4b27fcfa3919fa9bbd2d1adc9cdf14506b69dea5074429017e05502d7462",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0b0955e1ca4b09d0e0fb101a0985a7c0.png",
+      "bytes": 5536,
+      "sha256": "131e9848e47e476a3e8be73d33ccaa589bf7f7f169ff09616510c943cb5ae1f0",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0b0955e1ca4b09d0e0fb101a0985a7c0.png",
+      "bytes": 4548,
+      "sha256": "d545662a08dde4de30a7dad99eac893b4f5b8edc777cc77292010561b559b690",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/08ec8983b4f66bd41b1acf0c72181f53.png",
+      "bytes": 5452,
+      "sha256": "c131efb5174af414bdf47a8dc14c60805fde30716a3a87163c562d667bfd230c",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/08ec8983b4f66bd41b1acf0c72181f53.png",
+      "bytes": 4443,
+      "sha256": "8560305732f36d093f741731ee25c1d30060400ca6e47b9692b963f64e9520ae",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/07cef07cafff0a43440b664809454ab9.png",
+      "bytes": 5748,
+      "sha256": "b25fa535a048a739f6f8aedc884d46af20cde4ff7abc8acad90f0f4c6efe138c",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/07cef07cafff0a43440b664809454ab9.png",
+      "bytes": 4489,
+      "sha256": "8abbb087723b60f3e2c7e058ba7d7df228d39fa86e4eb69e5c0c7ce5c3587484",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0413e188cdb7a8a356b8e7dcd67a22a2.png",
+      "bytes": 5339,
+      "sha256": "9cee52ee5844eec9cf0a26df4b7e434b33c021acc73d694ac43b10fae630c8bc",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0413e188cdb7a8a356b8e7dcd67a22a2.png",
+      "bytes": 4097,
+      "sha256": "9866438573a687455a29746bb90ab0b13284e7b7a789cd39ec9357fb49629e7c",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/004a5121131d22f1c1d9f63828442577.png",
+      "bytes": 5533,
+      "sha256": "f4b0ca45a73a6f28206aa1ce1e3d340217d721ad7078cbc8adec15e3066d0e43",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/004a5121131d22f1c1d9f63828442577.png",
+      "bytes": 4739,
+      "sha256": "f92976a71e012dd8941d18e5bbf4ecb41488ab5c28490d920475c265b27fe588",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/069110c97a0e41150a796b102ea2fc34.png",
+      "bytes": 4962,
+      "sha256": "7029bbd87179753544ea93c5372460dee3487490057c6296d840440944ab9434",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/069110c97a0e41150a796b102ea2fc34.png",
+      "bytes": 4309,
+      "sha256": "7f5bb91a8401b9be6e8b08078348215fe572d501e054db0f93dc6a0f33b1b05e",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/16dfeb0ff6997b07fc7841ffeaae6b00.png",
+      "bytes": 4895,
+      "sha256": "1c2b423f543d0b1cb91f37e5c2a20baed8e9c7c0f12b6da2d103035f2ca249b3",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/16dfeb0ff6997b07fc7841ffeaae6b00.png",
+      "bytes": 3954,
+      "sha256": "aca9cc99ac4ee5cb457bb4a0b97ff57ee89e6b31e302927d666b597a40b6b287",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/07beb83affc32a5080972259ffc434de.png",
+      "bytes": 5670,
+      "sha256": "2485905653e656b51364e1417aed02375989604d1d50660c4ad7af20c4239280",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/07beb83affc32a5080972259ffc434de.png",
+      "bytes": 4582,
+      "sha256": "dd28c0ec0d0088a7e7b113cdc4688d339ab8e9caa8105ee957c5645293a292e8",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0dfcc3866428b4409512b5f91e9ded58.png",
+      "bytes": 5457,
+      "sha256": "ae5f95ebfba8cbe6c21b446e5d6399fc6a66880b6c47e01706e298afdecb3c45",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0dfcc3866428b4409512b5f91e9ded58.png",
+      "bytes": 4207,
+      "sha256": "cf36d3c0a4dcfaef3566f9bbae89834258e3803e0a9b98ae7e1fb2644d66f46e",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/182b8943058392a126b787009fbdf889.png",
+      "bytes": 6277,
+      "sha256": "109373947d7d122aba351e6684cf71ccc1731ed5ba946e44a34349a89bfe959b",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/182b8943058392a126b787009fbdf889.png",
+      "bytes": 4979,
+      "sha256": "62c9435b26b7a69b8e82750907b83cf2166102e3567b0705b04e96b46f2cc4b6",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/225b58cb755f97a3f659250aa272be8c.png",
+      "bytes": 5561,
+      "sha256": "162fd2437ceda14a83246848f412a485b73d64992304ef8a651b59ea4516ebbe",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/225b58cb755f97a3f659250aa272be8c.png",
+      "bytes": 4621,
+      "sha256": "96e3f864c28d581ded36f4e3f3ed2e7a76c0e5010cc66225fb59537b436109f7",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/03b72c7a6c098a3bf74b6c8b374862d7.png",
+      "bytes": 4544,
+      "sha256": "7fcea1484899cecf121683136cceb2416ed0710151d231d37a55de3a76b0f8b4",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/03b72c7a6c098a3bf74b6c8b374862d7.png",
+      "bytes": 4487,
+      "sha256": "567eddc04e3d338d4432eade7914631fcddbe00ed40ef673c14f669717b218e9",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0d2d987fe919761f3513d598e2a54e3f.png",
+      "bytes": 5269,
+      "sha256": "859b8872e1b2c31ce466b2809a4fa12c5f75107447e863ff71cd8c87feeaacc9",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0d2d987fe919761f3513d598e2a54e3f.png",
+      "bytes": 4169,
+      "sha256": "e4f77e99348ec622275385e1faf10b5e2c76cac8c8743066c6fd094cb5fe3ca8",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/2808bd97b6db9ede24687e7e6db454b6.png",
+      "bytes": 5886,
+      "sha256": "1d3abdcda3e5be756b57dc1910222100d4c4cc6f7a9e19a169fcb9d14dcb8efe",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/2808bd97b6db9ede24687e7e6db454b6.png",
+      "bytes": 4433,
+      "sha256": "8b50f23fe88474c85447fbc958bfb8ea176edb9f180fa5bf17d942ff0f8bf2a0",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/1b292812faf2544b1a7e7dc20b0d342e.png",
+      "bytes": 6231,
+      "sha256": "47e72a3b6c4b2173ed17dfa27feb05130b1741c12ca686c48818270f4783540f",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/1b292812faf2544b1a7e7dc20b0d342e.png",
+      "bytes": 4146,
+      "sha256": "f58b1a7d94b7cef2330c847fad8b274b7384aa438ff5ab8fd1c504b7fe09a0b4",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/1cc4c9db30ca3fb1a124b6e0f0b58ce3.png",
+      "bytes": 5465,
+      "sha256": "77f46993276bab87a8312b7f5bfd238be092f6e3abc02a86a7d4ca1a7e46586a",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/1cc4c9db30ca3fb1a124b6e0f0b58ce3.png",
+      "bytes": 4551,
+      "sha256": "d6b24e584c710497249d2dc1c3953affd9fdb252715cd608c7c1a2592f9dc574",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/00fc44412bca19f9f1990cf79c47adef.png",
+      "bytes": 5576,
+      "sha256": "4ac66d785d54f0ac0a48ce0262247f5e9300ecf01e2498031604f2bf4847dbac",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/00fc44412bca19f9f1990cf79c47adef.png",
+      "bytes": 4553,
+      "sha256": "965b6e86e5e3020fec08755e7938f85d77517a949c2551d0082bdbb5e439da61",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0ad031e1f4a0f6901f0b7547e5716a8a.png",
+      "bytes": 5959,
+      "sha256": "7b529dde6aee4d5c54c30172b8b0a1f798c5e5fc9234db8f2247d0053963fbeb",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0ad031e1f4a0f6901f0b7547e5716a8a.png",
+      "bytes": 4590,
+      "sha256": "29cffaa6614b497ff1258b81a353fcc5876ba302927cc54c68431b1dcba75219",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/059cc8bb024e0461a6b7e5fb5ac44d0a.png",
+      "bytes": 5684,
+      "sha256": "ed4854301bc08de70c1a04696c6495a534897788b3c55133d9f62cfe184e6775",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/059cc8bb024e0461a6b7e5fb5ac44d0a.png",
+      "bytes": 4232,
+      "sha256": "3d036e9a49b4de6f1b908ca88074cdbbc82ae98e9f29284b5f0831b99f3400c8",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/168ba8a45eac2b8b8eacc5d8609edd37.png",
+      "bytes": 5765,
+      "sha256": "10dc3f8844863d862061764a6a82ef84c130d471a930c760b7ebdb8c69a4f4bb",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/168ba8a45eac2b8b8eacc5d8609edd37.png",
+      "bytes": 4623,
+      "sha256": "ff22b5708df8c1fb7466d9013a259150ca698ac82b67777530a75466ddcaa9f6",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0b822daba6492d4ba392b4cecf7b2bec.png",
+      "bytes": 5098,
+      "sha256": "e01b705c2bf0a380defc115b087c5eb95cd8c9355c28ccd4333519fe3af8fcf8",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0b822daba6492d4ba392b4cecf7b2bec.png",
+      "bytes": 4507,
+      "sha256": "e55e52138e042dd161c3b4d4f7c6bb0b3f050c2787ee1461573a45a444a17007",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/00eb5c77f79af6aea1fcf21184c1bf52.png",
+      "bytes": 5048,
+      "sha256": "8ff027fffde819ef2ad63f7422e51da9155b6df10332a1688d16fc71bd0485a5",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/00eb5c77f79af6aea1fcf21184c1bf52.png",
+      "bytes": 4286,
+      "sha256": "e3d8babf31f72ab342d3cf624dbf2c38f5dbd209398d892b88672050caf4d67b",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/309a6d9e3d918059bc0b730dc044af54.png",
+      "bytes": 5615,
+      "sha256": "1be7743affee20b305f05560423b838485cabbc9d1252646f74bf4d8db080173",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/309a6d9e3d918059bc0b730dc044af54.png",
+      "bytes": 4452,
+      "sha256": "91adbcfab66846d37ad7e00903617966d5584eb3b6796f0245ee9469d996a805",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/0a15c19f92b0471622bc7251d9e1a603.png",
+      "bytes": 5333,
+      "sha256": "206de79f868f30a56cd0466228c59ef8a34c0ee51313aac27731ca274528319c",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/0a15c19f92b0471622bc7251d9e1a603.png",
+      "bytes": 4234,
+      "sha256": "b0b2d3cee5ee21e9bdd40e96e524804e6f46a37c1b633ef31bffe0741307c603",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/018cc7c1e78ba95c88795704e0dae997.png",
+      "bytes": 5676,
+      "sha256": "db5913f144ee316b7e9e18db30d332c60cb7a7d0987200e6ddd659ca4694efb5",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/018cc7c1e78ba95c88795704e0dae997.png",
+      "bytes": 4160,
+      "sha256": "64effa68aca446d8fffafa1796f5d59935b645843daff6d6b73c09699a91c5ac",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/13df1e0f9737c8b5fff70c7914322252.png",
+      "bytes": 4991,
+      "sha256": "c7049ea4e1d83ea674a2d965ca97f0d539d0704be5e71efdada173d492519c55",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/13df1e0f9737c8b5fff70c7914322252.png",
+      "bytes": 4264,
+      "sha256": "c31563a62cbaeb130d4c9edd061b71a2f42aef74328b3fe08ff923d407525ab7",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/27e60a00b7345af4663d9dfa473e0124.png",
+      "bytes": 5110,
+      "sha256": "cdb681e2b5ea3bd15561397d76512964d1fe5572c3d71f388e371b436ee20a86",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/27e60a00b7345af4663d9dfa473e0124.png",
+      "bytes": 4189,
+      "sha256": "c6b275cbe2ef78197e50d689edd03315ce75fc999314e154ea9efb3e9c55a537",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask/20aa75de1f51616798f339898110cc9e.png",
+      "bytes": 6055,
+      "sha256": "51d6e487b0779a493d37dd58e0104b33362444b6758b93ad7fde156fc5f81ebf",
+      "status": "downloaded"
+    },
+    {
+      "file": "mask_left/20aa75de1f51616798f339898110cc9e.png",
+      "bytes": 4781,
+      "sha256": "3faf8671fe8124c44858f4bda442d861c2fd491fd908f6fb9fb64152f47ac837",
+      "status": "downloaded"
+    }
+  ]
+}

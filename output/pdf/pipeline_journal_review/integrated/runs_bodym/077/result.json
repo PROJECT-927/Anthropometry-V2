@@ -1,0 +1,2638 @@
+{
+  "version": "integrated-candidates-v3.0",
+  "attempt_id": "BodyM-A-077",
+  "evidence_class": "retrospective_external_scan_target_prediction",
+  "input_mode": "silhouettes",
+  "height_cm": 167.15,
+  "status": "computed_candidate_set",
+  "reason": null,
+  "policy": {
+    "version": "integrated-candidates-v3.0",
+    "candidate_selection": "report_all_named_candidates_no_oracle_selection",
+    "base_waist_deletion": false,
+    "base_section_opening": false,
+    "base_section_closing": false,
+    "whole_volume_component_deletion": false,
+    "whole_volume_extent_smoothing": false,
+    "conditional_depth_cap": false,
+    "front_torso_clip_multiplier": 1.15,
+    "fragment_rejection_fraction": 0.01,
+    "mask_threshold": 0.5,
+    "minimum_frame_foreground_fraction": 0.02,
+    "silhouette_level_fractions_from_crown": {
+      "shoulder": 0.182,
+      "hip": 0.47,
+      "ankle": 0.961
+    },
+    "waist_shoulder_hip_fraction": 0.688,
+    "chest_shoulder_waist_fraction": 0.35,
+    "profile_membership_epsilon_over_h": 1e-08,
+    "sensitivity": "unavailable_not_calibrated; no legacy RSS",
+    "supplied_mask_preprocessing": "grayscale>127; nonempty/border guard only; no component removal or hole filling",
+    "integrated_outputs": "chest, waist proxy, hip girth candidates only; shoulder specified separately not run",
+    "display_export": "not executed; measurements do not depend on a mesh"
+  },
+  "stages": [
+    {
+      "stage": "front_supplied_mask",
+      "elapsed_seconds": 0.002299100044183433
+    },
+    {
+      "stage": "side_supplied_mask",
+      "elapsed_seconds": 0.0016194999916478992
+    },
+    {
+      "stage": "conventional_reconstruction",
+      "elapsed_seconds": 0.029545499943196774
+    },
+    {
+      "stage": "profile_reconstruction",
+      "elapsed_seconds": 0.4469146999763325
+    },
+    {
+      "stage": "section_candidates",
+      "elapsed_seconds": 0.8161058999830857
+    },
+    {
+      "stage": "level_ablations",
+      "elapsed_seconds": 1.1170080000301823
+    },
+    {
+      "stage": "optional_waist_hypothesis",
+      "elapsed_seconds": 0.1538927999790758
+    }
+  ],
+  "inputs": {
+    "front_sha256": "7b529dde6aee4d5c54c30172b8b0a1f798c5e5fc9234db8f2247d0053963fbeb",
+    "side_sha256": "29cffaa6614b497ff1258b81a353fcc5876ba302927cc54c68431b1dcba75219"
+  },
+  "runtime_environment": {
+    "python": "3.12.9",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel"
+  },
+  "sections": {
+    "chest_level": {
+      "conventional": {
+        "version": "section-candidates-v3.0",
+        "policy": "report_candidates_no_auto_selection",
+        "units": "mm",
+        "metadata": {
+          "requested_level_mm": 420.13219359999994,
+          "sampled_level_mm": 420.0,
+          "front_torso_bounds_mm": [
+            -275.71847914615216,
+            267.3918730969869
+          ],
+          "site": "chest_level",
+          "source_branch": "conventional",
+          "waist_deletion": false,
+          "profile_interpolated": null
+        },
+        "base_waist_adjustment": false,
+        "candidates": {
+          "fixed_constant_no_morph": {
+            "status": "unavailable",
+            "reason": "At least five two-dimensional points are required",
+            "perimeter_mm": null
+          },
+          "fixed_constant_uniform_no_morph": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 1440.7808843539767,
+            "axes_mm": [
+              303.1986823986283,
+              140.3349063223151
+            ],
+            "kind": "fixed_constant_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 24.896179283122027,
+              "gradient_normalized_residual_max_mm": 67.48056376557606,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -4.7717157861190405,
+                -7.317890596416303
+              ],
+              "centre_offset_over_observed_halfspan": [
+                2.1930331350620375e-17,
+                1.4441925523579274e-17
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.2477312032332406,
+                1.1409341979698853
+              ],
+              "design_condition_diagnostic": 3.9373360233409596,
+              "support_samples": 256
+            }
+          },
+          "constrained_no_morph": {
+            "status": "computed",
+            "reason": null,
+            "axes_mm": [
+              289.2268982267335,
+              139.13477612231063
+            ],
+            "centre_mm": [
+              -4.77171578611899,
+              -7.317890596416329
+            ],
+            "perimeter_mm": 1387.369329375595,
+            "quadratic_constraint": 0.8786125737566082,
+            "linear_design_condition": 1.9502474266593064,
+            "normalized_coefficients": [
+              -0.24052876310395802,
+              1.6855359941544717e-05,
+              -1.0393767333471642,
+              -1.7065724225276372e-16,
+              -2.031791980040882e-15,
+              0.450560396054132
+            ],
+            "origin_mm": [
+              -4.771715786118915,
+              -7.317890596416122
+            ],
+            "scale_mm": 211.3224716203148,
+            "kind": "fitted_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 21.314681563144404,
+              "gradient_normalized_residual_max_mm": 50.490216937164305,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -4.77171578611899,
+                -7.317890596416329
+              ],
+              "centre_offset_over_observed_halfspan": [
+                2.3026847918151394e-16,
+                -1.9496599456832017e-16
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.1902341490303003,
+                1.1311770418538687
+              ],
+              "design_condition_diagnostic": 3.3797928941436157,
+              "support_samples": 256
+            }
+          },
+          "width_depth_axis_aligned": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 1180.9372610530488,
+            "axes_mm": [
+              243.0,
+              123.0
+            ],
+            "kind": "axis_aligned_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 26.569425785471147,
+              "gradient_normalized_residual_max_mm": 54.87112059207769,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -4.771715786119046,
+                -7.317890596416305
+              ],
+              "centre_offset_over_observed_halfspan": [
+                0.0,
+                0.0
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.0000000000000002,
+                1.0000000000000002
+              ],
+              "design_condition_diagnostic": null,
+              "support_samples": 256
+            }
+          },
+          "unrounded_convex_diagnostic": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 1464.0,
+            "kind": "occupancy_diagnostic"
+          },
+          "historical_opening_0p9_corrected_fit": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 1304.0409199270307,
+            "axes_mm": [
+              250.34385296833088,
+              159.72323565066628
+            ],
+            "kind": "historical_shape_prior_comparator",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 3.4446247283715365,
+              "gradient_normalized_residual_max_mm": 6.544292955923183,
+              "valid_gradient_samples": 56,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -4.771715786119044,
+                -7.317890596416299
+              ],
+              "centre_offset_over_observed_halfspan": [
+                7.310110450206793e-18,
+                5.054673933252745e-17
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.030221617153625,
+                1.2985628914688316
+              ],
+              "design_condition_diagnostic": 6.509731410530037,
+              "support_samples": 56
+            }
+          }
+        },
+        "status": "computed",
+        "reason": null,
+        "component_count": 1,
+        "hull_vertex_count": 4,
+        "width_mm": 486.0,
+        "depth_mm": 246.0,
+        "h_mm": 2.0,
+        "sample_count": 256,
+        "convex_area_mm2": 119556.0,
+        "candidate_perimeter_range_mm": [
+          1180.9372610530488,
+          1440.7808843539767
+        ],
+        "model_disagreement_mm": 259.8436233009279,
+        "diagnostic_version": "candidate-diagnostics-v3.0",
+        "diagnostics_do_not_select_or_validate_anatomy": true,
+        "current_model_spread_mm": 259.8436233009279,
+        "current_model_spread_members": [
+          "fixed_constant_uniform_no_morph",
+          "constrained_no_morph",
+          "width_depth_axis_aligned"
+        ],
+        "spread_is_not_physical_interval": true,
+        "all_comparator_spread_members": [
+          "fixed_constant_uniform_no_morph",
+          "constrained_no_morph",
+          "width_depth_axis_aligned",
+          "historical_opening_0p9_corrected_fit"
+        ]
+      },
+      "profile": {
+        "version": "section-candidates-v3.0",
+        "policy": "report_candidates_no_auto_selection",
+        "units": "mm",
+        "metadata": {
+          "requested_level_mm": 420.13219359999994,
+          "sampled_level_mm": 420.0,
+          "front_torso_bounds_mm": [
+            -275.71847914615216,
+            267.3918730969869
+          ],
+          "site": "chest_level",
+          "source_branch": "profile",
+          "waist_deletion": false,
+          "profile_interpolated": false
+        },
+        "base_waist_adjustment": false,
+        "candidates": {
+          "fixed_constant_no_morph": {
+            "status": "unavailable",
+            "reason": "At least five two-dimensional points are required",
+            "perimeter_mm": null
+          },
+          "fixed_constant_uniform_no_morph": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 1427.722118863432,
+            "axes_mm": [
+              302.782700679563,
+              135.58123866437933
+            ],
+            "kind": "fixed_constant_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 24.56544167945604,
+              "gradient_normalized_residual_max_mm": 68.40917152425018,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -5.029291543694768,
+                -7.075181560796305
+              ],
+              "centre_offset_over_observed_halfspan": [
+                -1.1744508029092565e-16,
+                -8.210052619076788e-17
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.2511681799282903,
+                1.139338161372808
+              ],
+              "design_condition_diagnostic": 4.124751090785267,
+              "support_samples": 256
+            }
+          },
+          "constrained_no_morph": {
+            "status": "computed",
+            "reason": null,
+            "axes_mm": [
+              288.49322011629124,
+              134.5033356377995
+            ],
+            "centre_mm": [
+              -5.029291543694738,
+              -7.075181560796474
+            ],
+            "perimeter_mm": 1373.2891778204832,
+            "quadratic_constraint": 0.8302426656058014,
+            "linear_design_condition": 1.9828113647171726,
+            "normalized_coefficients": [
+              -0.23311352038805774,
+              0.00016468404532583343,
+              -1.0724388974266292,
+              2.346512515620503e-16,
+              -8.700145681578634e-16,
+              0.44659861023954267
+            ],
+            "origin_mm": [
+              -5.029291543694843,
+              -7.0751815607963895
+            ],
+            "scale_mm": 208.43020303241278,
+            "kind": "fitted_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 20.903894493698324,
+              "gradient_normalized_residual_max_mm": 50.95419166693089,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -5.029291543694738,
+                -7.075181560796474
+              ],
+              "centre_offset_over_observed_halfspan": [
+                7.340317518182853e-18,
+                -1.500200524031304e-15
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.1921207397923599,
+                1.1302801509940776
+              ],
+              "design_condition_diagnostic": 3.427661495678864,
+              "support_samples": 256
+            }
+          },
+          "width_depth_axis_aligned": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 1167.2759589209322,
+            "axes_mm": [
+              242.0,
+              119.0
+            ],
+            "kind": "axis_aligned_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 25.83228579912173,
+              "gradient_normalized_residual_max_mm": 53.39375529178954,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -5.02929154369474,
+                -7.075181560796295
+              ],
+              "centre_offset_over_observed_halfspan": [
+                0.0,
+                0.0
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.0000000000000002,
+                1.0
+              ],
+              "design_condition_diagnostic": null,
+              "support_samples": 256
+            }
+          },
+          "unrounded_convex_diagnostic": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 1444.0,
+            "kind": "occupancy_diagnostic"
+          },
+          "historical_opening_0p9_corrected_fit": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 1232.4976061326256,
+            "axes_mm": [
+              240.86780014315156,
+              145.5472717365866
+            ],
+            "kind": "historical_shape_prior_comparator",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 1.9068568504080416,
+              "gradient_normalized_residual_max_mm": 3.9271650273565024,
+              "valid_gradient_samples": 56,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -0.48198800825518395,
+                -7.397832999133629
+              ],
+              "centre_offset_over_observed_halfspan": [
+                0.018790510477022956,
+                -0.0027113566246834793
+              ],
+              "fitted_to_observed_span_ratios": [
+                0.9953183417731195,
+                1.2230969061750951
+              ],
+              "design_condition_diagnostic": 5.975817392815303,
+              "support_samples": 56
+            }
+          }
+        },
+        "status": "computed",
+        "reason": null,
+        "component_count": 1,
+        "hull_vertex_count": 4,
+        "width_mm": 484.0,
+        "depth_mm": 238.0,
+        "h_mm": 2.0,
+        "sample_count": 256,
+        "convex_area_mm2": 115192.0,
+        "candidate_perimeter_range_mm": [
+          1167.2759589209322,
+          1427.722118863432
+        ],
+        "model_disagreement_mm": 260.44615994249966,
+        "diagnostic_version": "candidate-diagnostics-v3.0",
+        "diagnostics_do_not_select_or_validate_anatomy": true,
+        "current_model_spread_mm": 260.44615994249966,
+        "current_model_spread_members": [
+          "fixed_constant_uniform_no_morph",
+          "constrained_no_morph",
+          "width_depth_axis_aligned"
+        ],
+        "spread_is_not_physical_interval": true,
+        "all_comparator_spread_members": [
+          "fixed_constant_uniform_no_morph",
+          "constrained_no_morph",
+          "width_depth_axis_aligned",
+          "historical_opening_0p9_corrected_fit"
+        ]
+      }
+    },
+    "waist_proxy": {
+      "conventional": {
+        "version": "section-candidates-v3.0",
+        "policy": "report_candidates_no_auto_selection",
+        "units": "mm",
+        "metadata": {
+          "requested_level_mm": 635.4106959999999,
+          "sampled_level_mm": 636.0,
+          "front_torso_bounds_mm": [
+            -167.52220646963758,
+            170.0092744691908
+          ],
+          "site": "waist_proxy",
+          "source_branch": "conventional",
+          "waist_deletion": false,
+          "profile_interpolated": null
+        },
+        "base_waist_adjustment": false,
+        "candidates": {
+          "fixed_constant_no_morph": {
+            "status": "unavailable",
+            "reason": "At least five two-dimensional points are required",
+            "perimeter_mm": null
+          },
+          "fixed_constant_uniform_no_morph": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 962.613261224299,
+            "axes_mm": [
+              177.52877509525024,
+              126.7591369010103
+            ],
+            "kind": "fixed_constant_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 17.27477468722863,
+              "gradient_normalized_residual_max_mm": 33.689752538176016,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                1.228284213880963,
+                8.682109403583695
+              ],
+              "centre_offset_over_observed_halfspan": [
+                6.042030065987247e-17,
+                0.0
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.2076787046743098,
+                1.1629279322500419
+              ],
+              "design_condition_diagnostic": 2.284507455300192,
+              "support_samples": 256
+            }
+          },
+          "constrained_no_morph": {
+            "status": "computed",
+            "reason": null,
+            "axes_mm": [
+              171.74014605680782,
+              124.62906937568953
+            ],
+            "centre_mm": [
+              1.22828421388098,
+              8.682109403583631
+            ],
+            "perimeter_mm": 936.962397830338,
+            "quadratic_constraint": 1.649124236030577,
+            "linear_design_condition": 1.602328262871008,
+            "normalized_coefficients": [
+              -0.36284202240995744,
+              0.00023446200502247617,
+              -0.6890051270319653,
+              -4.511313526195437e-16,
+              -1.4817262047581613e-15,
+              0.4898794877209776
+            ],
+            "origin_mm": [
+              1.228284213881072,
+              8.68210940358379
+            ],
+            "scale_mm": 147.8039241698271,
+            "kind": "fitted_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 15.791531267985553,
+              "gradient_normalized_residual_max_mm": 28.889441084134024,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                1.22828421388098,
+                8.682109403583631
+              ],
+              "centre_offset_over_observed_halfspan": [
+                1.7521887191363015e-16,
+                -5.866866625542112e-16
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.1683002775882751,
+                1.1433860239640201
+              ],
+              "design_condition_diagnostic": 3.118018992716254,
+              "support_samples": 256
+            }
+          },
+          "width_depth_axis_aligned": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 808.6839904987079,
+            "axes_mm": [
+              147.0,
+              109.0
+            ],
+            "kind": "axis_aligned_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 21.308766373563483,
+              "gradient_normalized_residual_max_mm": 43.778034911342424,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                1.2282842138809542,
+                8.682109403583695
+              ],
+              "centre_offset_over_observed_halfspan": [
+                0.0,
+                0.0
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.0,
+                1.0
+              ],
+              "design_condition_diagnostic": null,
+              "support_samples": 256
+            }
+          },
+          "unrounded_convex_diagnostic": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 1024.0,
+            "kind": "occupancy_diagnostic"
+          },
+          "historical_opening_0p9_corrected_fit": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 866.6608168659538,
+            "axes_mm": [
+              151.46986126713523,
+              123.69553403229908
+            ],
+            "kind": "historical_shape_prior_comparator",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 2.1639196203055993,
+              "gradient_normalized_residual_max_mm": 4.031495401106657,
+              "valid_gradient_samples": 48,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                1.2282842138809527,
+                8.682109403583686
+              ],
+              "centre_offset_over_observed_halfspan": [
+                -1.057355261547768e-17,
+                -8.148425868808489e-17
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.0304072195043212,
+                1.1348214131403584
+              ],
+              "design_condition_diagnostic": 2.9092210444156903,
+              "support_samples": 48
+            }
+          }
+        },
+        "status": "computed",
+        "reason": null,
+        "component_count": 1,
+        "hull_vertex_count": 4,
+        "width_mm": 294.0,
+        "depth_mm": 218.0,
+        "h_mm": 2.0,
+        "sample_count": 256,
+        "convex_area_mm2": 64092.0,
+        "candidate_perimeter_range_mm": [
+          808.6839904987079,
+          962.613261224299
+        ],
+        "model_disagreement_mm": 153.9292707255911,
+        "diagnostic_version": "candidate-diagnostics-v3.0",
+        "diagnostics_do_not_select_or_validate_anatomy": true,
+        "current_model_spread_mm": 153.9292707255911,
+        "current_model_spread_members": [
+          "fixed_constant_uniform_no_morph",
+          "constrained_no_morph",
+          "width_depth_axis_aligned"
+        ],
+        "spread_is_not_physical_interval": true,
+        "all_comparator_spread_members": [
+          "fixed_constant_uniform_no_morph",
+          "constrained_no_morph",
+          "width_depth_axis_aligned",
+          "historical_opening_0p9_corrected_fit"
+        ]
+      },
+      "profile": {
+        "version": "section-candidates-v3.0",
+        "policy": "report_candidates_no_auto_selection",
+        "units": "mm",
+        "metadata": {
+          "requested_level_mm": 635.4106959999999,
+          "sampled_level_mm": 636.0,
+          "front_torso_bounds_mm": [
+            -167.52220646963758,
+            170.0092744691908
+          ],
+          "site": "waist_proxy",
+          "source_branch": "profile",
+          "waist_deletion": false,
+          "profile_interpolated": false
+        },
+        "base_waist_adjustment": false,
+        "candidates": {
+          "fixed_constant_no_morph": {
+            "status": "unavailable",
+            "reason": "At least five two-dimensional points are required",
+            "perimeter_mm": null
+          },
+          "fixed_constant_uniform_no_morph": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 962.6132612242993,
+            "axes_mm": [
+              177.52877509525035,
+              126.75913690101028
+            ],
+            "kind": "fixed_constant_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 17.274774687228657,
+              "gradient_normalized_residual_max_mm": 33.68975253817615,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -0.02929154369475482,
+                6.924818439203698
+              ],
+              "centre_offset_over_observed_halfspan": [
+                -1.0332815480036002e-16,
+                -5.703898108165942e-17
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.2076787046743107,
+                1.1629279322500419
+              ],
+              "design_condition_diagnostic": 2.284507455300191,
+              "support_samples": 256
+            }
+          },
+          "constrained_no_morph": {
+            "status": "computed",
+            "reason": null,
+            "axes_mm": [
+              171.74014605680782,
+              124.6290693756895
+            ],
+            "centre_mm": [
+              -0.029291543694761335,
+              6.924818439203776
+            ],
+            "perimeter_mm": 936.9623978303377,
+            "quadratic_constraint": 1.6491242360305762,
+            "linear_design_condition": 1.6023282628710087,
+            "normalized_coefficients": [
+              -0.3628420224099574,
+              0.00023446200502240437,
+              -0.6890051270319654,
+              3.641249092795453e-16,
+              1.5696540321037696e-15,
+              0.48987948772097756
+            ],
+            "origin_mm": [
+              -0.029291543694835553,
+              6.924818439203607
+            ],
+            "scale_mm": 147.8039241698271,
+            "kind": "fitted_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 15.791531267985556,
+              "gradient_normalized_residual_max_mm": 28.88944108413402,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -0.029291543694761335,
+                6.924818439203776
+              ],
+              "centre_offset_over_observed_halfspan": [
+                -1.4765210973756334e-16,
+                6.518740695046791e-16
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.1683002775882751,
+                1.14338602396402
+              ],
+              "design_condition_diagnostic": 3.118018992716253,
+              "support_samples": 256
+            }
+          },
+          "width_depth_axis_aligned": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 808.6839904987079,
+            "axes_mm": [
+              147.0,
+              109.0
+            ],
+            "kind": "axis_aligned_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 21.308766373563483,
+              "gradient_normalized_residual_max_mm": 43.778034911342424,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -0.02929154369473963,
+                6.924818439203705
+              ],
+              "centre_offset_over_observed_halfspan": [
+                0.0,
+                0.0
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.0,
+                1.0
+              ],
+              "design_condition_diagnostic": null,
+              "support_samples": 256
+            }
+          },
+          "unrounded_convex_diagnostic": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 1024.0,
+            "kind": "occupancy_diagnostic"
+          },
+          "historical_opening_0p9_corrected_fit": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 866.6608168659538,
+            "axes_mm": [
+              151.46986126713523,
+              123.69553403229908
+            ],
+            "kind": "historical_shape_prior_comparator",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 2.1639196203055993,
+              "gradient_normalized_residual_max_mm": 4.031495401106657,
+              "valid_gradient_samples": 48,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -0.029291543694741108,
+                6.924818439203696
+              ],
+              "centre_offset_over_observed_halfspan": [
+                -1.0054315656681903e-17,
+                -8.148425868808489e-17
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.0304072195043212,
+                1.1348214131403584
+              ],
+              "design_condition_diagnostic": 2.9092210444156903,
+              "support_samples": 48
+            }
+          }
+        },
+        "status": "computed",
+        "reason": null,
+        "component_count": 1,
+        "hull_vertex_count": 4,
+        "width_mm": 294.0,
+        "depth_mm": 218.0,
+        "h_mm": 2.0,
+        "sample_count": 256,
+        "convex_area_mm2": 64092.0,
+        "candidate_perimeter_range_mm": [
+          808.6839904987079,
+          962.6132612242993
+        ],
+        "model_disagreement_mm": 153.92927072559144,
+        "diagnostic_version": "candidate-diagnostics-v3.0",
+        "diagnostics_do_not_select_or_validate_anatomy": true,
+        "current_model_spread_mm": 153.92927072559144,
+        "current_model_spread_members": [
+          "fixed_constant_uniform_no_morph",
+          "constrained_no_morph",
+          "width_depth_axis_aligned"
+        ],
+        "spread_is_not_physical_interval": true,
+        "all_comparator_spread_members": [
+          "fixed_constant_uniform_no_morph",
+          "constrained_no_morph",
+          "width_depth_axis_aligned",
+          "historical_opening_0p9_corrected_fit"
+        ]
+      }
+    },
+    "hip_level": {
+      "conventional": {
+        "version": "section-candidates-v3.0",
+        "policy": "report_candidates_no_auto_selection",
+        "units": "mm",
+        "metadata": {
+          "requested_level_mm": 785.605,
+          "sampled_level_mm": 786.0,
+          "front_torso_bounds_mm": [
+            -183.76049018227047,
+            168.29969162054726
+          ],
+          "site": "hip_level",
+          "source_branch": "conventional",
+          "waist_deletion": false,
+          "profile_interpolated": null
+        },
+        "base_waist_adjustment": false,
+        "candidates": {
+          "fixed_constant_no_morph": {
+            "status": "unavailable",
+            "reason": "At least five two-dimensional points are required",
+            "perimeter_mm": null
+          },
+          "fixed_constant_uniform_no_morph": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 1078.4799191743105,
+            "axes_mm": [
+              187.90018038720666,
+              154.57970741856963
+            ],
+            "kind": "fixed_constant_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 19.490623298903568,
+              "gradient_normalized_residual_max_mm": 33.93465336792706,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -4.771715786119051,
+                -2.317890596416297
+              ],
+              "centre_offset_over_observed_halfspan": [
+                -3.394312431975001e-17,
+                6.055761952500853e-17
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.1968163641001774,
+                1.171058492888845
+              ],
+              "design_condition_diagnostic": 2.0294928446477485,
+              "support_samples": 256
+            }
+          },
+          "constrained_no_morph": {
+            "status": "computed",
+            "reason": null,
+            "axes_mm": [
+              182.47676282097174,
+              151.52531455786018
+            ],
+            "centre_mm": [
+              -4.77171578611905,
+              -2.3178905964163135
+            ],
+            "perimeter_mm": 1051.5523806297474,
+            "quadratic_constraint": 1.8693426042138608,
+            "linear_design_condition": 1.5157021320288349,
+            "normalized_coefficients": [
+              -0.41519078355166666,
+              0.00022953253513870804,
+              -0.6021328581350505,
+              -5.747519398069447e-16,
+              -1.1833339057849347e-15,
+              0.4965635901137403
+            ],
+            "origin_mm": [
+              -4.771715786118935,
+              -2.3178905964161496
+            ],
+            "scale_mm": 166.85681409859416,
+            "kind": "fitted_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 18.02380270204557,
+              "gradient_normalized_residual_max_mm": 33.55044285846059,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -4.77171578611905,
+                -2.3178905964163135
+              ],
+              "centre_offset_over_observed_halfspan": [
+                -2.828593693312501e-17,
+                -6.392193172084235e-17
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.162272306656194,
+                1.1479191470798518
+              ],
+              "design_condition_diagnostic": 3.1516713185224305,
+              "support_samples": 256
+            }
+          },
+          "width_depth_axis_aligned": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 909.61959821265,
+            "axes_mm": [
+              157.0,
+              132.0
+            ],
+            "kind": "axis_aligned_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 24.610076565668376,
+              "gradient_normalized_residual_max_mm": 50.51749972655882,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -4.771715786119046,
+                -2.317890596416305
+              ],
+              "centre_offset_over_observed_halfspan": [
+                0.0,
+                0.0
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.0,
+                1.0
+              ],
+              "design_condition_diagnostic": null,
+              "support_samples": 256
+            }
+          },
+          "unrounded_convex_diagnostic": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 1156.0,
+            "kind": "occupancy_diagnostic"
+          },
+          "historical_opening_0p9_corrected_fit": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 961.5390510856147,
+            "axes_mm": [
+              161.96484043378658,
+              143.83373345652052
+            ],
+            "kind": "historical_shape_prior_comparator",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 2.327276111195361,
+              "gradient_normalized_residual_max_mm": 4.224928854512516,
+              "valid_gradient_samples": 44,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -4.7717157861190564,
+                -2.3178905964162984
+              ],
+              "centre_offset_over_observed_halfspan": [
+                -6.788624863950002e-17,
+                5.0464682937507114e-17
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.0316231874763475,
+                1.0896494958827312
+              ],
+              "design_condition_diagnostic": 2.11718446459466,
+              "support_samples": 44
+            }
+          }
+        },
+        "status": "computed",
+        "reason": null,
+        "component_count": 1,
+        "hull_vertex_count": 4,
+        "width_mm": 314.0,
+        "depth_mm": 264.0,
+        "h_mm": 2.0,
+        "sample_count": 256,
+        "convex_area_mm2": 82896.0,
+        "candidate_perimeter_range_mm": [
+          909.61959821265,
+          1078.4799191743105
+        ],
+        "model_disagreement_mm": 168.86032096166048,
+        "diagnostic_version": "candidate-diagnostics-v3.0",
+        "diagnostics_do_not_select_or_validate_anatomy": true,
+        "current_model_spread_mm": 168.86032096166048,
+        "current_model_spread_members": [
+          "fixed_constant_uniform_no_morph",
+          "constrained_no_morph",
+          "width_depth_axis_aligned"
+        ],
+        "spread_is_not_physical_interval": true,
+        "all_comparator_spread_members": [
+          "fixed_constant_uniform_no_morph",
+          "constrained_no_morph",
+          "width_depth_axis_aligned",
+          "historical_opening_0p9_corrected_fit"
+        ]
+      },
+      "profile": {
+        "version": "section-candidates-v3.0",
+        "policy": "report_candidates_no_auto_selection",
+        "units": "mm",
+        "metadata": {
+          "requested_level_mm": 785.605,
+          "sampled_level_mm": 786.0,
+          "front_torso_bounds_mm": [
+            -183.76049018227047,
+            168.29969162054726
+          ],
+          "site": "hip_level",
+          "source_branch": "profile",
+          "waist_deletion": false,
+          "profile_interpolated": false
+        },
+        "base_waist_adjustment": false,
+        "candidates": {
+          "fixed_constant_no_morph": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 1389.9788244181884,
+            "axes_mm": [
+              259.662393953084,
+              179.07295319912967
+            ],
+            "kind": "fixed_constant_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 0.14893202864972077,
+              "gradient_normalized_residual_max_mm": 0.20860178571378454,
+              "valid_gradient_samples": 6,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -4.043771711885412,
+                -1.836307313441906
+              ],
+              "centre_offset_over_observed_halfspan": [
+                0.006317434819290559,
+                0.0018374942104183803
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.1479048143249875,
+                1.9974019809086458
+              ],
+              "design_condition_diagnostic": 64.9734778297072,
+              "support_samples": 6
+            }
+          },
+          "fixed_constant_uniform_no_morph": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 1066.631557762002,
+            "axes_mm": [
+              186.59983385588774,
+              152.03705255235587
+            ],
+            "kind": "fixed_constant_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 19.166401339182574,
+              "gradient_normalized_residual_max_mm": 33.90574119835472,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -4.776423504969561,
+                -2.0678007399836495
+              ],
+              "centre_offset_over_observed_halfspan": [
+                0.0016209489661870445,
+                5.677554471265996e-05
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.196152669012261,
+                1.1695159539872861
+              ],
+              "design_condition_diagnostic": 2.0388957850210305,
+              "support_samples": 256
+            }
+          },
+          "constrained_no_morph": {
+            "status": "computed",
+            "reason": null,
+            "axes_mm": [
+              181.22334117584754,
+              149.09011586096932
+            ],
+            "centre_mm": [
+              -4.778639916160803,
+              -2.0677108766473555
+            ],
+            "perimeter_mm": 1040.166902930831,
+            "quadratic_constraint": 1.856730236855416,
+            "linear_design_condition": 1.52123825477874,
+            "normalized_coefficients": [
+              -0.4113436989580815,
+              -0.000305776941278555,
+              -0.6077643197358445,
+              -0.0009650467091487388,
+              -6.501903297294737e-05,
+              0.4962211885230803
+            ],
+            "origin_mm": [
+              -4.5850936651905245,
+              -2.058933768520335
+            ],
+            "scale_mm": 164.99796736771427,
+            "kind": "fitted_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 17.726508649326863,
+              "gradient_normalized_residual_max_mm": 33.07300709893841,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -4.778639916160803,
+                -2.0677108766473555
+              ],
+              "centre_offset_over_observed_halfspan": [
+                0.0016067412021406175,
+                5.7466801145690845e-05
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.1616879707275847,
+                1.1468472109792205
+              ],
+              "design_condition_diagnostic": 3.140962906953279,
+              "support_samples": 256
+            }
+          },
+          "width_depth_axis_aligned": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 900.3528554552585,
+            "axes_mm": [
+              156.0,
+              130.0
+            ],
+            "kind": "axis_aligned_ellipse_model",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 24.206305142202705,
+              "gradient_normalized_residual_max_mm": 49.89740955780214,
+              "valid_gradient_samples": 256,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -5.02929154369474,
+                -2.0751815607962953
+              ],
+              "centre_offset_over_observed_halfspan": [
+                0.0,
+                0.0
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.0,
+                1.0
+              ],
+              "design_condition_diagnostic": null,
+              "support_samples": 256
+            }
+          },
+          "unrounded_convex_diagnostic": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 1140.7966912753363,
+            "kind": "occupancy_diagnostic"
+          },
+          "historical_opening_0p9_corrected_fit": {
+            "status": "computed",
+            "reason": null,
+            "perimeter_mm": 955.5904690584592,
+            "axes_mm": [
+              161.15654646430826,
+              142.73820998882235
+            ],
+            "kind": "historical_shape_prior_comparator",
+            "fit_diagnostics": {
+              "gradient_normalized_residual_rms_mm": 2.3445680135149822,
+              "gradient_normalized_residual_max_mm": 4.4122066933320525,
+              "valid_gradient_samples": 52,
+              "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+              "centre_mm": [
+                -5.02929154369475,
+                -2.0751815607963002
+              ],
+              "centre_offset_over_observed_halfspan": [
+                -6.832141690000964e-17,
+                -3.75767792950053e-17
+              ],
+              "fitted_to_observed_span_ratios": [
+                1.033054785027617,
+                1.0979862306832489
+              ],
+              "design_condition_diagnostic": 2.2947780286853328,
+              "support_samples": 52
+            }
+          }
+        },
+        "status": "computed",
+        "reason": null,
+        "component_count": 1,
+        "hull_vertex_count": 6,
+        "width_mm": 312.0,
+        "depth_mm": 260.0,
+        "h_mm": 2.0,
+        "sample_count": 256,
+        "convex_area_mm2": 81110.0,
+        "candidate_perimeter_range_mm": [
+          900.3528554552585,
+          1389.9788244181884
+        ],
+        "model_disagreement_mm": 489.62596896292996,
+        "diagnostic_version": "candidate-diagnostics-v3.0",
+        "diagnostics_do_not_select_or_validate_anatomy": true,
+        "current_model_spread_mm": 489.62596896292996,
+        "current_model_spread_members": [
+          "fixed_constant_no_morph",
+          "fixed_constant_uniform_no_morph",
+          "constrained_no_morph",
+          "width_depth_axis_aligned"
+        ],
+        "spread_is_not_physical_interval": true,
+        "all_comparator_spread_members": [
+          "fixed_constant_no_morph",
+          "fixed_constant_uniform_no_morph",
+          "constrained_no_morph",
+          "width_depth_axis_aligned",
+          "historical_opening_0p9_corrected_fit"
+        ]
+      }
+    }
+  },
+  "physical_uncertainty": {
+    "available": false,
+    "value_mm": null,
+    "reason": "not_calibrated"
+  },
+  "landmark_source": "stature_proportion_level_proxies; perception_and_pose_bypassed",
+  "views": {
+    "front": {
+      "image_shape": [
+        960,
+        720
+      ],
+      "provided_silhouette": true,
+      "foreground_pixels": 137581
+    },
+    "side": {
+      "image_shape": [
+        960,
+        720
+      ],
+      "provided_silhouette": true,
+      "foreground_pixels": 95089
+    }
+  },
+  "levels_mm": {
+    "shoulder": 304.21299999999997,
+    "chest": 420.13219359999994,
+    "waist_proxy": 635.4106959999999,
+    "hip_landmark_or_proxy": 785.605
+  },
+  "reconstruction": {
+    "conventional": {
+      "grid_shape": [
+        415,
+        840,
+        170
+      ],
+      "voxel_mm": 2.0,
+      "occupied_voxels": 13031381,
+      "component_deletion": false,
+      "profile_rejected_rows": null,
+      "profile_rows": null
+    },
+    "profile": {
+      "grid_shape": [
+        706,
+        836,
+        207
+      ],
+      "voxel_mm": 2.0,
+      "occupied_voxels": 11997746,
+      "component_deletion": false,
+      "profile_rejected_rows": 35,
+      "profile_rows": 919
+    }
+  },
+  "level_ablations": {
+    "version": "per-level-profile-ablation-v3.0",
+    "entry_point": "post_perception_masks",
+    "voxel_mm": 2.0,
+    "height_cm": 167.15,
+    "policy": "common_front_torso_clip_1p15_no_depth_cap_no_waist_deletion",
+    "status": "computed",
+    "reason": null,
+    "levels": {
+      "chest_level": {
+        "target_y_mm": 420.13219359999994,
+        "status": "computed",
+        "reason": null,
+        "sampled_y_mm": 420.0,
+        "source_profile_row_px": 254.91833682321268,
+        "x_bounds_mm": [
+          -275.71847914615216,
+          267.3918730969869
+        ],
+        "front_support_columns": 243,
+        "clipped_support_columns": 243,
+        "methods": {
+          "unfiltered_widest": {
+            "version": "section-candidates-v3.0",
+            "policy": "report_candidates_no_auto_selection",
+            "units": "mm",
+            "metadata": {
+              "endpoint_id": "chest_level",
+              "source_branch": "unfiltered_widest",
+              "sampled_y_mm": 420.0,
+              "attempt_scope": "per_level_ablation"
+            },
+            "base_waist_adjustment": false,
+            "candidates": {
+              "fixed_constant_no_morph": {
+                "status": "unavailable",
+                "reason": "At least five two-dimensional points are required",
+                "perimeter_mm": null
+              },
+              "fixed_constant_uniform_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1433.7865739739116,
+                "axes_mm": [
+                  302.0566620617044,
+                  139.16484193126735
+                ],
+                "kind": "fixed_constant_ellipse_model"
+              },
+              "constrained_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "axes_mm": [
+                  288.0966877808601,
+                  137.98674821458837
+                ],
+                "centre_mm": [
+                  -5.029291543694763,
+                  -7.254470665825301
+                ],
+                "perimeter_mm": 1380.4482968907244,
+                "quadratic_constraint": 0.8717346759579055,
+                "linear_design_condition": 1.954739152977586,
+                "normalized_coefficients": [
+                  -0.23947993082806224,
+                  9.178477364901898e-05,
+                  -1.0439288221007628,
+                  1.6636475870404307e-16,
+                  -2.175010958755572e-15,
+                  0.4500132471638328
+                ],
+                "origin_mm": [
+                  -5.0292915436948356,
+                  -7.254470665825083
+                ],
+                "scale_mm": 210.164895268275,
+                "kind": "fitted_ellipse_model"
+              },
+              "width_depth_axis_aligned": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1174.8274667906505,
+                "axes_mm": [
+                  242.0,
+                  122.0
+                ],
+                "kind": "axis_aligned_ellipse_model"
+              },
+              "unrounded_convex_diagnostic": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1456.0,
+                "kind": "occupancy_diagnostic"
+              },
+              "historical_opening_0p9_corrected_fit": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1295.4199083331935,
+                "axes_mm": [
+                  249.03534230802168,
+                  158.23242684231107
+                ],
+                "kind": "historical_shape_prior_comparator"
+              }
+            },
+            "status": "computed",
+            "reason": null,
+            "component_count": 1,
+            "hull_vertex_count": 4,
+            "width_mm": 484.0,
+            "depth_mm": 244.0,
+            "h_mm": 2.0,
+            "sample_count": 256,
+            "convex_area_mm2": 118096.0,
+            "candidate_perimeter_range_mm": [
+              1174.8274667906505,
+              1433.7865739739116
+            ],
+            "model_disagreement_mm": 258.95910718326104,
+            "occupied_voxels_2d": 29889
+          },
+          "filtered_no_cap": {
+            "version": "section-candidates-v3.0",
+            "policy": "report_candidates_no_auto_selection",
+            "units": "mm",
+            "metadata": {
+              "endpoint_id": "chest_level",
+              "source_branch": "filtered_no_cap",
+              "sampled_y_mm": 420.0,
+              "attempt_scope": "per_level_ablation"
+            },
+            "base_waist_adjustment": false,
+            "candidates": {
+              "fixed_constant_no_morph": {
+                "status": "unavailable",
+                "reason": "At least five two-dimensional points are required",
+                "perimeter_mm": null
+              },
+              "fixed_constant_uniform_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1427.7221188634317,
+                "axes_mm": [
+                  302.7827006795629,
+                  135.58123866437933
+                ],
+                "kind": "fixed_constant_ellipse_model"
+              },
+              "constrained_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "axes_mm": [
+                  288.49322011629107,
+                  134.50333563779952
+                ],
+                "centre_mm": [
+                  -5.02929154369474,
+                  -6.25447066582508
+                ],
+                "perimeter_mm": 1373.2891778204823,
+                "quadratic_constraint": 0.830242665605803,
+                "linear_design_condition": 1.9828113647171726,
+                "normalized_coefficients": [
+                  -0.233113520388058,
+                  0.0001646840453257496,
+                  -1.072438897426628,
+                  2.297902603217107e-16,
+                  1.612159060583038e-16,
+                  0.4465986102395425
+                ],
+                "origin_mm": [
+                  -5.029291543694843,
+                  -6.254470665825096
+                ],
+                "scale_mm": 208.43020303241278,
+                "kind": "fitted_ellipse_model"
+              },
+              "width_depth_axis_aligned": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1167.2759589209322,
+                "axes_mm": [
+                  242.0,
+                  119.0
+                ],
+                "kind": "axis_aligned_ellipse_model"
+              },
+              "unrounded_convex_diagnostic": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1444.0,
+                "kind": "occupancy_diagnostic"
+              },
+              "historical_opening_0p9_corrected_fit": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1283.7256029785417,
+                "axes_mm": [
+                  248.02662856531396,
+                  155.24087466316465
+                ],
+                "kind": "historical_shape_prior_comparator"
+              }
+            },
+            "status": "computed",
+            "reason": null,
+            "component_count": 1,
+            "hull_vertex_count": 4,
+            "width_mm": 484.0,
+            "depth_mm": 238.0,
+            "h_mm": 2.0,
+            "sample_count": 256,
+            "convex_area_mm2": 115192.0,
+            "candidate_perimeter_range_mm": [
+              1167.2759589209322,
+              1427.7221188634317
+            ],
+            "model_disagreement_mm": 260.44615994249943,
+            "occupied_voxels_2d": 29160
+          },
+          "filtered_column_cap": {
+            "version": "section-candidates-v3.0",
+            "policy": "report_candidates_no_auto_selection",
+            "units": "mm",
+            "metadata": {
+              "endpoint_id": "chest_level",
+              "source_branch": "filtered_column_cap",
+              "sampled_y_mm": 420.0,
+              "attempt_scope": "per_level_ablation"
+            },
+            "base_waist_adjustment": false,
+            "candidates": {
+              "fixed_constant_no_morph": {
+                "status": "unavailable",
+                "reason": "At least five two-dimensional points are required",
+                "perimeter_mm": null
+              },
+              "fixed_constant_uniform_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1427.7221188634317,
+                "axes_mm": [
+                  302.7827006795629,
+                  135.58123866437933
+                ],
+                "kind": "fixed_constant_ellipse_model"
+              },
+              "constrained_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "axes_mm": [
+                  288.49322011629107,
+                  134.50333563779952
+                ],
+                "centre_mm": [
+                  -5.02929154369474,
+                  -6.25447066582508
+                ],
+                "perimeter_mm": 1373.2891778204823,
+                "quadratic_constraint": 0.830242665605803,
+                "linear_design_condition": 1.9828113647171726,
+                "normalized_coefficients": [
+                  -0.233113520388058,
+                  0.0001646840453257496,
+                  -1.072438897426628,
+                  2.297902603217107e-16,
+                  1.612159060583038e-16,
+                  0.4465986102395425
+                ],
+                "origin_mm": [
+                  -5.029291543694843,
+                  -6.254470665825096
+                ],
+                "scale_mm": 208.43020303241278,
+                "kind": "fitted_ellipse_model"
+              },
+              "width_depth_axis_aligned": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1167.2759589209322,
+                "axes_mm": [
+                  242.0,
+                  119.0
+                ],
+                "kind": "axis_aligned_ellipse_model"
+              },
+              "unrounded_convex_diagnostic": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1444.0,
+                "kind": "occupancy_diagnostic"
+              },
+              "historical_opening_0p9_corrected_fit": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1232.4976061326256,
+                "axes_mm": [
+                  240.86780014315164,
+                  145.5472717365866
+                ],
+                "kind": "historical_shape_prior_comparator"
+              }
+            },
+            "status": "computed",
+            "reason": null,
+            "component_count": 1,
+            "hull_vertex_count": 4,
+            "width_mm": 484.0,
+            "depth_mm": 238.0,
+            "h_mm": 2.0,
+            "sample_count": 256,
+            "convex_area_mm2": 115192.0,
+            "candidate_perimeter_range_mm": [
+              1167.2759589209322,
+              1427.7221188634317
+            ],
+            "model_disagreement_mm": 260.44615994249943,
+            "occupied_voxels_2d": 28666
+          }
+        },
+        "raw_profile_interval_mm": [
+          -130.5199766505913,
+          115.02137264211817
+        ],
+        "raw_endpoints_evaluated_at_common_continuous_y": true,
+        "filtered_profile_interval_mm": [
+          -127.14099202381333,
+          112.78914524177463
+        ],
+        "profile_interpolated": false,
+        "cap_active_columns_before_torso_clip": 42,
+        "cap_active_columns_after_torso_clip": 42,
+        "min_clipped_column_thickness_mm": 180.0,
+        "filtered_core_depth_mm": 239.93013726558797,
+        "changed_voxels_due_to_column_cap": 494,
+        "cap_minus_filtered_perimeter_mm": {
+          "constrained_no_morph": {
+            "value_mm": 0.0,
+            "reason": null
+          },
+          "fixed_constant_no_morph": {
+            "value_mm": null,
+            "reason": "one_or_both_unavailable"
+          },
+          "fixed_constant_uniform_no_morph": {
+            "value_mm": 0.0,
+            "reason": null
+          },
+          "historical_opening_0p9_corrected_fit": {
+            "value_mm": -51.227996845916095,
+            "reason": null
+          },
+          "unrounded_convex_diagnostic": {
+            "value_mm": 0.0,
+            "reason": null
+          },
+          "width_depth_axis_aligned": {
+            "value_mm": 0.0,
+            "reason": null
+          }
+        },
+        "changed_voxels_due_to_profile_filter": 729,
+        "filtered_minus_raw_perimeter_mm": {
+          "constrained_no_morph": {
+            "value_mm": -7.1591190702420135,
+            "reason": null
+          },
+          "fixed_constant_no_morph": {
+            "value_mm": null,
+            "reason": "one_or_both_unavailable"
+          },
+          "fixed_constant_uniform_no_morph": {
+            "value_mm": -6.064455110479912,
+            "reason": null
+          },
+          "historical_opening_0p9_corrected_fit": {
+            "value_mm": -11.69430535465176,
+            "reason": null
+          },
+          "unrounded_convex_diagnostic": {
+            "value_mm": -12.0,
+            "reason": null
+          },
+          "width_depth_axis_aligned": {
+            "value_mm": -7.551507869718307,
+            "reason": null
+          }
+        }
+      },
+      "waist_proxy": {
+        "target_y_mm": 635.4106959999999,
+        "status": "computed",
+        "reason": null,
+        "sampled_y_mm": 636.0,
+        "source_profile_row_px": 373.6763386180078,
+        "x_bounds_mm": [
+          -167.52220646963758,
+          170.0092744691908
+        ],
+        "front_support_columns": 240,
+        "clipped_support_columns": 148,
+        "methods": {
+          "unfiltered_widest": {
+            "version": "section-candidates-v3.0",
+            "policy": "report_candidates_no_auto_selection",
+            "units": "mm",
+            "metadata": {
+              "endpoint_id": "waist_proxy",
+              "source_branch": "unfiltered_widest",
+              "sampled_y_mm": 636.0,
+              "attempt_scope": "per_level_ablation"
+            },
+            "base_waist_adjustment": false,
+            "candidates": {
+              "fixed_constant_no_morph": {
+                "status": "unavailable",
+                "reason": "At least five two-dimensional points are required",
+                "perimeter_mm": null
+              },
+              "fixed_constant_uniform_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 959.5644392701163,
+                "axes_mm": [
+                  177.65774574137208,
+                  125.53697483873323
+                ],
+                "kind": "fixed_constant_ellipse_model"
+              },
+              "constrained_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "axes_mm": [
+                  171.8108235783592,
+                  123.45292098819935
+                ],
+                "centre_mm": [
+                  -0.029291543694791713,
+                  8.745529334174751
+                ],
+                "perimeter_mm": 933.8292575050979,
+                "quadratic_constraint": 1.6305500827724058,
+                "linear_design_condition": 1.6091595883272165,
+                "normalized_coefficients": [
+                  -0.3592699363093082,
+                  0.00015711512519549892,
+                  -0.695855625270178,
+                  2.1389576109387854e-16,
+                  5.730933753150879e-16,
+                  0.48925618197911297
+                ],
+                "origin_mm": [
+                  -0.029291543694835553,
+                  8.745529334174691
+                ],
+                "scale_mm": 147.22880466420816,
+                "kind": "fitted_ellipse_model"
+              },
+              "width_depth_axis_aligned": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 805.7976848246135,
+                "axes_mm": [
+                  147.0,
+                  108.0
+                ],
+                "kind": "axis_aligned_ellipse_model"
+              },
+              "unrounded_convex_diagnostic": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1020.0,
+                "kind": "occupancy_diagnostic"
+              },
+              "historical_opening_0p9_corrected_fit": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 862.419745890072,
+                "axes_mm": [
+                  151.2065658552583,
+                  122.56028207215067
+                ],
+                "kind": "historical_shape_prior_comparator"
+              }
+            },
+            "status": "computed",
+            "reason": null,
+            "component_count": 1,
+            "hull_vertex_count": 4,
+            "width_mm": 294.0,
+            "depth_mm": 216.0,
+            "h_mm": 2.0,
+            "sample_count": 256,
+            "convex_area_mm2": 63504.0,
+            "candidate_perimeter_range_mm": [
+              805.7976848246135,
+              959.5644392701163
+            ],
+            "model_disagreement_mm": 153.76675444550278,
+            "occupied_voxels_2d": 16132
+          },
+          "filtered_no_cap": {
+            "version": "section-candidates-v3.0",
+            "policy": "report_candidates_no_auto_selection",
+            "units": "mm",
+            "metadata": {
+              "endpoint_id": "waist_proxy",
+              "source_branch": "filtered_no_cap",
+              "sampled_y_mm": 636.0,
+              "attempt_scope": "per_level_ablation"
+            },
+            "base_waist_adjustment": false,
+            "candidates": {
+              "fixed_constant_no_morph": {
+                "status": "unavailable",
+                "reason": "At least five two-dimensional points are required",
+                "perimeter_mm": null
+              },
+              "fixed_constant_uniform_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 962.6132612242998,
+                "axes_mm": [
+                  177.52877509525047,
+                  126.75913690101027
+                ],
+                "kind": "fixed_constant_ellipse_model"
+              },
+              "constrained_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "axes_mm": [
+                  171.74014605680802,
+                  124.62906937568943
+                ],
+                "centre_mm": [
+                  -0.029291543694766102,
+                  7.745529334174834
+                ],
+                "perimeter_mm": 936.9623978303384,
+                "quadratic_constraint": 1.6491242360305736,
+                "linear_design_condition": 1.6023282628710083,
+                "normalized_coefficients": [
+                  -0.3628420224099568,
+                  0.00023446200502235138,
+                  -0.6890051270319666,
+                  3.407748586468404e-16,
+                  1.224661355438697e-15,
+                  0.4898794877209778
+                ],
+                "origin_mm": [
+                  -0.029291543694835553,
+                  7.7455293341747025
+                ],
+                "scale_mm": 147.8039241698271,
+                "kind": "fitted_ellipse_model"
+              },
+              "width_depth_axis_aligned": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 808.6839904987079,
+                "axes_mm": [
+                  147.0,
+                  109.0
+                ],
+                "kind": "axis_aligned_ellipse_model"
+              },
+              "unrounded_convex_diagnostic": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1024.0,
+                "kind": "occupancy_diagnostic"
+              },
+              "historical_opening_0p9_corrected_fit": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 866.6608168659541,
+                "axes_mm": [
+                  151.4698612671352,
+                  123.69553403229914
+                ],
+                "kind": "historical_shape_prior_comparator"
+              }
+            },
+            "status": "computed",
+            "reason": null,
+            "component_count": 1,
+            "hull_vertex_count": 4,
+            "width_mm": 294.0,
+            "depth_mm": 218.0,
+            "h_mm": 2.0,
+            "sample_count": 256,
+            "convex_area_mm2": 64092.0,
+            "candidate_perimeter_range_mm": [
+              808.6839904987079,
+              962.6132612242998
+            ],
+            "model_disagreement_mm": 153.9292707255919,
+            "occupied_voxels_2d": 16280
+          },
+          "filtered_column_cap": {
+            "version": "section-candidates-v3.0",
+            "policy": "report_candidates_no_auto_selection",
+            "units": "mm",
+            "metadata": {
+              "endpoint_id": "waist_proxy",
+              "source_branch": "filtered_column_cap",
+              "sampled_y_mm": 636.0,
+              "attempt_scope": "per_level_ablation"
+            },
+            "base_waist_adjustment": false,
+            "candidates": {
+              "fixed_constant_no_morph": {
+                "status": "unavailable",
+                "reason": "At least five two-dimensional points are required",
+                "perimeter_mm": null
+              },
+              "fixed_constant_uniform_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 962.6132612242998,
+                "axes_mm": [
+                  177.52877509525047,
+                  126.75913690101027
+                ],
+                "kind": "fixed_constant_ellipse_model"
+              },
+              "constrained_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "axes_mm": [
+                  171.74014605680802,
+                  124.62906937568943
+                ],
+                "centre_mm": [
+                  -0.029291543694766102,
+                  7.745529334174834
+                ],
+                "perimeter_mm": 936.9623978303384,
+                "quadratic_constraint": 1.6491242360305736,
+                "linear_design_condition": 1.6023282628710083,
+                "normalized_coefficients": [
+                  -0.3628420224099568,
+                  0.00023446200502235138,
+                  -0.6890051270319666,
+                  3.407748586468404e-16,
+                  1.224661355438697e-15,
+                  0.4898794877209778
+                ],
+                "origin_mm": [
+                  -0.029291543694835553,
+                  7.7455293341747025
+                ],
+                "scale_mm": 147.8039241698271,
+                "kind": "fitted_ellipse_model"
+              },
+              "width_depth_axis_aligned": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 808.6839904987079,
+                "axes_mm": [
+                  147.0,
+                  109.0
+                ],
+                "kind": "axis_aligned_ellipse_model"
+              },
+              "unrounded_convex_diagnostic": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1024.0,
+                "kind": "occupancy_diagnostic"
+              },
+              "historical_opening_0p9_corrected_fit": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 866.6608168659541,
+                "axes_mm": [
+                  151.4698612671352,
+                  123.69553403229914
+                ],
+                "kind": "historical_shape_prior_comparator"
+              }
+            },
+            "status": "computed",
+            "reason": null,
+            "component_count": 1,
+            "hull_vertex_count": 4,
+            "width_mm": 294.0,
+            "depth_mm": 218.0,
+            "h_mm": 2.0,
+            "sample_count": 256,
+            "convex_area_mm2": 64092.0,
+            "candidate_perimeter_range_mm": [
+              808.6839904987079,
+              962.6132612242998
+            ],
+            "model_disagreement_mm": 153.9292707255919,
+            "occupied_voxels_2d": 16280
+          }
+        },
+        "raw_profile_interval_mm": [
+          -99.59995488780567,
+          118.65902226126941
+        ],
+        "raw_endpoints_evaluated_at_common_continuous_y": true,
+        "filtered_profile_interval_mm": [
+          -102.97241477495908,
+          117.83082593328501
+        ],
+        "profile_interpolated": false,
+        "cap_active_columns_before_torso_clip": 64,
+        "cap_active_columns_after_torso_clip": 0,
+        "min_clipped_column_thickness_mm": 338.0,
+        "filtered_core_depth_mm": 220.8032407082441,
+        "changed_voxels_due_to_column_cap": 0,
+        "cap_minus_filtered_perimeter_mm": {
+          "constrained_no_morph": {
+            "value_mm": 0.0,
+            "reason": null
+          },
+          "fixed_constant_no_morph": {
+            "value_mm": null,
+            "reason": "one_or_both_unavailable"
+          },
+          "fixed_constant_uniform_no_morph": {
+            "value_mm": 0.0,
+            "reason": null
+          },
+          "historical_opening_0p9_corrected_fit": {
+            "value_mm": 0.0,
+            "reason": null
+          },
+          "unrounded_convex_diagnostic": {
+            "value_mm": 0.0,
+            "reason": null
+          },
+          "width_depth_axis_aligned": {
+            "value_mm": 0.0,
+            "reason": null
+          }
+        },
+        "changed_voxels_due_to_profile_filter": 148,
+        "filtered_minus_raw_perimeter_mm": {
+          "constrained_no_morph": {
+            "value_mm": 3.1331403252405607,
+            "reason": null
+          },
+          "fixed_constant_no_morph": {
+            "value_mm": null,
+            "reason": "one_or_both_unavailable"
+          },
+          "fixed_constant_uniform_no_morph": {
+            "value_mm": 3.048821954183495,
+            "reason": null
+          },
+          "historical_opening_0p9_corrected_fit": {
+            "value_mm": 4.241070975882053,
+            "reason": null
+          },
+          "unrounded_convex_diagnostic": {
+            "value_mm": 4.0,
+            "reason": null
+          },
+          "width_depth_axis_aligned": {
+            "value_mm": 2.8863056740943875,
+            "reason": null
+          }
+        }
+      },
+      "hip_level": {
+        "target_y_mm": 785.605,
+        "status": "computed",
+        "reason": null,
+        "sampled_y_mm": 786.0,
+        "source_profile_row_px": 456.1471731977266,
+        "x_bounds_mm": [
+          -183.76049018227047,
+          168.29969162054726
+        ],
+        "front_support_columns": 212,
+        "clipped_support_columns": 157,
+        "methods": {
+          "unfiltered_widest": {
+            "version": "section-candidates-v3.0",
+            "policy": "report_candidates_no_auto_selection",
+            "units": "mm",
+            "metadata": {
+              "endpoint_id": "hip_level",
+              "source_branch": "unfiltered_widest",
+              "sampled_y_mm": 786.0,
+              "attempt_scope": "per_level_ablation"
+            },
+            "base_waist_adjustment": false,
+            "candidates": {
+              "fixed_constant_no_morph": {
+                "status": "unavailable",
+                "reason": "At least five two-dimensional points are required",
+                "perimeter_mm": null
+              },
+              "fixed_constant_uniform_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1071.0763323657363,
+                "axes_mm": [
+                  186.71939161890631,
+                  153.3981862433145
+                ],
+                "kind": "fixed_constant_ellipse_model"
+              },
+              "constrained_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "axes_mm": [
+                  181.32338551386007,
+                  150.37155905608617
+                ],
+                "centre_mm": [
+                  -5.029291543694698,
+                  -2.2544706658251807
+                ],
+                "perimeter_mm": 1044.320058962598,
+                "quadratic_constraint": 1.8676064276362345,
+                "linear_design_condition": 1.5164839276523179,
+                "normalized_coefficients": [
+                  -0.41465027565628326,
+                  0.00022563389299702386,
+                  -0.6029177535984477,
+                  6.731484411108147e-16,
+                  -4.506733392678681e-16,
+                  0.4965155351726062
+                ],
+                "origin_mm": [
+                  -5.029291543694832,
+                  -2.254470665825119
+                ],
+                "scale_mm": 165.70222587863088,
+                "kind": "fitted_ellipse_model"
+              },
+              "width_depth_axis_aligned": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 903.34826609597,
+                "axes_mm": [
+                  156.0,
+                  131.0
+                ],
+                "kind": "axis_aligned_ellipse_model"
+              },
+              "unrounded_convex_diagnostic": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1148.0,
+                "kind": "occupancy_diagnostic"
+              },
+              "historical_opening_0p9_corrected_fit": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 953.2016288125449,
+                "axes_mm": [
+                  160.67631099862808,
+                  142.4635724580635
+                ],
+                "kind": "historical_shape_prior_comparator"
+              }
+            },
+            "status": "computed",
+            "reason": null,
+            "component_count": 1,
+            "hull_vertex_count": 4,
+            "width_mm": 312.0,
+            "depth_mm": 262.0,
+            "h_mm": 2.0,
+            "sample_count": 256,
+            "convex_area_mm2": 81744.0,
+            "candidate_perimeter_range_mm": [
+              903.34826609597,
+              1071.0763323657363
+            ],
+            "model_disagreement_mm": 167.72806626976637,
+            "occupied_voxels_2d": 20724
+          },
+          "filtered_no_cap": {
+            "version": "section-candidates-v3.0",
+            "policy": "report_candidates_no_auto_selection",
+            "units": "mm",
+            "metadata": {
+              "endpoint_id": "hip_level",
+              "source_branch": "filtered_no_cap",
+              "sampled_y_mm": 786.0,
+              "attempt_scope": "per_level_ablation"
+            },
+            "base_waist_adjustment": false,
+            "candidates": {
+              "fixed_constant_no_morph": {
+                "status": "unavailable",
+                "reason": "At least five two-dimensional points are required",
+                "perimeter_mm": null
+              },
+              "fixed_constant_uniform_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1067.755954266159,
+                "axes_mm": [
+                  186.82547369936597,
+                  152.16526114686758
+                ],
+                "kind": "fixed_constant_ellipse_model"
+              },
+              "constrained_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "axes_mm": [
+                  181.38174783194987,
+                  149.18928355104944
+                ],
+                "centre_mm": [
+                  -5.029291543694792,
+                  -1.2544706658251612
+                ],
+                "perimeter_mm": 1040.9832444825229,
+                "quadratic_constraint": 1.8564420903692211,
+                "linear_design_condition": 1.52143845059933,
+                "normalized_coefficients": [
+                  -0.41125773145358996,
+                  0.00013757855029610582,
+                  -0.6078913187804145,
+                  1.9711205995104303e-16,
+                  -2.968763056627963e-16,
+                  0.4962049011016076
+                ],
+                "origin_mm": [
+                  -5.029291543694832,
+                  -1.2544706658251208
+                ],
+                "scale_mm": 165.12775741688995,
+                "kind": "fitted_ellipse_model"
+              },
+              "width_depth_axis_aligned": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 900.3528554552585,
+                "axes_mm": [
+                  156.0,
+                  130.0
+                ],
+                "kind": "axis_aligned_ellipse_model"
+              },
+              "unrounded_convex_diagnostic": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1144.0,
+                "kind": "occupancy_diagnostic"
+              },
+              "historical_opening_0p9_corrected_fit": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 955.5904690584589,
+                "axes_mm": [
+                  161.15654646430824,
+                  142.7382099888223
+                ],
+                "kind": "historical_shape_prior_comparator"
+              }
+            },
+            "status": "computed",
+            "reason": null,
+            "component_count": 1,
+            "hull_vertex_count": 4,
+            "width_mm": 312.0,
+            "depth_mm": 260.0,
+            "h_mm": 2.0,
+            "sample_count": 256,
+            "convex_area_mm2": 81120.0,
+            "candidate_perimeter_range_mm": [
+              900.3528554552585,
+              1067.755954266159
+            ],
+            "model_disagreement_mm": 167.4030988109006,
+            "occupied_voxels_2d": 20567
+          },
+          "filtered_column_cap": {
+            "version": "section-candidates-v3.0",
+            "policy": "report_candidates_no_auto_selection",
+            "units": "mm",
+            "metadata": {
+              "endpoint_id": "hip_level",
+              "source_branch": "filtered_column_cap",
+              "sampled_y_mm": 786.0,
+              "attempt_scope": "per_level_ablation"
+            },
+            "base_waist_adjustment": false,
+            "candidates": {
+              "fixed_constant_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1389.9788244181925,
+                "axes_mm": [
+                  259.6623939530854,
+                  179.07295319912936
+                ],
+                "kind": "fixed_constant_ellipse_model"
+              },
+              "fixed_constant_uniform_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1066.6274535985938,
+                "axes_mm": [
+                  186.59859097447682,
+                  152.03704911942347
+                ],
+                "kind": "fixed_constant_ellipse_model"
+              },
+              "constrained_no_morph": {
+                "status": "computed",
+                "reason": null,
+                "axes_mm": [
+                  181.22253391696736,
+                  149.09025517344716
+                ],
+                "centre_mm": [
+                  -4.784074900691636,
+                  -1.265868250706859
+                ],
+                "perimeter_mm": 1040.1646646746522,
+                "quadratic_constraint": 1.8567376391491772,
+                "linear_design_condition": 1.521236450950835,
+                "normalized_coefficients": [
+                  -0.4113459417394962,
+                  0.00033761471912338744,
+                  -0.6077610184720108,
+                  -0.0009858501780820735,
+                  4.510630980524722e-05,
+                  0.49622123301834137
+                ],
+                "origin_mm": [
+                  -4.586356978976839,
+                  -1.2719361648356196
+                ],
+                "scale_mm": 164.9976656155572,
+                "kind": "fitted_ellipse_model"
+              },
+              "width_depth_axis_aligned": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 900.3528554552585,
+                "axes_mm": [
+                  156.0,
+                  130.0
+                ],
+                "kind": "axis_aligned_ellipse_model"
+              },
+              "unrounded_convex_diagnostic": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 1140.7966912753363,
+                "kind": "occupancy_diagnostic"
+              },
+              "historical_opening_0p9_corrected_fit": {
+                "status": "computed",
+                "reason": null,
+                "perimeter_mm": 955.5904690584589,
+                "axes_mm": [
+                  161.15654646430824,
+                  142.7382099888223
+                ],
+                "kind": "historical_shape_prior_comparator"
+              }
+            },
+            "status": "computed",
+            "reason": null,
+            "component_count": 1,
+            "hull_vertex_count": 6,
+            "width_mm": 312.0,
+            "depth_mm": 260.0,
+            "h_mm": 2.0,
+            "sample_count": 256,
+            "convex_area_mm2": 81110.0,
+            "candidate_perimeter_range_mm": [
+              900.3528554552585,
+              1389.9788244181925
+            ],
+            "model_disagreement_mm": 489.62596896293405,
+            "occupied_voxels_2d": 20562
+          }
+        },
+        "raw_profile_interval_mm": [
+          -134.15762626974256,
+          129.57197111872316
+        ],
+        "raw_endpoints_evaluated_at_common_continuous_y": true,
+        "filtered_profile_interval_mm": [
+          -132.35637142037078,
+          128.9448642516995
+        ],
+        "profile_interpolated": false,
+        "cap_active_columns_before_torso_clip": 45,
+        "cap_active_columns_after_torso_clip": 1,
+        "min_clipped_column_thickness_mm": 252.0,
+        "filtered_core_depth_mm": 261.3012356720703,
+        "changed_voxels_due_to_column_cap": 5,
+        "cap_minus_filtered_perimeter_mm": {
+          "constrained_no_morph": {
+            "value_mm": -0.8185798078707194,
+            "reason": null
+          },
+          "fixed_constant_no_morph": {
+            "value_mm": null,
+            "reason": "one_or_both_unavailable"
+          },
+          "fixed_constant_uniform_no_morph": {
+            "value_mm": -1.1285006675652767,
+            "reason": null
+          },
+          "historical_opening_0p9_corrected_fit": {
+            "value_mm": 0.0,
+            "reason": null
+          },
+          "unrounded_convex_diagnostic": {
+            "value_mm": -3.203308724663657,
+            "reason": null
+          },
+          "width_depth_axis_aligned": {
+            "value_mm": 0.0,
+            "reason": null
+          }
+        },
+        "changed_voxels_due_to_profile_filter": 157,
+        "filtered_minus_raw_perimeter_mm": {
+          "constrained_no_morph": {
+            "value_mm": -3.3368144800751907,
+            "reason": null
+          },
+          "fixed_constant_no_morph": {
+            "value_mm": null,
+            "reason": "one_or_both_unavailable"
+          },
+          "fixed_constant_uniform_no_morph": {
+            "value_mm": -3.320378099577283,
+            "reason": null
+          },
+          "historical_opening_0p9_corrected_fit": {
+            "value_mm": 2.388840245914025,
+            "reason": null
+          },
+          "unrounded_convex_diagnostic": {
+            "value_mm": -4.0,
+            "reason": null
+          },
+          "width_depth_axis_aligned": {
+            "value_mm": -2.9954106407114978,
+            "reason": null
+          }
+        }
+      }
+    },
+    "allocates_dense_3d": false,
+    "grid_shape_2d": [
+      706,
+      836
+    ],
+    "sagittal_samples": 696,
+    "scales_mm_per_px": {
+      "front": 1.8759820426487093,
+      "side": 1.8188248095756256
+    },
+    "origins_px": {
+      "front": 359.17283950617286,
+      "side": 365.76060935799785
+    },
+    "profile_failure": null
+  },
+  "optional_waist_hypothesis": {
+    "left_proposal": {
+      "version": "optional-waist-hypothesis-v3.0",
+      "default_applied": false,
+      "status": "proposed",
+      "reason": "optional_positive_curvature_heuristic",
+      "displacement_mm": 0.3111688654997044,
+      "anatomically_validated": false,
+      "local_alpha_per_mm": 0.003637869579058633,
+      "local_slope": -0.16796404580878743,
+      "local_design_condition": 566.6991871119262,
+      "support_rows": 31,
+      "trace_span_mm": 80.66722783389457,
+      "curvature_per_mm": 0.0007649243230345884,
+      "angle_rad": 0.06171411777502425,
+      "zero_displacement": false
+    },
+    "right_proposal": {
+      "version": "optional-waist-hypothesis-v3.0",
+      "default_applied": false,
+      "status": "proposed",
+      "reason": "optional_positive_curvature_heuristic",
+      "displacement_mm": 8.34165299525976,
+      "anatomically_validated": false,
+      "local_alpha_per_mm": 0.004473747688762981,
+      "local_slope": -0.12738837802780267,
+      "local_design_condition": 566.6991871119262,
+      "support_rows": 31,
+      "trace_span_mm": 178.21829405162737,
+      "curvature_per_mm": 0.004059804652626921,
+      "angle_rad": 0.7403224241410141,
+      "zero_displacement": false
+    },
+    "default_applied": false,
+    "evaluation": {
+      "configuration": {
+        "version": "optional-waist-hypothesis-v3.0",
+        "source_branch": "optional_inherited_waist_deletion",
+        "waist_y_mm": 635.9579124579125,
+        "d_left_mm": 0.3111688654997044,
+        "d_right_mm": 8.34165299525976,
+        "left_half_width_mm": 147.60447245200436,
+        "right_half_width_mm": 148.3174363310745,
+        "band_mm": 15.0,
+        "taper_origin_z_mm": 0.0,
+        "default_applied": false,
+        "anatomically_validated": false
+      },
+      "status": "evaluated",
+      "reason": null,
+      "comparison": {
+        "default_applied": false,
+        "anatomically_validated": false,
+        "base": {
+          "version": "section-candidates-v3.0",
+          "policy": "report_candidates_no_auto_selection",
+          "units": "mm",
+          "metadata": {
+            "level_source": "fixed_fraction_trace_nearest_row",
+            "waist_deletion": true
+          },
+          "base_waist_adjustment": false,
+          "candidates": {},
+          "status": "rejected",
+          "reason": "empty_or_multiple_components",
+          "component_count": 3
+        },
+        "hypothesis": {
+          "version": "section-candidates-v3.0",
+          "policy": "report_candidates_no_auto_selection",
+          "units": "mm",
+          "metadata": {
+            "level_source": "fixed_fraction_trace_nearest_row",
+            "waist_deletion": true
+          },
+          "base_waist_adjustment": false,
+          "candidates": {},
+          "status": "rejected",
+          "reason": "empty_or_multiple_components",
+          "component_count": 3
+        },
+        "computationally_admissible": false,
+        "reason": "base_or_hypothesis_not_measurable"
+      },
+      "actual_sampled_y_mm": 636.0,
+      "added_voxels": 0,
+      "removed_voxels": 5734,
+      "base_input_unchanged": true
+    }
+  },
+  "elapsed_seconds": 3.02457620005589,
+  "process_memory": {
+    "available": true,
+    "peak_working_set_bytes": 533823488,
+    "peak_pagefile_bytes": 1652797440,
+    "method": "Windows GetProcessMemoryInfo; process lifetime"
+  },
+  "source_hashes": {
+    "source\\measurement_extraction.py": "8446152e67b02c29049372fda83788fb054627e7006a3fe24ae3881da52279a7",
+    "source\\mediapipe_silhouette.py": "37812ef74ca6456276878ca68afcf7b85a23977d8413936c8979613d98743014",
+    "source\\pose_normalization.py": "ef2cb5927814f34644461c00ccf98c4d3ad00d7b0d4393c8abd9e26a70711f27",
+    "source\\profile_carve.py": "bc17a726abfd73f266700dec8771d0ad46bf4a4aaa0b5c896b9eae370b292cc7",
+    "source\\visual_hull.py": "1972bbf492accaa17c42bc43823896a31a6762b51ed65d5e7f8a009474293227",
+    "source\\voxel_memory.py": "403fd1d30370d991d90fb1b280aa7b31d575da9b633ee866c408c134c0387e4a",
+    "source\\waist_correction.py": "32cdf21fcce5f20cc99eb38c37ce83be6eb7287551618239c9cd31520cec2489"
+  },
+  "candidate_module_sha256": "f21dca3207f1456ea112def5ca7642d4bfd3e1352d9295753642655a0ea3383b",
+  "driver_sha256": "9a856c4ecf00e65e95bbd7192f27c412de42fad1b7179bba89da3c4bf278c944"
+}

@@ -1,0 +1,1 @@
+Complete standalone paper: upload this ZIP as a new Overleaf project and use main.tex as the main document with pdfLaTeX. Embedded bibliography; no external images, bib files or custom class.12 pages including24 references. Locally compiled with Tectonic/XeTeX; a live Overleaf compile was not performed.

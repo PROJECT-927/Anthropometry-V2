@@ -1,0 +1,46 @@
+{
+  "scope": "Independent exact conic probes of isolated research helper; no human or full pipeline validation.",
+  "cases": [
+    {
+      "axis_ratio": 1.0,
+      "coverage": "full",
+      "scaled_condition": 2.0000000000000013,
+      "max_relative_axis_error": 3.3306690738754696e-16
+    },
+    {
+      "axis_ratio": 1.0,
+      "coverage": "quarter",
+      "scaled_condition": 36.828341317570086,
+      "max_relative_axis_error": 9.992007221626409e-15
+    },
+    {
+      "axis_ratio": 10.0,
+      "coverage": "full",
+      "scaled_condition": 111.97103387895949,
+      "max_relative_axis_error": 4.6629367034256575e-15
+    },
+    {
+      "axis_ratio": 10.0,
+      "coverage": "quarter",
+      "scaled_condition": 1030.2760979189752,
+      "max_relative_axis_error": 1.2323475573339238e-14
+    },
+    {
+      "axis_ratio": 100.0,
+      "coverage": "full",
+      "scaled_condition": 11174.346665614736,
+      "max_relative_axis_error": 2.5579538487363607e-13
+    },
+    {
+      "axis_ratio": 100.0,
+      "coverage": "quarter",
+      "scaled_condition": 103408.99474358025,
+      "max_relative_axis_error": 1.5853984791647235e-12
+    }
+  ],
+  "exact_fit_sensitivity_status": {
+    "available": true,
+    "reason": "conditional_algebraic_model",
+    "value_mm": 8.728552185982891e-15
+  }
+}

@@ -50,6 +50,9 @@ MAX_HEIGHT_CM = 260.0
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_BYTES
+# Local template fixes should be visible on the next page load, including
+# when the app is running without Flask's debug reloader.
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 _jobs = {}
 _jobs_lock = threading.Lock()
@@ -476,12 +479,15 @@ def _save_landmarks(raw, dest_dir, stem):
 
 @app.route("/")
 def index():
-    return render_template(
+    response = app.make_response(render_template(
         "index.html",
         min_height=MIN_HEIGHT_CM,
         max_height=MAX_HEIGHT_CM,
         max_upload_mb=MAX_UPLOAD_BYTES // (1024 * 1024),
-    )
+    ))
+    response.cache_control.no_store = True
+    response.headers["X-Anthropometry-Frontend"] = "aligned-pose-crop-v3"
+    return response
 
 
 @app.route("/models/pose_landmarker_heavy.task")

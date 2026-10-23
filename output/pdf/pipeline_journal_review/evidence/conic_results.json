@@ -1,0 +1,1662 @@
+{
+  "scope": "isolated corrected conic verification, not corrected end-to-end human results",
+  "seed": 20261021,
+  "units": "mm and radians; algebraic residual dimensionless",
+  "nonuniform_case": {
+    "angles_rad": [
+      0.0,
+      0.15,
+      0.35,
+      0.8,
+      1.4,
+      2.0,
+      2.8,
+      3.4,
+      4.0,
+      4.8,
+      5.6
+    ],
+    "truth_axes_mm": [
+      160,
+      100
+    ],
+    "corrected_axes_mm": [
+      159.9999999999999,
+      100.00000000000001
+    ],
+    "historical_axes_mm": [
+      155.35917506861367,
+      97.09948441788364
+    ]
+  },
+  "exact_cases": [
+    {
+      "scale": 0.01,
+      "rotation_rad": 0.0,
+      "centre_mm": [
+        0.0,
+        0.0
+      ],
+      "axes_mm": [
+        1.5999999999999996,
+        0.9999999999999999
+      ],
+      "max_relative_axis_error": 2.220446049250313e-16,
+      "centre_error_mm": 2.2591401799415137e-16,
+      "condition_scaled": 3.757928041096079
+    },
+    {
+      "scale": 0.01,
+      "rotation_rad": 0.0,
+      "centre_mm": [
+        20.0,
+        -10.0
+      ],
+      "axes_mm": [
+        1.5999999999999999,
+        0.9999999999999998
+      ],
+      "max_relative_axis_error": 2.220446049250313e-16,
+      "centre_error_mm": 0.0,
+      "condition_scaled": 3.7579280410960743
+    },
+    {
+      "scale": 0.01,
+      "rotation_rad": 0.0,
+      "centre_mm": [
+        1000000.0,
+        -2000000.0
+      ],
+      "axes_mm": [
+        1.6000000000104415,
+        0.999999999995431
+      ],
+      "max_relative_axis_error": 6.52589093874667e-12,
+      "centre_error_mm": 0.0,
+      "condition_scaled": 3.7579280411973652
+    },
+    {
+      "scale": 0.01,
+      "rotation_rad": 0.47,
+      "centre_mm": [
+        0.0,
+        0.0
+      ],
+      "axes_mm": [
+        1.6000000000000005,
+        1.0000000000000002
+      ],
+      "max_relative_axis_error": 2.220446049250313e-16,
+      "centre_error_mm": 4.388541835720876e-16,
+      "condition_scaled": 4.216561114630056
+    },
+    {
+      "scale": 0.01,
+      "rotation_rad": 0.47,
+      "centre_mm": [
+        20.0,
+        -10.0
+      ],
+      "axes_mm": [
+        1.6,
+        0.9999999999999997
+      ],
+      "max_relative_axis_error": 3.3306690738754696e-16,
+      "centre_error_mm": 0.0,
+      "condition_scaled": 4.216561114630075
+    },
+    {
+      "scale": 0.01,
+      "rotation_rad": 0.47,
+      "centre_mm": [
+        1000000.0,
+        -2000000.0
+      ],
+      "axes_mm": [
+        1.5999999999688654,
+        1.0000000000334188
+      ],
+      "max_relative_axis_error": 3.341882326424184e-11,
+      "centre_error_mm": 0.0,
+      "condition_scaled": 4.216561114353695
+    },
+    {
+      "scale": 0.01,
+      "rotation_rad": 1.2,
+      "centre_mm": [
+        0.0,
+        0.0
+      ],
+      "axes_mm": [
+        1.5999999999999999,
+        0.9999999999999998
+      ],
+      "max_relative_axis_error": 2.220446049250313e-16,
+      "centre_error_mm": 2.2729511820139823e-16,
+      "condition_scaled": 4.303458669734753
+    },
+    {
+      "scale": 0.01,
+      "rotation_rad": 1.2,
+      "centre_mm": [
+        20.0,
+        -10.0
+      ],
+      "axes_mm": [
+        1.6000000000000008,
+        1.0000000000000004
+      ],
+      "max_relative_axis_error": 4.440892098500626e-16,
+      "centre_error_mm": 0.0,
+      "condition_scaled": 4.303458669734755
+    },
+    {
+      "scale": 0.01,
+      "rotation_rad": 1.2,
+      "centre_mm": [
+        1000000.0,
+        -2000000.0
+      ],
+      "axes_mm": [
+        1.6000000000247456,
+        0.9999999999665307
+      ],
+      "max_relative_axis_error": 3.346933841186228e-11,
+      "centre_error_mm": 0.0,
+      "condition_scaled": 4.303458670575499
+    },
+    {
+      "scale": 1.0,
+      "rotation_rad": 0.0,
+      "centre_mm": [
+        0.0,
+        0.0
+      ],
+      "axes_mm": [
+        159.99999999999983,
+        100.00000000000001
+      ],
+      "max_relative_axis_error": 1.1102230246251565e-15,
+      "centre_error_mm": 3.2171190647067566e-14,
+      "condition_scaled": 3.7579280410960774
+    },
+    {
+      "scale": 1.0,
+      "rotation_rad": 0.0,
+      "centre_mm": [
+        20.0,
+        -10.0
+      ],
+      "axes_mm": [
+        159.9999999999999,
+        100.00000000000001
+      ],
+      "max_relative_axis_error": 6.661338147750939e-16,
+      "centre_error_mm": 3.275440170573378e-14,
+      "condition_scaled": 3.757928041096078
+    },
+    {
+      "scale": 1.0,
+      "rotation_rad": 0.0,
+      "centre_mm": [
+        1000000.0,
+        -2000000.0
+      ],
+      "axes_mm": [
+        160.00000000000057,
+        99.99999999994941
+      ],
+      "max_relative_axis_error": 5.059286323216838e-13,
+      "centre_error_mm": 0.0,
+      "condition_scaled": 3.7579280410992397
+    },
+    {
+      "scale": 1.0,
+      "rotation_rad": 0.47,
+      "centre_mm": [
+        0.0,
+        0.0
+      ],
+      "axes_mm": [
+        160.00000000000003,
+        100.0
+      ],
+      "max_relative_axis_error": 2.220446049250313e-16,
+      "centre_error_mm": 8.82475770564939e-14,
+      "condition_scaled": 4.216561114630057
+    },
+    {
+      "scale": 1.0,
+      "rotation_rad": 0.47,
+      "centre_mm": [
+        20.0,
+        -10.0
+      ],
+      "axes_mm": [
+        159.99999999999997,
+        100.00000000000004
+      ],
+      "max_relative_axis_error": 4.440892098500626e-16,
+      "centre_error_mm": 6.674942990534282e-14,
+      "condition_scaled": 4.216561114630054
+    },
+    {
+      "scale": 1.0,
+      "rotation_rad": 0.47,
+      "centre_mm": [
+        1000000.0,
+        -2000000.0
+      ],
+      "axes_mm": [
+        160.00000000000404,
+        100.00000000004393
+      ],
+      "max_relative_axis_error": 4.3920422854171193e-13,
+      "centre_error_mm": 0.0,
+      "condition_scaled": 4.216561114620145
+    },
+    {
+      "scale": 1.0,
+      "rotation_rad": 1.2,
+      "centre_mm": [
+        0.0,
+        0.0
+      ],
+      "axes_mm": [
+        160.0,
+        99.99999999999999
+      ],
+      "max_relative_axis_error": 1.1102230246251565e-16,
+      "centre_error_mm": 7.86426696961181e-14,
+      "condition_scaled": 4.303458669734751
+    },
+    {
+      "scale": 1.0,
+      "rotation_rad": 1.2,
+      "centre_mm": [
+        20.0,
+        -10.0
+      ],
+      "axes_mm": [
+        160.00000000000003,
+        100.00000000000004
+      ],
+      "max_relative_axis_error": 4.440892098500626e-16,
+      "centre_error_mm": 1.3873790429220374e-14,
+      "condition_scaled": 4.30345866973475
+    },
+    {
+      "scale": 1.0,
+      "rotation_rad": 1.2,
+      "centre_mm": [
+        1000000.0,
+        -2000000.0
+      ],
+      "axes_mm": [
+        160.00000000001054,
+        99.99999999999822
+      ],
+      "max_relative_axis_error": 6.59472476627343e-14,
+      "centre_error_mm": 0.0,
+      "condition_scaled": 4.303458669732557
+    },
+    {
+      "scale": 100.0,
+      "rotation_rad": 0.0,
+      "centre_mm": [
+        0.0,
+        0.0
+      ],
+      "axes_mm": [
+        15999.999999999989,
+        10000.0
+      ],
+      "max_relative_axis_error": 6.661338147750939e-16,
+      "centre_error_mm": 2.2737367544323206e-12,
+      "condition_scaled": 3.7579280410960814
+    },
+    {
+      "scale": 100.0,
+      "rotation_rad": 0.0,
+      "centre_mm": [
+        20.0,
+        -10.0
+      ],
+      "axes_mm": [
+        15999.999999999989,
+        10000.0
+      ],
+      "max_relative_axis_error": 6.661338147750939e-16,
+      "centre_error_mm": 2.2737367544323206e-12,
+      "condition_scaled": 3.7579280410960814
+    },
+    {
+      "scale": 100.0,
+      "rotation_rad": 0.0,
+      "centre_mm": [
+        1000000.0,
+        -2000000.0
+      ],
+      "axes_mm": [
+        15999.999999999958,
+        10000.000000000071
+      ],
+      "max_relative_axis_error": 7.105427357601002e-15,
+      "centre_error_mm": 0.0,
+      "condition_scaled": 3.7579280410961116
+    },
+    {
+      "scale": 100.0,
+      "rotation_rad": 0.47,
+      "centre_mm": [
+        0.0,
+        0.0
+      ],
+      "axes_mm": [
+        16000.000000000004,
+        10000.000000000002
+      ],
+      "max_relative_axis_error": 2.220446049250313e-16,
+      "centre_error_mm": 4.780257777753977e-12,
+      "condition_scaled": 4.216561114630056
+    },
+    {
+      "scale": 100.0,
+      "rotation_rad": 0.47,
+      "centre_mm": [
+        20.0,
+        -10.0
+      ],
+      "axes_mm": [
+        16000.000000000004,
+        10000.000000000002
+      ],
+      "max_relative_axis_error": 2.220446049250313e-16,
+      "centre_error_mm": 4.780257777753977e-12,
+      "condition_scaled": 4.216561114630056
+    },
+    {
+      "scale": 100.0,
+      "rotation_rad": 0.47,
+      "centre_mm": [
+        1000000.0,
+        -2000000.0
+      ],
+      "axes_mm": [
+        15999.999999999985,
+        10000.000000000036
+      ],
+      "max_relative_axis_error": 3.552713678800501e-15,
+      "centre_error_mm": 0.0,
+      "condition_scaled": 4.216561114630003
+    },
+    {
+      "scale": 100.0,
+      "rotation_rad": 1.2,
+      "centre_mm": [
+        0.0,
+        0.0
+      ],
+      "axes_mm": [
+        15999.999999999998,
+        10000.000000000004
+      ],
+      "max_relative_axis_error": 4.440892098500626e-16,
+      "centre_error_mm": 5.494806652808855e-12,
+      "condition_scaled": 4.303458669734748
+    },
+    {
+      "scale": 100.0,
+      "rotation_rad": 1.2,
+      "centre_mm": [
+        20.0,
+        -10.0
+      ],
+      "axes_mm": [
+        15999.999999999998,
+        10000.000000000004
+      ],
+      "max_relative_axis_error": 4.440892098500626e-16,
+      "centre_error_mm": 5.494806652808855e-12,
+      "condition_scaled": 4.303458669734748
+    },
+    {
+      "scale": 100.0,
+      "rotation_rad": 1.2,
+      "centre_mm": [
+        1000000.0,
+        -2000000.0
+      ],
+      "axes_mm": [
+        15999.999999999996,
+        9999.999999999976
+      ],
+      "max_relative_axis_error": 2.3314683517128287e-15,
+      "centre_error_mm": 0.0,
+      "condition_scaled": 4.303458669734725
+    }
+  ],
+  "noise_cases": [
+    {
+      "coordinate_noise_sd_mm": 0.2,
+      "trials": [
+        {
+          "axes_mm": [
+            160.00237118955235,
+            100.01720213277567
+          ],
+          "perimeter_mm": 827.7805256087129,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.12561830705671384
+          }
+        },
+        {
+          "axes_mm": [
+            159.95264060144245,
+            100.0181323982405
+          ],
+          "perimeter_mm": 827.6107984795256,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.11236509117983016
+          }
+        },
+        {
+          "axes_mm": [
+            160.00259226328575,
+            100.04018399799507
+          ],
+          "perimeter_mm": 827.8441392259774,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.11055517573749318
+          }
+        },
+        {
+          "axes_mm": [
+            160.02489780441798,
+            100.00281903636764
+          ],
+          "perimeter_mm": 827.819234200075,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.11093166970575898
+          }
+        },
+        {
+          "axes_mm": [
+            159.92582120914705,
+            99.9955378472761
+          ],
+          "perimeter_mm": 827.4561034459558,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.10149218903199006
+          }
+        },
+        {
+          "axes_mm": [
+            160.02950873377074,
+            99.98383874687481
+          ],
+          "perimeter_mm": 827.7833125534092,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.11617547223979259
+          }
+        },
+        {
+          "axes_mm": [
+            160.0338445197961,
+            100.02549028150675
+          ],
+          "perimeter_mm": 827.9122200014036,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.11011903607118488
+          }
+        },
+        {
+          "axes_mm": [
+            160.0531763208217,
+            99.98079030310629
+          ],
+          "perimeter_mm": 827.8569750794705,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.10255984135648984
+          }
+        },
+        {
+          "axes_mm": [
+            159.99176631196363,
+            100.06255775201109
+          ],
+          "perimeter_mm": 827.8678287665977,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.11284344540000943
+          }
+        },
+        {
+          "axes_mm": [
+            160.00038016903628,
+            100.05059453711779
+          ],
+          "perimeter_mm": 827.864947561497,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.1101842144550925
+          }
+        },
+        {
+          "axes_mm": [
+            160.0040392681196,
+            100.01971778278237
+          ],
+          "perimeter_mm": 827.7931833474285,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.10966277151300907
+          }
+        },
+        {
+          "axes_mm": [
+            159.9804711363047,
+            100.0197450737475
+          ],
+          "perimeter_mm": 827.7116149097657,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.10953693558506017
+          }
+        },
+        {
+          "axes_mm": [
+            159.99961356877972,
+            99.99736248641001
+          ],
+          "perimeter_mm": 827.7167214929113,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.10618773918883986
+          }
+        },
+        {
+          "axes_mm": [
+            160.06378295922013,
+            100.00116076993821
+          ],
+          "perimeter_mm": 827.9494148461157,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.10354461484613213
+          }
+        },
+        {
+          "axes_mm": [
+            160.02859145314366,
+            99.98924354570339
+          ],
+          "perimeter_mm": 827.7949120437345,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.11421880166932989
+          }
+        },
+        {
+          "axes_mm": [
+            159.96088209867588,
+            100.02826577136898
+          ],
+          "perimeter_mm": 827.667060466591,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.10558166103078252
+          }
+        },
+        {
+          "axes_mm": [
+            159.99357502313487,
+            99.976401269655
+          ],
+          "perimeter_mm": 827.6384874080974,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.10308916406628502
+          }
+        },
+        {
+          "axes_mm": [
+            159.9901284054992,
+            100.03513743715472
+          ],
+          "perimeter_mm": 827.7871626459146,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.11772406478176686
+          }
+        },
+        {
+          "axes_mm": [
+            160.02257539333485,
+            99.98682958539712
+          ],
+          "perimeter_mm": 827.7674696469336,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.0974972079244578
+          }
+        },
+        {
+          "axes_mm": [
+            160.03135452218828,
+            100.01509236551303
+          ],
+          "perimeter_mm": 827.8751617532513,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.12085586897754207
+          }
+        },
+        {
+          "axes_mm": [
+            159.99170169687955,
+            100.02530433586321
+          ],
+          "perimeter_mm": 827.7657215471106,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.10961660603510337
+          }
+        },
+        {
+          "axes_mm": [
+            160.00570271617,
+            99.99378622510979
+          ],
+          "perimeter_mm": 827.7280373984574,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.11724643827432948
+          }
+        },
+        {
+          "axes_mm": [
+            159.96668043319542,
+            100.01251021695408
+          ],
+          "perimeter_mm": 827.6440574635358,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.10767016126550254
+          }
+        },
+        {
+          "axes_mm": [
+            160.02148476240345,
+            99.9798321688062
+          ],
+          "perimeter_mm": 827.7445593539561,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.12831488508340594
+          }
+        },
+        {
+          "axes_mm": [
+            160.02058481880815,
+            100.00919604515992
+          ],
+          "perimeter_mm": 827.8217295361821,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.12251404735027331
+          }
+        },
+        {
+          "axes_mm": [
+            159.98872470316172,
+            100.01274515059917
+          ],
+          "perimeter_mm": 827.7210638849413,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.10563667683829395
+          }
+        },
+        {
+          "axes_mm": [
+            160.01284194859736,
+            99.96005193650883
+          ],
+          "perimeter_mm": 827.6605363879919,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.1056618363364447
+          }
+        },
+        {
+          "axes_mm": [
+            160.00714978191914,
+            99.96400900105148
+          ],
+          "perimeter_mm": 827.6516343230205,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.11202453484205113
+          }
+        },
+        {
+          "axes_mm": [
+            160.01194553596216,
+            100.00529895947525
+          ],
+          "perimeter_mm": 827.7811444072037,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.10722270488525153
+          }
+        },
+        {
+          "axes_mm": [
+            159.97727507820122,
+            99.97725698744905
+          ],
+          "perimeter_mm": 827.5843583828358,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.105609926903271
+          }
+        }
+      ],
+      "mean_error_against_exact_mm": 0.02781576104346186,
+      "rmse_against_exact_mm": 0.10895398441795735
+    },
+    {
+      "coordinate_noise_sd_mm": 1.0,
+      "trials": [
+        {
+          "axes_mm": [
+            159.7459005459069,
+            100.1587603162437
+          ],
+          "perimeter_mm": 827.2795899464132,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5561840032329266
+          }
+        },
+        {
+          "axes_mm": [
+            159.9672639513699,
+            99.99122454373622
+          ],
+          "perimeter_mm": 827.5878705037334,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5125718602167308
+          }
+        },
+        {
+          "axes_mm": [
+            160.16607835692358,
+            100.0302123473322
+          ],
+          "perimeter_mm": 828.3832514107271,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.572340193810842
+          }
+        },
+        {
+          "axes_mm": [
+            160.0890069268501,
+            100.06985158966015
+          ],
+          "perimeter_mm": 828.2246207581819,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.4914695380880859
+          }
+        },
+        {
+          "axes_mm": [
+            159.84014946301747,
+            100.26269505148761
+          ],
+          "perimeter_mm": 827.8904372599325,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5622885805990887
+          }
+        },
+        {
+          "axes_mm": [
+            160.03824914818932,
+            99.99974007036205
+          ],
+          "perimeter_mm": 827.8570696987889,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.6004841019356337
+          }
+        },
+        {
+          "axes_mm": [
+            160.12697258825557,
+            99.90201033121127
+          ],
+          "perimeter_mm": 827.8973423295639,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5576138601136055
+          }
+        },
+        {
+          "axes_mm": [
+            159.9038404975979,
+            99.89343102926453
+          ],
+          "perimeter_mm": 827.1007556773427,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5713949515780279
+          }
+        },
+        {
+          "axes_mm": [
+            159.96405420429568,
+            100.03695753981356
+          ],
+          "perimeter_mm": 827.701819925703,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5359309532758223
+          }
+        },
+        {
+          "axes_mm": [
+            160.2256294781708,
+            100.09324085461355
+          ],
+          "perimeter_mm": 828.7618842775734,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5417099135097379
+          }
+        },
+        {
+          "axes_mm": [
+            160.10031749974576,
+            100.12145124070713
+          ],
+          "perimeter_mm": 828.4049137185439,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5976424914423456
+          }
+        },
+        {
+          "axes_mm": [
+            160.22670548123483,
+            100.18863078968909
+          ],
+          "perimeter_mm": 829.0264471917225,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5536278493884481
+          }
+        },
+        {
+          "axes_mm": [
+            159.9986929980915,
+            99.82158460531916
+          ],
+          "perimeter_mm": 827.2330299577538,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5855179988823952
+          }
+        },
+        {
+          "axes_mm": [
+            160.01570804165738,
+            100.04289113633165
+          ],
+          "perimeter_mm": 827.8969764709773,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5576692151018965
+          }
+        },
+        {
+          "axes_mm": [
+            160.12740676311466,
+            99.9013035494885
+          ],
+          "perimeter_mm": 827.8969154193438,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5742497735733063
+          }
+        },
+        {
+          "axes_mm": [
+            159.8900988643079,
+            100.14657551526368
+          ],
+          "perimeter_mm": 827.7455593277643,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5858728672615106
+          }
+        },
+        {
+          "axes_mm": [
+            159.8440087565232,
+            99.90073767760113
+          ],
+          "perimeter_mm": 826.9134515150004,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5230268822986034
+          }
+        },
+        {
+          "axes_mm": [
+            160.09484241521844,
+            100.03896940106723
+          ],
+          "perimeter_mm": 828.1603927289574,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5359849779625632
+          }
+        },
+        {
+          "axes_mm": [
+            160.06780762991352,
+            100.16672722427886
+          ],
+          "perimeter_mm": 828.4161500187605,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5697897848311864
+          }
+        },
+        {
+          "axes_mm": [
+            159.8611057163972,
+            100.20207783403758
+          ],
+          "perimeter_mm": 827.7970587515771,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5440631006374252
+          }
+        },
+        {
+          "axes_mm": [
+            160.07990479661507,
+            100.04493330030405
+          ],
+          "perimeter_mm": 828.1249507078139,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5927037283413322
+          }
+        },
+        {
+          "axes_mm": [
+            159.73139204298144,
+            99.88442108787662
+          ],
+          "perimeter_mm": 826.4787128858429,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5207730933378634
+          }
+        },
+        {
+          "axes_mm": [
+            160.14535389360216,
+            100.09277690353413
+          ],
+          "perimeter_mm": 828.4825084554778,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5641572842591587
+          }
+        },
+        {
+          "axes_mm": [
+            159.92158784351366,
+            100.02629458354825
+          ],
+          "perimeter_mm": 827.525557887682,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5387091722650633
+          }
+        },
+        {
+          "axes_mm": [
+            160.20962545112923,
+            99.76873360826171
+          ],
+          "perimeter_mm": 827.8197065368751,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5563003128105493
+          }
+        },
+        {
+          "axes_mm": [
+            160.0573589216382,
+            100.01654857408862
+          ],
+          "perimeter_mm": 827.9692316219229,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5441989876021872
+          }
+        },
+        {
+          "axes_mm": [
+            160.00611218881016,
+            100.0619602266749
+          ],
+          "perimeter_mm": 827.9158873028904,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5362430476512938
+          }
+        },
+        {
+          "axes_mm": [
+            160.086757025501,
+            100.21056106935964
+          ],
+          "perimeter_mm": 828.6016977037714,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.593294039696814
+          }
+        },
+        {
+          "axes_mm": [
+            160.26624484453342,
+            99.90176114324571
+          ],
+          "perimeter_mm": 828.3793180549682,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.46836632193050165
+          }
+        },
+        {
+          "axes_mm": [
+            160.1657833650599,
+            100.12434858093842
+          ],
+          "perimeter_mm": 828.6396137992596,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 0.5736371767832362
+          }
+        }
+      ],
+      "mean_error_against_exact_mm": 0.21156928358551189,
+      "rmse_against_exact_mm": 0.5968565497163912
+    },
+    {
+      "coordinate_noise_sd_mm": 3.0,
+      "trials": [
+        {
+          "axes_mm": [
+            160.0465697920763,
+            100.16926390300475
+          ],
+          "perimeter_mm": 828.3495321912634,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.4744959213180902
+          }
+        },
+        {
+          "axes_mm": [
+            161.12694753822166,
+            99.77935630402436
+          ],
+          "perimeter_mm": 831.0299766134955,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.7151891934511456
+          }
+        },
+        {
+          "axes_mm": [
+            159.64097521959556,
+            100.16085686752646
+          ],
+          "perimeter_mm": 826.922055172384,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.6038994715608315
+          }
+        },
+        {
+          "axes_mm": [
+            160.1395789176355,
+            100.2463091784086
+          ],
+          "perimeter_mm": 828.8824413376412,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.7745513676157412
+          }
+        },
+        {
+          "axes_mm": [
+            160.28825075734872,
+            100.465724399994
+          ],
+          "perimeter_mm": 829.9977152463915,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.6068516876481842
+          }
+        },
+        {
+          "axes_mm": [
+            159.44556755596665,
+            100.38479453145868
+          ],
+          "perimeter_mm": 826.8592529619414,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.6606951991552252
+          }
+        },
+        {
+          "axes_mm": [
+            160.34933374733384,
+            100.65040323876319
+          ],
+          "perimeter_mm": 830.7148006386121,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.563991248530304
+          }
+        },
+        {
+          "axes_mm": [
+            160.20117837937664,
+            100.47707446209876
+          ],
+          "perimeter_mm": 829.7273036702244,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.635493345153956
+          }
+        },
+        {
+          "axes_mm": [
+            160.60048653789494,
+            100.01540774503975
+          ],
+          "perimeter_mm": 829.8482562065029,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.8673968919112538
+          }
+        },
+        {
+          "axes_mm": [
+            160.3940828276745,
+            99.43286180963452
+          ],
+          "perimeter_mm": 827.5427833511739,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.598461253489647
+          }
+        },
+        {
+          "axes_mm": [
+            160.45940411728367,
+            100.84985821454227
+          ],
+          "perimeter_mm": 831.6421099183547,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.787710447513311
+          }
+        },
+        {
+          "axes_mm": [
+            159.87555204434076,
+            100.70419862483456
+          ],
+          "perimeter_mm": 829.2225700931677,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.5983310317535548
+          }
+        },
+        {
+          "axes_mm": [
+            160.19366181610812,
+            99.32211336269326
+          ],
+          "perimeter_mm": 826.5455321344746,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.7332161052457127
+          }
+        },
+        {
+          "axes_mm": [
+            159.9925119518561,
+            100.12441515851238
+          ],
+          "perimeter_mm": 828.0396120936341,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.6453366344475642
+          }
+        },
+        {
+          "axes_mm": [
+            159.47041792391565,
+            100.47880043290057
+          ],
+          "perimeter_mm": 827.2029560382205,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.7570135874150314
+          }
+        },
+        {
+          "axes_mm": [
+            159.58056688158032,
+            100.46048755752659
+          ],
+          "perimeter_mm": 827.5338427717046,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.606230020557441
+          }
+        },
+        {
+          "axes_mm": [
+            159.6988813216969,
+            100.12040272844578
+          ],
+          "perimeter_mm": 827.0117908370871,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.7077767319319006
+          }
+        },
+        {
+          "axes_mm": [
+            159.75291343776502,
+            100.86874455592388
+          ],
+          "perimeter_mm": 829.2496800811768,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.4825154557305267
+          }
+        },
+        {
+          "axes_mm": [
+            159.57584552208198,
+            100.35180557742481
+          ],
+          "perimeter_mm": 827.2196448223675,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.7469340335380565
+          }
+        },
+        {
+          "axes_mm": [
+            160.64004192229297,
+            100.47681121669888
+          ],
+          "perimeter_mm": 831.2463797387126,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.683811393315861
+          }
+        },
+        {
+          "axes_mm": [
+            160.35456935038357,
+            100.10291027977671
+          ],
+          "perimeter_mm": 829.2350624722422,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.7748490108569346
+          }
+        },
+        {
+          "axes_mm": [
+            160.24633879919014,
+            99.81570452655205
+          ],
+          "perimeter_mm": 828.075250847166,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.6654612307365784
+          }
+        },
+        {
+          "axes_mm": [
+            160.0712322208283,
+            100.37513677163095
+          ],
+          "perimeter_mm": 828.998329325789,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.6508663726484007
+          }
+        },
+        {
+          "axes_mm": [
+            160.52299627602306,
+            100.57118247263583
+          ],
+          "perimeter_mm": 831.099201935623,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.7793586544994549
+          }
+        },
+        {
+          "axes_mm": [
+            160.25330782225583,
+            100.06678711533738
+          ],
+          "perimeter_mm": 828.7854625313983,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.7907788051376496
+          }
+        },
+        {
+          "axes_mm": [
+            159.61517311786542,
+            100.23040000315818
+          ],
+          "perimeter_mm": 827.0231719370706,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.7919420620834983
+          }
+        },
+        {
+          "axes_mm": [
+            160.5365255289787,
+            99.68734185017274
+          ],
+          "perimeter_mm": 828.730964978065,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.6334143342102236
+          }
+        },
+        {
+          "axes_mm": [
+            160.53625036095949,
+            99.90051936363574
+          ],
+          "perimeter_mm": 829.3118492087145,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.6923788406735594
+          }
+        },
+        {
+          "axes_mm": [
+            159.4905059926943,
+            100.64457199793117
+          ],
+          "perimeter_mm": 827.7270997632972,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.671914880542508
+          }
+        },
+        {
+          "axes_mm": [
+            159.25659859234824,
+            101.25120065159918
+          ],
+          "perimeter_mm": 828.5849409721616,
+          "conditional_sensitivity": {
+            "available": true,
+            "reason": "conditional_algebraic_model",
+            "value_mm": 1.705060623992358
+          }
+        }
+      ],
+      "mean_error_against_exact_mm": 1.0197975517586086,
+      "rmse_against_exact_mm": 1.759170626600136
+    }
+  ],
+  "high_aspect_cases": [
+    {
+      "ratio_a_over_b": 10.0,
+      "sampling": "full_nonuniform",
+      "accepted": true,
+      "axes_mm": [
+        160.0000000000001,
+        15.999999999999984
+      ],
+      "condition_scaled": 146.3056548086772,
+      "max_relative_axis_error": 9.992007221626409e-16
+    },
+    {
+      "ratio_a_over_b": 10.0,
+      "sampling": "short_arc",
+      "accepted": true,
+      "axes_mm": [
+        160.00000000069116,
+        16.000000000035676
+      ],
+      "condition_scaled": 248.46557063331613,
+      "max_relative_axis_error": 4.319655744211559e-12
+    },
+    {
+      "ratio_a_over_b": 100.0,
+      "sampling": "full_nonuniform",
+      "accepted": true,
+      "axes_mm": [
+        160.0000000001791,
+        1.5999999999999817
+      ],
+      "condition_scaled": 14618.800025541505,
+      "max_relative_axis_error": 1.1195488980320079e-12
+    },
+    {
+      "ratio_a_over_b": 100.0,
+      "sampling": "short_arc",
+      "accepted": true,
+      "axes_mm": [
+        159.9999999992143,
+        1.5999999999960188
+      ],
+      "condition_scaled": 15755.477316864064,
+      "max_relative_axis_error": 4.910516437917067e-12
+    }
+  ],
+  "conditioning_policy": "Rank=5 at NumPy lstsq default threshold; Q eigenvalue magnitudes must exceed 1e-12 norm(Q,2). Report design condition; no accuracy guarantee at untested conditions or short arcs.",
+  "rejected_invalid_cases": {
+    "fewer_than_five": true,
+    "repeated": true,
+    "collinear": true,
+    "nonfinite": true,
+    "hyperbola": true
+  },
+  "perimeter_gradient_checks": [
+    {
+      "axes_mm": [
+        100.0,
+        100.0
+      ],
+      "analytic": [
+        3.141592653589793,
+        3.141592653589793
+      ],
+      "finite_difference": [
+        3.1415926536624283,
+        3.1415926536624283
+      ],
+      "max_absolute_difference": 7.263523116307624e-11
+    },
+    {
+      "axes_mm": [
+        160.0,
+        100.0
+      ],
+      "analytic": [
+        3.4642732470473807,
+        2.7344155269997894
+      ],
+      "finite_difference": [
+        3.4642732467773385,
+        2.7344155266746384
+      ],
+      "max_absolute_difference": 3.251510172219696e-10
+    },
+    {
+      "axes_mm": [
+        200.0,
+        20.0
+      ],
+      "analytic": [
+        3.947492269910131,
+        1.1306024860396608
+      ],
+      "finite_difference": [
+        3.947492270128805,
+        1.1306024861710284
+      ],
+      "max_absolute_difference": 2.1867396782226933e-10
+    }
+  ],
+  "ramanujan_vs_exact": {
+    "ratio_b_over_a_min": 0.1,
+    "ratio_b_over_a_max": 1.0,
+    "sample_count": 901,
+    "exact_formula": "4 a ellipe(1-b^2/a^2)",
+    "max_relative_error": 0.0008419496372671365,
+    "worst_ratio": 0.1
+  },
+  "five_point_sensitivity": {
+    "available": false,
+    "reason": "insufficient_degrees_of_freedom",
+    "value_mm": null
+  },
+  "invalid_perturbation_sensitivity": {
+    "available": false,
+    "reason": "invalid_conic_perturbation",
+    "value_mm": null
+  },
+  "all_tests_passed": true
+}

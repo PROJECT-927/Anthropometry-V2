@@ -1,0 +1,416 @@
+{
+  "cases": {
+    "ellipse": {
+      "version": "section-candidates-v3.0",
+      "policy": "report_candidates_no_auto_selection",
+      "units": "mm",
+      "metadata": {
+        "attempt_id": "ellipse"
+      },
+      "base_waist_adjustment": false,
+      "candidates": {
+        "fixed_constant_no_morph": {
+          "status": "computed",
+          "reason": null,
+          "perimeter_mm": 826.752184382524,
+          "axes_mm": [
+            159.8213704301552,
+            99.87034991651961
+          ],
+          "kind": "fixed_constant_ellipse_model",
+          "fit_diagnostics": {
+            "gradient_normalized_residual_rms_mm": 0.1285545635863426,
+            "gradient_normalized_residual_max_mm": 0.2376707082764961,
+            "valid_gradient_samples": 60,
+            "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+            "centre_mm": [
+              1.6300687465963144e-15,
+              -3.302487405009663e-16
+            ],
+            "centre_offset_over_observed_halfspan": [
+              1.0187929666226966e-17,
+              -3.302487405009663e-18
+            ],
+            "fitted_to_observed_span_ratios": [
+              0.9988835651884701,
+              0.9987034991651962
+            ],
+            "design_condition_diagnostic": 2.7130526708467686,
+            "support_samples": 60
+          }
+        },
+        "fixed_constant_uniform_no_morph": {
+          "status": "computed",
+          "reason": null,
+          "perimeter_mm": 825.6190641007809,
+          "axes_mm": [
+            159.64025331988864,
+            99.68540392036277
+          ],
+          "kind": "fixed_constant_ellipse_model",
+          "fit_diagnostics": {
+            "gradient_normalized_residual_rms_mm": 0.16891255051067686,
+            "gradient_normalized_residual_max_mm": 0.3593422498805666,
+            "valid_gradient_samples": 256,
+            "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+            "centre_mm": [
+              8.13937275357144e-15,
+              4.221333568404636e-15
+            ],
+            "centre_offset_over_observed_halfspan": [
+              5.08710797098215e-17,
+              4.221333568404636e-17
+            ],
+            "fitted_to_observed_span_ratios": [
+              0.997751583249304,
+              0.9968540392036277
+            ],
+            "design_condition_diagnostic": 2.5786693842037485,
+            "support_samples": 256
+          }
+        },
+        "constrained_no_morph": {
+          "status": "computed",
+          "reason": null,
+          "axes_mm": [
+            159.63941521484196,
+            99.6850750812171
+          ],
+          "centre_mm": [
+            -2.3775306233649947e-15,
+            -3.0772189748713606e-15
+          ],
+          "perimeter_mm": 825.6152613223086,
+          "quadratic_constraint": 1.3538550470720043,
+          "linear_design_condition": 1.7443934697708368,
+          "normalized_coefficients": [
+            0.3122194946250003,
+            0.0,
+            0.8007187389124092,
+            5.579705478400053e-17,
+            -7.623449413640933e-17,
+            -0.4727564387576281
+          ],
+          "origin_mm": [
+            9.2148511043888e-15,
+            -9.253015020860289e-15
+          ],
+          "scale_mm": 129.73328354159688,
+          "kind": "fitted_ellipse_model",
+          "fit_diagnostics": {
+            "gradient_normalized_residual_rms_mm": 0.1688913751709772,
+            "gradient_normalized_residual_max_mm": 0.3601784683227695,
+            "valid_gradient_samples": 256,
+            "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+            "centre_mm": [
+              -2.3775306233649947e-15,
+              -3.0772189748713606e-15
+            ],
+            "centre_offset_over_observed_halfspan": [
+              -1.4859566396031217e-17,
+              -3.077218974871361e-17
+            ],
+            "fitted_to_observed_span_ratios": [
+              0.9977463450927623,
+              0.9968507508121708
+            ],
+            "design_condition_diagnostic": 3.7943401437682738,
+            "support_samples": 256
+          }
+        },
+        "width_depth_axis_aligned": {
+          "status": "computed",
+          "reason": null,
+          "perimeter_mm": 827.7255214445767,
+          "axes_mm": [
+            160.0,
+            100.0
+          ],
+          "kind": "axis_aligned_ellipse_model",
+          "fit_diagnostics": {
+            "gradient_normalized_residual_rms_mm": 0.3724204102547916,
+            "gradient_normalized_residual_max_mm": 0.632018021616622,
+            "valid_gradient_samples": 256,
+            "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+            "centre_mm": [
+              0.0,
+              0.0
+            ],
+            "centre_offset_over_observed_halfspan": [
+              0.0,
+              0.0
+            ],
+            "fitted_to_observed_span_ratios": [
+              1.0,
+              1.0
+            ],
+            "design_condition_diagnostic": null,
+            "support_samples": 256
+          }
+        },
+        "unrounded_convex_diagnostic": {
+          "status": "computed",
+          "reason": null,
+          "perimeter_mm": 826.2209330883308,
+          "kind": "occupancy_diagnostic"
+        },
+        "historical_opening_0p9_corrected_fit": {
+          "status": "computed",
+          "reason": null,
+          "perimeter_mm": 782.8080201142337,
+          "axes_mm": [
+            144.97407202918023,
+            102.36275471211258
+          ],
+          "kind": "historical_shape_prior_comparator",
+          "fit_diagnostics": {
+            "gradient_normalized_residual_rms_mm": 1.7552450089644882,
+            "gradient_normalized_residual_max_mm": 3.0052167631054156,
+            "valid_gradient_samples": 58,
+            "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+            "centre_mm": [
+              6.81141267099223e-16,
+              -1.0639894393877854e-15
+            ],
+            "centre_offset_over_observed_halfspan": [
+              4.2571329193701436e-18,
+              -1.0639894393877854e-17
+            ],
+            "fitted_to_observed_span_ratios": [
+              0.9060879501823764,
+              1.0236275471211258
+            ],
+            "design_condition_diagnostic": 2.636443306762596,
+            "support_samples": 58
+          }
+        }
+      },
+      "status": "computed",
+      "reason": null,
+      "component_count": 1,
+      "hull_vertex_count": 60,
+      "width_mm": 320.0,
+      "depth_mm": 200.0,
+      "h_mm": 2.0,
+      "sample_count": 256,
+      "convex_area_mm2": 49992.0,
+      "candidate_perimeter_range_mm": [
+        782.8080201142337,
+        827.7255214445767
+      ],
+      "model_disagreement_mm": 44.91750133034293,
+      "diagnostic_version": "candidate-diagnostics-v3.0",
+      "diagnostics_do_not_select_or_validate_anatomy": true,
+      "current_model_spread_mm": 2.1102601222680732,
+      "current_model_spread_members": [
+        "fixed_constant_no_morph",
+        "fixed_constant_uniform_no_morph",
+        "constrained_no_morph",
+        "width_depth_axis_aligned"
+      ],
+      "spread_is_not_physical_interval": true,
+      "all_comparator_spread_members": [
+        "fixed_constant_no_morph",
+        "fixed_constant_uniform_no_morph",
+        "constrained_no_morph",
+        "width_depth_axis_aligned",
+        "historical_opening_0p9_corrected_fit"
+      ]
+    },
+    "box": {
+      "version": "section-candidates-v3.0",
+      "policy": "report_candidates_no_auto_selection",
+      "units": "mm",
+      "metadata": {
+        "attempt_id": "box"
+      },
+      "base_waist_adjustment": false,
+      "candidates": {
+        "fixed_constant_no_morph": {
+          "status": "unavailable",
+          "reason": "At least five two-dimensional points are required",
+          "perimeter_mm": null
+        },
+        "fixed_constant_uniform_no_morph": {
+          "status": "computed",
+          "reason": null,
+          "perimeter_mm": 993.9173401395201,
+          "axes_mm": [
+            195.86623510767615,
+            115.26511241031912
+          ],
+          "kind": "fixed_constant_ellipse_model",
+          "fit_diagnostics": {
+            "gradient_normalized_residual_rms_mm": 17.585683069278023,
+            "gradient_normalized_residual_max_mm": 39.847372569561664,
+            "valid_gradient_samples": 256,
+            "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+            "centre_mm": [
+              6.4998049267337604e-15,
+              2.8069926260241546e-15
+            ],
+            "centre_offset_over_observed_halfspan": [
+              4.0623780792086e-17,
+              2.806992626024155e-17
+            ],
+            "fitted_to_observed_span_ratios": [
+              1.2241639588265785,
+              1.1526511529129686
+            ],
+            "design_condition_diagnostic": 2.852067782448304,
+            "support_samples": 256
+          }
+        },
+        "constrained_no_morph": {
+          "status": "computed",
+          "reason": null,
+          "axes_mm": [
+            188.38266327373597,
+            113.76679949478445
+          ],
+          "centre_mm": [
+            0.0,
+            0.0
+          ],
+          "perimeter_mm": 963.7586161845468,
+          "quadratic_constraint": 1.2875787376290633,
+          "linear_design_condition": 1.7407805932938138,
+          "normalized_coefficients": [
+            -0.3019566739301853,
+            0.0001730332099307498,
+            -0.8279333727954785,
+            0.0,
+            0.0,
+            0.47552817616340254
+          ],
+          "origin_mm": [
+            0.0,
+            0.0
+          ],
+          "scale_mm": 150.1153527812029,
+          "kind": "fitted_ellipse_model",
+          "fit_diagnostics": {
+            "gradient_normalized_residual_rms_mm": 15.686380634126586,
+            "gradient_normalized_residual_max_mm": 30.867327197792868,
+            "valid_gradient_samples": 256,
+            "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+            "centre_mm": [
+              0.0,
+              0.0
+            ],
+            "centre_offset_over_observed_halfspan": [
+              0.0,
+              0.0
+            ],
+            "fitted_to_observed_span_ratios": [
+              1.177391635342074,
+              1.137668021756396
+            ],
+            "design_condition_diagnostic": 3.0944501620925076,
+            "support_samples": 256
+          }
+        },
+        "width_depth_axis_aligned": {
+          "status": "computed",
+          "reason": null,
+          "perimeter_mm": 827.7255214445767,
+          "axes_mm": [
+            160.0,
+            100.0
+          ],
+          "kind": "axis_aligned_ellipse_model",
+          "fit_diagnostics": {
+            "gradient_normalized_residual_rms_mm": 20.600578396392567,
+            "gradient_normalized_residual_max_mm": 42.3999152002544,
+            "valid_gradient_samples": 256,
+            "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+            "centre_mm": [
+              0.0,
+              0.0
+            ],
+            "centre_offset_over_observed_halfspan": [
+              0.0,
+              0.0
+            ],
+            "fitted_to_observed_span_ratios": [
+              1.0,
+              1.0
+            ],
+            "design_condition_diagnostic": null,
+            "support_samples": 256
+          }
+        },
+        "unrounded_convex_diagnostic": {
+          "status": "computed",
+          "reason": null,
+          "perimeter_mm": 1040.0,
+          "kind": "occupancy_diagnostic"
+        },
+        "historical_opening_0p9_corrected_fit": {
+          "status": "computed",
+          "reason": null,
+          "perimeter_mm": 902.9072041036866,
+          "axes_mm": [
+            164.911080200404,
+            120.78698887114525
+          ],
+          "kind": "historical_shape_prior_comparator",
+          "fit_diagnostics": {
+            "gradient_normalized_residual_rms_mm": 2.4260014559979646,
+            "gradient_normalized_residual_max_mm": 4.495790913570234,
+            "valid_gradient_samples": 52,
+            "meaning": "first-order normal-distance proxy, not exact orthogonal residual or physical uncertainty",
+            "centre_mm": [
+              -5.006254412768853e-15,
+              -6.42585177514943e-16
+            ],
+            "centre_offset_over_observed_halfspan": [
+              -3.128909007980533e-17,
+              -6.42585177514943e-18
+            ],
+            "fitted_to_observed_span_ratios": [
+              1.030694251252525,
+              1.2078698887114525
+            ],
+            "design_condition_diagnostic": 4.289620063951929,
+            "support_samples": 52
+          }
+        }
+      },
+      "status": "computed",
+      "reason": null,
+      "component_count": 1,
+      "hull_vertex_count": 4,
+      "width_mm": 320.0,
+      "depth_mm": 200.0,
+      "h_mm": 2.0,
+      "sample_count": 256,
+      "convex_area_mm2": 64000.0,
+      "candidate_perimeter_range_mm": [
+        827.7255214445767,
+        993.9173401395201
+      ],
+      "model_disagreement_mm": 166.19181869494344,
+      "diagnostic_version": "candidate-diagnostics-v3.0",
+      "diagnostics_do_not_select_or_validate_anatomy": true,
+      "current_model_spread_mm": 166.19181869494344,
+      "current_model_spread_members": [
+        "fixed_constant_uniform_no_morph",
+        "constrained_no_morph",
+        "width_depth_axis_aligned"
+      ],
+      "spread_is_not_physical_interval": true,
+      "all_comparator_spread_members": [
+        "fixed_constant_uniform_no_morph",
+        "constrained_no_morph",
+        "width_depth_axis_aligned",
+        "historical_opening_0p9_corrected_fit"
+      ]
+    }
+  },
+  "checks": {
+    "does_not_mutate_or_change_values": true
+  },
+  "all_checks_passed": true,
+  "scope": "Diagnostics contract only; does not evaluate human measurement quality or select a model"
+}

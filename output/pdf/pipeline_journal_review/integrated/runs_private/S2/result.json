@@ -1,0 +1,356 @@
+{
+  "version": "integrated-candidates-v3.0",
+  "attempt_id": "S2",
+  "evidence_class": "development_rgb_not_independent",
+  "input_mode": "rgb",
+  "height_cm": 177.0,
+  "status": "rejected",
+  "reason": "boolean index did not match indexed array along axis 0; size of axis is 1 but size of corresponding boolean axis is 176",
+  "policy": {
+    "version": "integrated-candidates-v3.0",
+    "candidate_selection": "report_all_named_candidates_no_oracle_selection",
+    "base_waist_deletion": false,
+    "base_section_opening": false,
+    "base_section_closing": false,
+    "whole_volume_component_deletion": false,
+    "whole_volume_extent_smoothing": false,
+    "conditional_depth_cap": false,
+    "front_torso_clip_multiplier": 1.15,
+    "fragment_rejection_fraction": 0.01,
+    "mask_threshold": 0.5,
+    "minimum_frame_foreground_fraction": 0.02,
+    "silhouette_level_fractions_from_crown": {
+      "shoulder": 0.182,
+      "hip": 0.47,
+      "ankle": 0.961
+    },
+    "waist_shoulder_hip_fraction": 0.688,
+    "chest_shoulder_waist_fraction": 0.35,
+    "profile_membership_epsilon_over_h": 1e-08,
+    "sensitivity": "unavailable_not_calibrated; no legacy RSS",
+    "display_export": "not executed; measurements do not depend on a mesh"
+  },
+  "stages": [
+    {
+      "stage": "front_perception",
+      "elapsed_seconds": 1.1033448000671342
+    },
+    {
+      "stage": "side_perception",
+      "elapsed_seconds": 0.3007588000036776
+    },
+    {
+      "stage": "conventional_reconstruction",
+      "elapsed_seconds": 0.007234600023366511
+    }
+  ],
+  "inputs": {
+    "front_sha256": "e10644b4ef2fdf92314cc3f83f64b3ecfe841b5fdc793a69e257f14a37c3babc",
+    "side_sha256": "b00a77799e8c6b0abd8b194c9191e019752aa946514dbe255fa08f133e488caa"
+  },
+  "runtime_environment": {
+    "python": "3.12.9",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel"
+  },
+  "sections": {},
+  "physical_uncertainty": {
+    "available": false,
+    "value_mm": null,
+    "reason": "not_calibrated"
+  },
+  "model_sha256": "64437af838a65d18e5ba7a0d39b465540069bc8aae8308de3e318aad31fcbc7b",
+  "landmark_source": "pretrained_pose_on_RGB",
+  "views": {
+    "front": {
+      "image_shape": [
+        1280,
+        960,
+        3
+      ],
+      "padding_columns": 0,
+      "components": {
+        "components": 1,
+        "removed_pixels": 0,
+        "removed_fraction": 0.0
+      },
+      "rotation_deg": -2.039362040466181,
+      "scale_transform": 0.9992819623279304,
+      "alignment_out_of_canvas_source_pixels": 0,
+      "landmarks": {
+        "left_shoulder": {
+          "xy": [
+            579.4511032104492,
+            461.1071892082691
+          ],
+          "visibility": 0.9997803568840027
+        },
+        "right_shoulder": {
+          "xy": [
+            393.8588047027588,
+            451.81080397963524
+          ],
+          "visibility": 0.9997791647911072
+        },
+        "left_elbow": {
+          "xy": [
+            704.1436958312988,
+            518.8856140375137
+          ],
+          "visibility": 0.9892287254333496
+        },
+        "right_elbow": {
+          "xy": [
+            264.68284606933594,
+            498.51927930116653
+          ],
+          "visibility": 0.9935376048088074
+        },
+        "left_wrist": {
+          "xy": [
+            822.0018768310547,
+            556.3759465813637
+          ],
+          "visibility": 0.969048023223877
+        },
+        "right_wrist": {
+          "xy": [
+            121.86638832092285,
+            530.1931429505348
+          ],
+          "visibility": 0.9951144456863403
+        },
+        "left_hip": {
+          "xy": [
+            522.9299354553223,
+            757.309089422226
+          ],
+          "visibility": 0.9999232292175293
+        },
+        "right_hip": {
+          "xy": [
+            425.8917045593262,
+            750.8778829574585
+          ],
+          "visibility": 0.9999333620071411
+        },
+        "left_ankle": {
+          "xy": [
+            499.6904182434082,
+            1067.4748789668083
+          ],
+          "visibility": 0.9908190369606018
+        },
+        "right_ankle": {
+          "xy": [
+            430.4014205932617,
+            1071.9314342737198
+          ],
+          "visibility": 0.9887903928756714
+        }
+      },
+      "landmarks_normalized": {
+        "left_shoulder": [
+          573.8434387786037,
+          457.81094381458087
+        ],
+        "right_shoulder": [
+          388.17128519800315,
+          455.12687541243514
+        ],
+        "left_hip": [
+          527.9317213975016,
+          755.6226067051085
+        ],
+        "right_hip": [
+          430.7958889889618,
+          752.6508180552349
+        ],
+        "left_ankle": [
+          515.7532552253854,
+          1066.1957815320898
+        ],
+        "right_ankle": [
+          446.7163421645765,
+          1073.1102686164336
+        ],
+        "left_elbow": [
+          700.4222062945703,
+          511.07717905856214
+        ],
+        "right_elbow": [
+          260.83081652974175,
+          506.365812711717
+        ],
+        "left_wrist": [
+          819.4543402481065,
+          544.3257657683774
+        ],
+        "right_wrist": [
+          119.33363808457409,
+          543.0755127845157
+        ]
+      },
+      "foreground_pixels": 147096,
+      "normalized_pixels": 146881
+    },
+    "side": {
+      "image_shape": [
+        1280,
+        960,
+        3
+      ],
+      "padding_columns": 0,
+      "components": {
+        "components": 1,
+        "removed_pixels": 0,
+        "removed_fraction": 0.0
+      },
+      "rotation_deg": -3.5339847019567703,
+      "scale_transform": 0.969950052139645,
+      "alignment_out_of_canvas_source_pixels": 0,
+      "landmarks": {
+        "left_shoulder": {
+          "xy": [
+            555.2539209127426,
+            384.05006301403046
+          ],
+          "visibility": 0.9985148310661316
+        },
+        "right_shoulder": {
+          "xy": [
+            523.7109326720238,
+            385.7596422433853
+          ],
+          "visibility": 0.9923200011253357
+        },
+        "left_elbow": {
+          "xy": [
+            387.8361495733261,
+            398.13005352020264
+          ],
+          "visibility": 0.9360941052436829
+        },
+        "right_elbow": {
+          "xy": [
+            387.25143325328827,
+            400.39332258701324
+          ],
+          "visibility": 0.0039624059572815895
+        },
+        "left_wrist": {
+          "xy": [
+            225.61980032920837,
+            396.3772020339966
+          ],
+          "visibility": 0.8454888463020325
+        },
+        "right_wrist": {
+          "xy": [
+            240.72319480776787,
+            396.84980154037476
+          ],
+          "visibility": 0.005686295218765736
+        },
+        "left_hip": {
+          "xy": [
+            524.5731014609337,
+            710.9069106578827
+          ],
+          "visibility": 0.999528169631958
+        },
+        "right_hip": {
+          "xy": [
+            507.35843020677567,
+            695.5879538059235
+          ],
+          "visibility": 0.9992109537124634
+        },
+        "left_ankle": {
+          "xy": [
+            504.7209714651108,
+            1052.628717660904
+          ],
+          "visibility": 0.47162893414497375
+        },
+        "right_ankle": {
+          "xy": [
+            500.6565879583359,
+            989.9345860481262
+          ],
+          "visibility": 0.029781442135572433
+        }
+      },
+      "landmarks_normalized": {
+        "left_shoulder": [
+          544.1465340964108,
+          386.27949407907596
+        ],
+        "right_shoulder": [
+          513.7118031073888,
+          389.8204480625247
+        ],
+        "left_hip": [
+          533.9864667189307,
+          704.5457941215337
+        ],
+        "right_hip": [
+          516.4049530038625,
+          690.7446615396633
+        ],
+        "left_ankle": [
+          535.1984645463718,
+          1036.5555160413119
+        ],
+        "right_ankle": [
+          527.5153383200968,
+          976.1039781680521
+        ],
+        "left_elbow": [
+          382.91026925312246,
+          409.92003100671843
+        ],
+        "right_elbow": [
+          382.47951905073467,
+          412.1460736584764
+        ],
+        "left_wrist": [
+          225.76291204826032,
+          417.92172079078347
+        ],
+        "right_wrist": [
+          240.41284883473742,
+          417.47624117257067
+        ]
+      },
+      "foreground_pixels": 123197,
+      "normalized_pixels": 115905
+    }
+  },
+  "levels_mm": {
+    "shoulder": 384.42218890656574,
+    "chest": 525.3897224887838,
+    "waist_proxy": 787.1865705700461,
+    "hip_landmark_or_proxy": 969.835534347671
+  },
+  "exception_type": "IndexError",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\SUMANTH S SHETTY\\Documents\\GitHub\\Anthropometry-V2\\output\\pdf\\pipeline_journal_review\\integrated\\run_pipeline.py\", line 182, in execute\n    conventional=stage('conventional_reconstruction',lambda:visual_hull(front,side,args.height_cm,args.voxel_mm,args.coarse_mm))\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\SUMANTH S SHETTY\\Documents\\GitHub\\Anthropometry-V2\\output\\pdf\\pipeline_journal_review\\integrated\\run_pipeline.py\", line 155, in stage\n    try:return fn()\n               ^^^^\n  File \"C:\\Users\\SUMANTH S SHETTY\\Documents\\GitHub\\Anthropometry-V2\\output\\pdf\\pipeline_journal_review\\integrated\\run_pipeline.py\", line 182, in <lambda>\n    conventional=stage('conventional_reconstruction',lambda:visual_hull(front,side,args.height_cm,args.voxel_mm,args.coarse_mm))\n                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\SUMANTH S SHETTY\\Documents\\GitHub\\Anthropometry-V2\\output\\pdf\\pipeline_journal_review\\integrated\\source\\visual_hull.py\", line 174, in visual_hull\n    coarse_occ, cxs, cys, czs = _carve_grid(\n                                ^^^^^^^^^^^^\n  File \"C:\\Users\\SUMANTH S SHETTY\\Documents\\GitHub\\Anthropometry-V2\\output\\pdf\\pipeline_journal_review\\integrated\\source\\visual_hull.py\", line 123, in _carve_grid\n    occ_f = _sample_mask(front_mask, top_f + ys[None, :] / scale_f,\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\SUMANTH S SHETTY\\Documents\\GitHub\\Anthropometry-V2\\output\\pdf\\pipeline_journal_review\\integrated\\source\\visual_hull.py\", line 104, in _sample_mask\n    rv, cv_ = rows_i[valid], cols_i[valid]\n              ~~~~~~^^^^^^^\nIndexError: boolean index did not match indexed array along axis 0; size of axis is 1 but size of corresponding boolean axis is 176\n",
+  "elapsed_seconds": 1.8121026000007987,
+  "process_memory": {
+    "available": true,
+    "peak_working_set_bytes": 482553856,
+    "peak_pagefile_bytes": 1553338368,
+    "method": "Windows GetProcessMemoryInfo; process lifetime"
+  },
+  "source_hashes": {
+    "source\\measurement_extraction.py": "8446152e67b02c29049372fda83788fb054627e7006a3fe24ae3881da52279a7",
+    "source\\mediapipe_silhouette.py": "37812ef74ca6456276878ca68afcf7b85a23977d8413936c8979613d98743014",
+    "source\\pose_normalization.py": "ef2cb5927814f34644461c00ccf98c4d3ad00d7b0d4393c8abd9e26a70711f27",
+    "source\\profile_carve.py": "bc17a726abfd73f266700dec8771d0ad46bf4a4aaa0b5c896b9eae370b292cc7",
+    "source\\visual_hull.py": "852f88d8877dea8b4b36050c51f2303d0266b51def9d10edf6ee1b878efb9720",
+    "source\\voxel_memory.py": "403fd1d30370d991d90fb1b280aa7b31d575da9b633ee866c408c134c0387e4a",
+    "source\\waist_correction.py": "32cdf21fcce5f20cc99eb38c37ce83be6eb7287551618239c9cd31520cec2489"
+  },
+  "candidate_module_sha256": "f21dca3207f1456ea112def5ca7642d4bfd3e1352d9295753642655a0ea3383b",
+  "driver_sha256": "93f0057c686ebb7162b1c40de07f4d8de5d79bb90fd5fa9a6650084acb76ccb6"
+}

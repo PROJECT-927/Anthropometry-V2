@@ -1,0 +1,4 @@
+Anthropometry interface -> http://127.0.0.1:5000
+For phone testing on the same Wi-Fi, open this computer's LAN address.
+ * Serving Flask app 'app'
+ * Debug mode: off

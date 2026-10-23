@@ -1,0 +1,45 @@
+{
+  "photo": "thilakside.jpeg",
+  "original_memory_commit": "dc71c2a",
+  "reproduction": {
+    "full_frame_dimensions": [
+      960,
+      1280
+    ],
+    "full_frame_pose_count": 1,
+    "crop_dimensions": [
+      619,
+      1212
+    ],
+    "error": "image_frame.cc:415 Check failed: 1 == ChannelSize() (1 vs. 4); WASM RuntimeError Aborted()"
+  },
+  "corrected_real_browser_run": {
+    "crop_dimensions": [
+      620,
+      1212
+    ],
+    "crop_pose_count": 1,
+    "refinement": "cropped",
+    "status": "success"
+  },
+  "local_server": {
+    "url": "http://127.0.0.1:5000/",
+    "before_restart": "Served cached old error text, without fallback or crop alignment.",
+    "after_restart": "Serves crop alignment and fallback, no old terminating error string.",
+    "frontend_header": "aligned-pose-crop-v3"
+  },
+  "normal_interface_run": {
+    "job_id": "9f716d055210",
+    "front": "thilakfront.jpeg",
+    "side": "thilakside.jpeg",
+    "height_cm": 177,
+    "state": "Complete",
+    "percent": 100,
+    "pipeline": "Steps1-7 completed; measurements.json and hull_viewer.html produced."
+  },
+  "tests": {
+    "suite": "tests/test_privacy_preprocessing.py",
+    "passed": 12
+  },
+  "scope": "Reproduces and fixes browser pose-refinement crash; completion does not certify measurement accuracy."
+}

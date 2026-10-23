@@ -1,0 +1,60 @@
+{
+  "scope": "Frozen optional policy and actual inherited taper on selected synthetic sections; no anatomical efficacy evidence.",
+  "source_hashes_match": true,
+  "attempt_count": 32,
+  "selected_cases": [
+    {
+      "family": "box",
+      "sagittal_offset_mm": 0,
+      "displacement_mm": 20,
+      "removed_voxels": 7988,
+      "diagnostic_perimeter_change_mm": 0.0,
+      "base_unchanged": true,
+      "reproduced": true
+    },
+    {
+      "family": "box",
+      "sagittal_offset_mm": 40,
+      "displacement_mm": 20,
+      "removed_voxels": 8694,
+      "diagnostic_perimeter_change_mm": -36.689498788071205,
+      "base_unchanged": true,
+      "reproduced": true
+    },
+    {
+      "family": "ellipse",
+      "sagittal_offset_mm": 0,
+      "displacement_mm": 10,
+      "removed_voxels": 4604,
+      "diagnostic_perimeter_change_mm": -31.54399790006778,
+      "base_unchanged": true,
+      "reproduced": true
+    },
+    {
+      "family": "concave",
+      "sagittal_offset_mm": 40,
+      "displacement_mm": 0,
+      "removed_voxels": 0,
+      "diagnostic_perimeter_change_mm": 0.0,
+      "base_unchanged": true,
+      "reproduced": true
+    }
+  ],
+  "positive_quadratic": {
+    "version": "optional-waist-hypothesis-v3.0",
+    "default_applied": false,
+    "status": "proposed",
+    "reason": "optional_positive_curvature_heuristic",
+    "displacement_mm": 20.871215252207993,
+    "anatomically_validated": false,
+    "local_alpha_per_mm": 0.000999999999999999,
+    "local_slope": 0.0,
+    "local_design_condition": 644.10229138338,
+    "support_rows": 31,
+    "trace_span_mm": 400.0,
+    "curvature_per_mm": 0.0019999999999999983,
+    "angle_rad": 0.8230336921349753,
+    "zero_displacement": false
+  },
+  "interpretation": "The centered-box hypothesis deletes occupancy while its convex perimeter is unchanged; off-center behavior differs. Optional separation prevents silently treating deletion as measured waist correction."
+}

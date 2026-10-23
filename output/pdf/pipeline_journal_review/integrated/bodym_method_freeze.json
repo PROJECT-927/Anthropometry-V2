@@ -1,0 +1,39 @@
+{
+  "scope": "retrospective external benchmark, project prior TestA use unknown; not an untouched holdout",
+  "cohort_sha256": "b6fc3be54d538a7db319381745e4bef333b95625d3394df6eb06e921fc600204",
+  "label_access": "target labels not downloaded/read when this manifest created",
+  "hashes": {
+    "evidence\\analyze_candidates_v3.py": "637efc55368ab047464aec7a3b6103ea154acb91c58aaacaf2d4ec3bb31f454d",
+    "evidence\\candidate_diagnostics_v3.py": "1c8a750ed4520a77477bfc71a603ea6d1d56373288f41b27354875041b0e9a4a",
+    "evidence\\corrected_conic.py": "99e035bc52846e68eb73d013dec2ce7531dfadf6b4f50f6decdd07e33535e245",
+    "evidence\\historical_profile_kernel.py": "d36bbdfbf90edcb994589ce168b6ada7afb23d778a060908dfc4e0e7dcc35fcf",
+    "evidence\\section_candidates_v3.py": "f21dca3207f1456ea112def5ca7642d4bfd3e1352d9295753642655a0ea3383b",
+    "evidence\\verify_candidate_diagnostics_v3.py": "74fe4162feff6efbdaeb6aa8318859674f6b0ef78cd549d7dfcc7758dabf82d2",
+    "evidence\\verify_candidates_v3.py": "3ccaef190b711aa38e4bc545de98684ddc5f46e1beb8fdc773c66a7c2f310a70",
+    "evidence\\verify_exact_perimeter_partials_v3.py": "2b2778a76e139d4ec735807bf25d418f17c7620c29b1927129b485eaff601d6d",
+    "evidence\\verify_waist_policy_v3.py": "9a4d5329ac2e1e066926390cd7fe3ef51992ebd42444b9f82d736e260deb4332",
+    "evidence\\waist_policy_v3.py": "590bfe1f933eea621c1c12ec579cbc9e4f4e488896d445fd15ca93f3c0ba2413",
+    "integrated\\acquire_bodym.py": "e8801800afb197a9e779edbe69d99b6ef252532b56909aab9844fb4ac4cc4ed7",
+    "integrated\\evaluate_bodym.py": "d5bc6701cdf3b69ee3f54a2455ca407cdedd4eaa7111e5ed39728ab91e6e34e9",
+    "integrated\\profile_ablation.py": "799fd6ea22091c8fc3f3f316dff1d890fa3852b5a06437fd5fae4c3e773427aa",
+    "integrated\\run_pipeline.py": "9a856c4ecf00e65e95bbd7192f27c412de42fad1b7179bba89da3c4bf278c944",
+    "integrated\\source\\measurement_extraction.py": "8446152e67b02c29049372fda83788fb054627e7006a3fe24ae3881da52279a7",
+    "integrated\\source\\mediapipe_silhouette.py": "37812ef74ca6456276878ca68afcf7b85a23977d8413936c8979613d98743014",
+    "integrated\\source\\pose_normalization.py": "ef2cb5927814f34644461c00ccf98c4d3ad00d7b0d4393c8abd9e26a70711f27",
+    "integrated\\source\\profile_carve.py": "bc17a726abfd73f266700dec8771d0ad46bf4a4aaa0b5c896b9eae370b292cc7",
+    "integrated\\source\\visual_hull.py": "1972bbf492accaa17c42bc43823896a31a6762b51ed65d5e7f8a009474293227",
+    "integrated\\source\\voxel_memory.py": "403fd1d30370d991d90fb1b280aa7b31d575da9b633ee866c408c134c0387e4a",
+    "integrated\\source\\waist_correction.py": "32cdf21fcce5f20cc99eb38c37ce83be6eb7287551618239c9cd31520cec2489",
+    "integrated\\verify_profile_ablation.py": "4105865cb56962a42ac441ffb700680147824994e4b5906403d71d3903d6949f"
+  },
+  "protocol": {
+    "voxel_mm": 2.0,
+    "coarse_mm": 10.0,
+    "selection": "all87 metadata subjects; lexicographicallyfirstpairedphoto",
+    "level_policy": "fixed stature proportions in driver",
+    "candidates": "all6 no truth selection",
+    "metrics": "per endpoint/branch/candidate coverage,bias,MAE,RMSE; paired absolute-error differences on commonavailable subjects; no pooling body sites as N",
+    "targets": "BodyM scan-derived chest,waist,hip targets, cm convertedto mm; plane mismatch retained in predictionerror",
+    "confidence": "descriptive cohort metrics; no generalization confidenceclaim"
+  }
+}

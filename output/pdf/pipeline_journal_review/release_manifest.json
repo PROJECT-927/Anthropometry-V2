@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-22",
+  "status": "finalized at user request; further iterations stopped; no overall PASS claimed",
+  "pages": 12,
+  "references": 24,
+  "current_source_sha256": "03148ff769f40486770c8600106c63006cfc74d3a34b8bd8665b1bf29fcae49b",
+  "current_pdf_sha256": "e6301ef2140cccd13c54ad7019aedcbb67000a875ddc1295edd37d0198249827",
+  "evidence": [
+    "598synthetic section attempts",
+    "32waist configurations",
+    "3development RGB attempts",
+    "87-subject retrospective BodyM TestA benchmark"
+  ],
+  "exclusions": [
+    "privatephotos/masks",
+    "modelbinary",
+    "downloadeddatasets",
+    "uncompletedTestBwork"
+  ],
+  "source_roles": {
+    "main.tex": "final paper",
+    "integrated/run_pipeline.py": "frozen isolated research pipeline",
+    "integrated/bodym_method_freeze.json": "prelabel method/configuration freeze",
+    "review/revision_v3.tex": "pre-final Table1 consistency edit archive",
+    "review/revision_v3_final.tex": "final paper snapshot",
+    "review/round_4_response.md": "completed changes, not a reviewer verdict"
+  }
+}

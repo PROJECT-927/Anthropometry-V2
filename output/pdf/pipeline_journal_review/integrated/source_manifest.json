@@ -1,0 +1,49 @@
+{
+  "source_basis": "Historical project snapshot with listed isolated research changes; application source unchanged",
+  "files": {
+    "mediapipe_silhouette.py": {
+      "original_sha256": "8c02dc636e37117714c76ae4e2f07993702e4cb0044fe940f6ebdcd98fdf00e1",
+      "research_sha256": "37812ef74ca6456276878ca68afcf7b85a23977d8413936c8979613d98743014",
+      "changes": [
+        "Newline/encoding normalization only; decoded text and AST verified identical."
+      ]
+    },
+    "pose_normalization.py": {
+      "original_sha256": "ef2cb5927814f34644461c00ccf98c4d3ad00d7b0d4393c8abd9e26a70711f27",
+      "research_sha256": "ef2cb5927814f34644461c00ccf98c4d3ad00d7b0d4393c8abd9e26a70711f27",
+      "changes": []
+    },
+    "visual_hull.py": {
+      "original_sha256": "8ac89032400016a34a6dd8498d2063e7d3aade5f5f3380d9341a4f2726e78834",
+      "research_sha256": "1972bbf492accaa17c42bc43823896a31a6762b51ed65d5e7f8a009474293227",
+      "changes": [
+        "Equivalent 2D-projection sampling replaces full 3D coordinate temporaries; explicit grid budget.",
+        "Broadcast row/column coordinate tables before indexed nearest-pixel sampling; regression probe required."
+      ]
+    },
+    "waist_correction.py": {
+      "original_sha256": "32cdf21fcce5f20cc99eb38c37ce83be6eb7287551618239c9cd31520cec2489",
+      "research_sha256": "32cdf21fcce5f20cc99eb38c37ce83be6eb7287551618239c9cd31520cec2489",
+      "changes": []
+    },
+    "measurement_extraction.py": {
+      "original_sha256": "3b2d3d5e101c4b2505ec85a617283a0423c9c3993e763ab06582e8b5002f5df0",
+      "research_sha256": "8446152e67b02c29049372fda83788fb054627e7006a3fe24ae3881da52279a7",
+      "changes": [
+        "Legacy fit entry point delegates to corrected centred/scaled SVD reference; no old sign expression reachable there."
+      ]
+    },
+    "profile_carve.py": {
+      "original_sha256": "0fe4b09e7304b7cdaee554603998ed08be1b0b33953b882b674af6b7574b6e38",
+      "research_sha256": "bc17a726abfd73f266700dec8771d0ad46bf4a4aaa0b5c896b9eae370b292cc7",
+      "changes": [
+        "Grid-scaled 1e-8*h membership tolerance and explicit grid allocation budget."
+      ]
+    },
+    "voxel_memory.py": {
+      "origin": "current workspace memory-guard helper",
+      "original_sha256": "403fd1d30370d991d90fb1b280aa7b31d575da9b633ee866c408c134c0387e4a",
+      "research_sha256": "403fd1d30370d991d90fb1b280aa7b31d575da9b633ee866c408c134c0387e4a"
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "scope": "Run001 frozen-code/hash audit and scalar vertical-run/common-grid reproduction; labels were not accessed.",
+  "frozen_sources_match": true,
+  "attempt_id": "BodyM-A-001",
+  "common_grid_checks": [
+    {
+      "endpoint": "chest",
+      "scalar_vertical_runs_and_common_grid_candidates_match": true,
+      "active_before_clip": 0,
+      "active_after_clip": 0,
+      "cap_changed_section_voxels": 0
+    },
+    {
+      "endpoint": "waist_proxy",
+      "scalar_vertical_runs_and_common_grid_candidates_match": true,
+      "active_before_clip": 25,
+      "active_after_clip": 1,
+      "cap_changed_section_voxels": 93
+    },
+    {
+      "endpoint": "hip",
+      "scalar_vertical_runs_and_common_grid_candidates_match": true,
+      "active_before_clip": 70,
+      "active_after_clip": 0,
+      "cap_changed_section_voxels": 0
+    }
+  ],
+  "helper_z_origin_mm": -728.1188523628108,
+  "source_profile_z_origin_mm": -161.95452633381498,
+  "z_grid_origin_difference_modulo_h_cells": 0.917836985502106,
+  "source_profile_vs_common_grid": [
+    {
+      "endpoint": "chest",
+      "source_profile_minus_common_grid_perimeter_mm": {
+        "fixed_constant_no_morph": null,
+        "fixed_constant_uniform_no_morph": -2.2737367544323206e-13,
+        "constrained_no_morph": 3.637978807091713e-12,
+        "width_depth_axis_aligned": 0.0,
+        "unrounded_convex_diagnostic": 0.0,
+        "historical_opening_0p9_corrected_fit": 0.0
+      }
+    },
+    {
+      "endpoint": "waist_proxy",
+      "source_profile_minus_common_grid_perimeter_mm": {
+        "fixed_constant_no_morph": 0.0,
+        "fixed_constant_uniform_no_morph": 1.1368683772161603e-13,
+        "constrained_no_morph": -3.410605131648481e-13,
+        "width_depth_axis_aligned": 0.0,
+        "unrounded_convex_diagnostic": 0.0,
+        "historical_opening_0p9_corrected_fit": 1.1368683772161603e-13
+      }
+    },
+    {
+      "endpoint": "hip",
+      "source_profile_minus_common_grid_perimeter_mm": {
+        "fixed_constant_no_morph": null,
+        "fixed_constant_uniform_no_morph": -2.2737367544323206e-13,
+        "constrained_no_morph": -3.410605131648481e-13,
+        "width_depth_axis_aligned": 0.0,
+        "unrounded_convex_diagnostic": 0.0,
+        "historical_opening_0p9_corrected_fit": 3.410605131648481e-13
+      }
+    }
+  ],
+  "interpretation": "The helper internally compares W/F/C on a shared grid. Source-profile and helper grids need not have the same Z phase, so their C estimates must be distinguished unless harmonized explicitly."
+}

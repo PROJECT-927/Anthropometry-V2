@@ -1,0 +1,13 @@
+{
+  "attempt_id": "BodyM-A-068",
+  "status": "rejected",
+  "reason": "input_mask_border_contact",
+  "elapsed_seconds": 0.3533292000647634,
+  "peak_memory": {
+    "available": true,
+    "peak_working_set_bytes": 111456256,
+    "peak_pagefile_bytes": 1163624448,
+    "method": "Windows GetProcessMemoryInfo; process lifetime"
+  }
+}
+

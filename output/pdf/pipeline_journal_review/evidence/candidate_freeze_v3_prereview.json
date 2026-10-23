@@ -1,0 +1,184 @@
+{
+  "freeze_utc": "2026-10-21T15:36:05.191226+00:00",
+  "plan": {
+    "version": "candidate-benchmark-v3.0",
+    "selection_policy": "report_all_no_auto_selection_no_parameter_tuning",
+    "candidate_names": [
+      "fixed_constant_no_morph",
+      "fixed_constant_uniform_no_morph",
+      "constrained_no_morph",
+      "width_depth_axis_aligned",
+      "unrounded_convex_diagnostic",
+      "historical_opening_0p9_corrected_fit"
+    ],
+    "seed": 20261024,
+    "arc_sample_count": 256,
+    "truth_boundary_samples": 32768,
+    "noise_boundary_samples": 2048,
+    "noise_model": "eight-frequency smooth normal displacement, independent fixed random phases/amplitudes, specified RMS mm; this is not a measured camera/noise model",
+    "entry_points": [
+      "direct_known_section",
+      "two_axis_projected_occupancy"
+    ],
+    "metrics": [
+      "per-candidate available/failure count",
+      "perimeter error vs continuous section and convex truth",
+      "error vs noiseless raster convex perimeter",
+      "same-sample solver comparison",
+      "continuous model disagreement",
+      "all-case raw outputs",
+      "family/grid/noise summaries"
+    ],
+    "development": {
+      "shapes": [
+        [
+          "ellipse",
+          160,
+          100,
+          2
+        ],
+        [
+          "circle",
+          100,
+          100,
+          2
+        ],
+        [
+          "superellipse",
+          140,
+          90,
+          4
+        ],
+        [
+          "box",
+          150,
+          90,
+          0
+        ],
+        [
+          "rounded_box",
+          150,
+          100,
+          25
+        ],
+        [
+          "egg",
+          140,
+          95,
+          0.12
+        ],
+        [
+          "concave",
+          130,
+          95,
+          0.16
+        ]
+      ],
+      "angles_deg": [
+        0,
+        30
+      ],
+      "spacing_mm": [
+        2,
+        4
+      ],
+      "noise_rms_mm": [
+        0,
+        1
+      ]
+    },
+    "test": {
+      "shapes": [
+        [
+          "ellipse",
+          180,
+          75,
+          2
+        ],
+        [
+          "ellipse",
+          110,
+          85,
+          2
+        ],
+        [
+          "circle",
+          75,
+          75,
+          2
+        ],
+        [
+          "superellipse",
+          160,
+          75,
+          3
+        ],
+        [
+          "superellipse",
+          130,
+          100,
+          6
+        ],
+        [
+          "box",
+          170,
+          65,
+          0
+        ],
+        [
+          "rounded_box",
+          160,
+          80,
+          18
+        ],
+        [
+          "egg",
+          155,
+          85,
+          -0.2
+        ],
+        [
+          "concave",
+          145,
+          90,
+          0.25
+        ]
+      ],
+      "angles_deg": [
+        15,
+        55,
+        80
+      ],
+      "spacing_mm": [
+        1,
+        2,
+        4
+      ],
+      "noise_rms_mm": [
+        0,
+        0.5,
+        2
+      ]
+    },
+    "failure_cases": [
+      "empty",
+      "two_components",
+      "border_contact",
+      "nonuniform_grid"
+    ],
+    "waist_cases": [
+      "zero",
+      "deletion",
+      "added_occupancy",
+      "disconnection",
+      "off_centre"
+    ],
+    "physical_claim": "No human anthropometry, real acquisition, or anatomical prior validation"
+  },
+  "plan_sha256": "2310f4c441f0b566a59503cce680f64a9faaa2dfd771308670e9512ed26c6bd1",
+  "source_sha256": {
+    "verify_candidates_v3.py": "8c0a246d95c0770de92ba1954ab6318644bd95eb21fdc6a776801aae40c31f25",
+    "section_candidates_v3.py": "f21dca3207f1456ea112def5ca7642d4bfd3e1352d9295753642655a0ea3383b",
+    "corrected_conic.py": "99e035bc52846e68eb73d013dec2ce7531dfadf6b4f50f6decdd07e33535e245"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "pdf_sha256": "e6301ef2140cccd13c54ad7019aedcbb67000a875ddc1295edd37d0198249827",
+  "pages": 12,
+  "pages_rendered_and_visually_checked": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "method": "All twelve V3 pages inspected as rendered contact sheets; final Table1 consistency edit inspected at1400px onpage7. No clipping, overlap or broken math/table layout observed.",
+  "final_change": "Table1 branch identities corrected; all other content unchanged.",
+  "scope": "Layout verification, not scientific acceptance."
+}

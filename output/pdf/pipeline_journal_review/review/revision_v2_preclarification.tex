@@ -1,0 +1,359 @@
+% Standalone manuscript: upload this complete file as main.tex to Overleaf.
+% Bibliography is embedded; no external figures, .bib files, or custom class.
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=24mm]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{array,booktabs}
+\usepackage{microtype}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{3em}
+\setlength{\parskip}{0.2em}
+\setlength{\parindent}{1.2em}
+\setlength{\abovedisplayskip}{7pt plus 2pt minus 2pt}
+\setlength{\belowdisplayskip}{7pt plus 2pt minus 2pt}
+\renewcommand{\arraystretch}{1.08}
+\newcommand{\R}{\mathbb R}
+\newcommand{\indic}{\mathbb I}
+\newcommand{\clip}{\operatorname{clip}}
+\title{Two-View Image-Based Anthropometry:\\
+Profile-Guided Reconstruction and Numerical Verification}
+\author{Internal review draft}
+\date{}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This paper specifies a two-view anthropometry method and examines its numerical components with reproducible synthetic tests. Pretrained perception supplies frontal and profile silhouettes calibrated by stature. Filtered profile intervals are coupled to frontal column thickness to constrain depth at narrow structures; a bounded waist rule applies local occupancy deletion. Measurements use explicitly identified reconstruction branches and defined section levels. A centred, scaled least-squares reference estimator recovers elliptical sections and distinguishes unavailable sensitivity from a computed zero. Across 27 noiseless ellipse cases spanning rotations, translations, and coordinate scales, its maximum relative semi-axis error was $3.35\times10^{-11}$. Controlled geometric experiments examine the profile constraint and its failure cases. These results verify specified computations under synthetic assumptions. Independent anthropometric agreement, the anatomical value of the waist rule, and improvement over established two-view methods remain open empirical questions.
+\end{abstract}
+\noindent\textbf{Keywords:} image-based anthropometry; visual hull; profile-guided reconstruction; geometric measurement.
+
+\section{Introduction and Related Work}
+Photographic anthropometry requires correspondence between image-derived geometry and a specified physical measurement. ISO~8559-1 distinguishes circumferences, breadths, and surface paths used in clothing measurement~\cite{iso8559}. Meunier and Yin evaluated a two-dimensional photographic measurement system~\cite{meunier2000}; Hung \emph{et al.} estimated circumferences from image-derived widths and depths~\cite{hung2004}. Automatic measurement from frontal and lateral silhouettes was subsequently developed by Aslam \emph{et al.}~\cite{aslam2017}. These studies establish substantial prior work for two-view measurement and elliptical section models.
+
+The visual hull represents the volume consistent with observed silhouettes~\cite{laurentini1994visual}. Human-shape methods include the statistical SMPL representation~\cite{loper2015smpl}, volumetric inference in BodyNet~\cite{varol2018bodynet}, and learned reconstruction from orthographic silhouettes~\cite{ji2019}. Here, pretrained perception is followed by geometric rules in physical units. A filtered profile interval is coupled to frontal run topology and column thickness to limit replicated limb depth. A tapered waist deletion provides a local shape prior, and a half-ellipse approximates a specified shoulder path. Established component algorithms retain their attribution.
+
+Hung \emph{et al.} combine photographic breadth/depth with ellipse-based circumferences~\cite{hung2004}; Aslam \emph{et al.} use silhouette fiducials and an ellipsoid model under calibrated capture~\cite{aslam2017}. Here the proposed adaptation assigns occupancy intervals to frontal columns before section fitting. Ji \emph{et al.} learn silhouette features for a body-shape representation~\cite{ji2019}; recent compact multi-view work combines RGB/depth-assisted imagery with SMPL and exemplar optimization~\cite{chen2025compact}. These objectives differ from the present geometric tests, which establish neither comparative accuracy nor global priority.
+
+\section{Image Preparation and Metric Alignment}
+\subsection{Acquisition, masks, and landmarks}
+Inputs are frontal and approximately orthogonal profile RGB images, together with stature $H$ in centimetres. The full crown and feet must be visible; close-fitting clothing and consistent posture reduce silhouette ambiguity. Let $X$ denote lateral position, $Y$ distance downwards from the crown, and $Z$ sagittal position, all in millimetres. A pinhole camera gives $u=f_xx_c/z_c+c_u$ and $v=f_yy_c/z_c+c_v$. Replacing depth by a representative $z_0$ yields the weak-perspective approximation used below. A depth displacement $\Delta z$ changes magnification by approximately $-\Delta z/z_0$. The implementation estimates neither camera intrinsics nor residual yaw, so stature calibration alone does not eliminate perspective error.
+
+Planned capture should retain focal setting and camera distance between views, keep the camera level with the subject centre, and record intended $90^\circ$ separation. Approximately horizontal, separated arms define the intended pose. Border contact, alignment clipping, missing landmarks and discarded components require recorded rejection/review. No acquisition tolerance is validated. If $|\Delta z|\leq d<z_0$, relative pinhole magnification differs by at most $d/(z_0-d)$, bounding one perspective effect.
+
+The implementation uses MediaPipe~\cite{lugaresi2019mediapipe} and its Pose Landmarker segmentation output~\cite{mediapipeguide}. The heavy pretrained model operates in single-image, single-person mode with detection and presence thresholds of $0.5$. Contiguous RGB arrays are padded on the right with replicated columns to a width divisible by four; the segmentation map is cropped back afterwards. This alignment step preserves image scale. A mismatched map is resized bilinearly. Foreground is defined by the strict probability threshold $p>0.5$, followed by selection of the largest eight-connected component. Enclosed background holes smaller than $2\%$ of foreground area are filled; border-connected background is retained. Missing pose or segmentation output, or foreground occupying less than $2\%$ of the frame, causes rejection. Default mask dilation is zero.
+
+An optional GrabCut baseline uses the foreground/background colour-mixture and boundary formulation of Rother \emph{et al.}~\cite{rother2004grabcut}. Landmark-based initialization constructs a torso polygon, limb capsules, and a head region. With estimated pixel stature $H_p=(y_{\rm ankle}-y_{\rm shoulder})/0.779$, seed erosion is $0.012H_p$ and the probable-foreground and background dilations are $0.045H_p$ and $0.13H_p$. A border ring spans $2\%$ of the smaller image dimension. Five iterations with random seed zero precede a $7\times7$ elliptical closing and the same component cleanup. This baseline is separate from the default learned mask.
+
+Landmarks are refined by a second inference on the silhouette bounding box expanded by $15\%$. Crops whose longer dimension is below 1024 pixels are enlarged bicubically; larger crops retain their resolution. For resize factor $\gamma$, resized crop dimensions $(W_r,H_r)$, and crop origin $(x_0,y_0)$, a normalized landmark $(\xi,\eta)$ maps to $(x_0+W_r\xi/\gamma,\,y_0+H_r\eta/\gamma)$. Shoulder, hip, and ankle pairs (indices 11--12, 23--24, 27--28) determine alignment. Elbows and wrists provide subsequent overlap checks. The fit is rejected when more than three requested landmarks have visibility below $0.3$.
+
+\subsection{Weighted alignment and calibration}
+For image points $p_i$, canonical targets $q_i$ place each shoulder, hip, and ankle pair horizontally while preserving its Euclidean pair distance and mean vertical position. Shoulder and hip midpoints define a common spine coordinate; ankle stance and image ordering are preserved. Visibility weights are clipped to $[0.05,1]$ and normalized to sum to one. The similarity fit extends orthogonal Procrustes alignment~\cite{schonemann1966generalized}:
+\begin{equation}
+ \min_{\sigma>0,R\in SO(2),t}\sum_iw_i\|\sigma Rp_i+t-q_i\|^2.
+ \label{eq:procrustes}
+\end{equation}
+Writing $\bar p=\sum_iw_ip_i$, $\bar q=\sum_iw_iq_i$, and
+$K=\sum_iw_i(p_i-\bar p)(q_i-\bar q)^T=U\Sigma V^T$, the solution is
+\begin{equation}
+ \begin{aligned}
+ S&=\operatorname{diag}(1,\det(VU^T)),& R&=VSU^T,\\
+ \sigma&=\frac{\operatorname{tr}(\Sigma S)}{\sum_iw_i\|p_i-\bar p\|^2},&
+ t&=\bar q-\sigma R\bar p.
+ \end{aligned}
+\end{equation}
+Eliminating translation centres the objective; maximizing its cross term gives $R$, and differentiation with respect to scale gives $\sigma$. Near-zero source spread uses unit scale. Rotation beyond $35^\circ$ or scale outside $[0.6,1.6]$ causes rejection. Masks are warped on the original canvas with bilinear interpolation and rethresholded at $0.5$; landmarks receive the same transform. This global alignment can leave articulation differences and can clip foreground at the canvas boundary.
+
+Calibration follows warping. In each view $v\in\{f,s\}$, let $t_v,b_v$ be the first and last occupied rows and $L_v=b_v-t_v+1$. Set $H_m=10H$ and $s_v=H_m/L_v$ millimetres per pixel. The horizontal origin $c_v$ is the equally weighted mean of nonempty-row silhouette midpoints. Projection is
+\begin{equation}
+ (u_f,v_f)=(c_f+X/s_f,\,t_f+Y/s_f),\qquad
+ (u_s,v_s)=(c_s+Z/s_s,\,t_s+Y/s_s).
+ \label{eq:projection}
+\end{equation}
+Nearest-pixel mask lookup returns zero outside the image. Occupancy arrays use $(X,Y,Z)$ ordering. OpenCV section coordinates are $(\text{column},\text{row})=(Z\text{-index},X\text{-index})$ and must be reversed when recovering metric $(X,Z)$ points. Supplied stature is a common scale input to both views. Continuous geometric measurements therefore satisfy $\Delta C/C\simeq\Delta H/H$; fixed metric thresholds and voxel discretization can change the discrete response.
+
+\section{Reconstruction and Local Shape Constraints}
+\subsection{Conventional occupancy and branch selection}
+For binary masks $M_f,M_s$, the conventional orthographic occupancy is
+\begin{equation}
+ O_0(X,Y,Z)=M_f(u_f,v_f)M_s(u_s,v_s).
+ \label{eq:hull}
+\end{equation}
+At a given height, every frontal run pairs with every profile run. With $n$ frontal and $m$ profile intervals, this produces up to $nm$ rectangular regions, including limb-depth replication. Reconstruction first uses a 10\,mm grid over silhouette extrema with 30\,mm lateral and sagittal margins and $0\leq Y<H_m$. The occupied coarse bounding box is expanded by one coarse cell and resampled uniformly at $h=2$\,mm. Features absent from the coarse sample can consequently be missed. The fine stage stores a dense array over this box.
+
+The largest 26-connected volume component is retained. Within successive $XZ$ slices, eight-connected components are tracked greedily by nearest centroid, with a maximum linking distance of 60\,mm. Tracks spanning at least five slices have their centroid coordinates and four half-extents filtered by a cubic Savitzky--Golay fit~\cite{savitzky1964smoothing}, using at most 15 slices. Negative half-extents are clipped to zero. Each original component is intersected with its smoothed bounding rectangle, and the largest volume component is selected again. This operation trims occupancy; it cannot recover missing material.
+
+The resulting conventional hull receives the waist correction below and supplies waist and hip sections. Chest uses an independently constructed, unrounded profile-guided volume, followed by its own section conditioning. A rounded copy of the profile-guided volume is used for display. Failure to construct a usable profile core sends chest and display processing to the corrected conventional hull. Shoulder and hip-to-ankle outputs use masks and landmarks directly.
+
+\subsection{Profile filtering and columnwise depth}
+At profile row $y$, select the widest occupied run $[\ell_y,u_y]$, with width $d_y=u_y-\ell_y$ and centre $c_y=(\ell_y+u_y)/2$. Reject missing runs and rows satisfying
+\begin{equation}
+ d_y>1.8\operatorname{median}(d)\quad\text{or}\quad
+ |c_y-\operatorname{median}(c)|>
+ \max\{6\operatorname{MAD}(c),40\text{ pixels}\}.
+\end{equation}
+Here MAD is the unscaled median absolute deviation. A 51-row vertical dilation expands the rejected-row mask by approximately 25 rows in either direction. Accepted endpoints are linearly interpolated, with endpoint clamping, then filtered by a 101-row median and a cubic Savitzky--Golay window of at most 61 odd-numbered rows. Windows shrink or are bypassed for short sequences. No accepted rows causes branch failure. For offsets $r$ in a filtering window, the local polynomial coefficients solve
+\begin{equation}
+ \hat a=(V^TV)^{-1}V^Tf,\qquad V_{rk}=r^k,\quad k=0,\ldots,3;
+ \qquad \hat f(0)=\hat a_0.
+\end{equation}
+Window lengths are in pixels, so their physical bandwidth depends on $s_s$. Interpolated heights are flagged because rejected observations have been replaced by a smooth depth prior.
+
+Converting filtered endpoints to metric coordinates gives $\zeta_-(Y)$ and $\zeta_+(Y)$. For each fixed frontal column $X$, identify its contiguous vertical foreground runs. If the run containing $Y$ spans $n_Y(X,Y)$ fine-grid samples, define
+\begin{equation}
+ \begin{aligned}
+ T(X,Y)&=h\,n_Y(X,Y),&
+ D_p(Y)&=\zeta_+(Y)-\zeta_-(Y),\\
+ z_c(Y)&=\tfrac12[\zeta_+(Y)+\zeta_-(Y)],&
+ z_\pm(X,Y)&=z_c(Y)\pm\tfrac12\min\{D_p(Y),T(X,Y)\},\\
+ O_p(X,Y,Z)&=M_f(u_f,v_f)\indic\{z_-\leq Z\leq z_+\}.&&
+ \end{aligned}
+ \label{eq:profile}
+\end{equation}
+The profile supplies a shared sagittal midpoint and depth. The frontal vertical run bounds thickness at outer columns of an approximately horizontal limb, even when it joins the torso horizontally. Endpoint interpolation can extend occupancy beyond the observed profile mask, so $O_p$ is model-conditioned. Computation uses 64-column chunks and retains dense output storage.
+
+For a straight strip of perpendicular thickness $t$ at angle $\varphi$ to the horizontal, an interior vertical intersection has length $t/|\cos\varphi|$ before finite-length effects. The cap consequently weakens toward a vertical orientation. A shared midpoint cannot recover unknown limb displacement in $Z$. Interpolated levels and departures from the intended pose must accompany the output.
+
+\subsection{Measurement levels and curvature-dependent waist correction}
+The frontal torso trace starts from the widest horizontal run and subsequently selects the run nearest the preceding midpoint. Separate left/right arm-separation tests use five-row margins. Missing trace values are interpolated and smoothed by a cubic 21-row fit. With mean shoulder and hip levels $Y_s,Y_h$, the waist proxy is $Y_w=Y_s+0.688(Y_h-Y_s)$, snapped to the nearest available trace row. The factor approximates $(0.818-0.620)/(0.818-0.530)$ from engineering body-height fractions. Chest is evaluated at $Y_c=Y_s+0.35(Y_w-Y_s)$; hip uses the landmark level. These prescribed levels do not search for maximum chest or hip girth.
+
+Each torso half-width is clipped using its 15th percentile in a $\pm40$\,mm neighbourhood; nonpositive widths are rejected. Girth extraction expands these bounds by a factor of $1.15$, whereas shoulder extraction uses the unexpanded trace. Conventional-hull sections also receive a centred depth cap $D_c=\min(D,0.75W)$ when a profile elbow or wrist lies within 90\,mm of the measurement level, or when those landmarks are unavailable. Removal exceeding $1\%$ of original depth generates an advisory. Profile-guided chest receives only lateral torso clipping.
+
+Waist refinement locates a local minimum of each half-width within $\pm15$ trace samples of $Y_w$, then walks along rising widths to obtain an enclosing interval $[Y_0,Y_1]$. Fit $w(Y)\simeq\alpha(Y-Y_w)^2+\beta(Y-Y_w)+\gamma$. The graph curvature is $2\alpha/(1+\beta^2)^{3/2}$; the implementation uses the small-slope magnitude $\kappa=|2\alpha|$. Writing $L=Y_1-Y_0$, the inward displacement is
+\begin{equation}
+ \begin{aligned}
+ R_c&=\kappa^{-1},\qquad
+ \theta=2\arcsin\!\left(\clip\!\left(\frac{L}{2R_c},-0.999,0.999\right)\right),\\
+ d&=\min\!\left\{\frac{R_c}{2}[1-\cos(\theta/2)],\,0.40w_{\rm loc}\right\}.
+ \end{aligned}
+ \label{eq:waist}
+\end{equation}
+Here $w_{\rm loc}$ is the smaller of the endpoint and local waist half-widths. The correction is skipped for prominence below 2\,mm, nonpositive $L$, or $\kappa<10^{-6}$\,mm$^{-1}$. The displacement uses half the circular sagitta; before clipping, its small-curvature limit is $d\simeq\kappa L^2/16$. This attenuated geometric prior is derived from the frontal width trace.
+
+Within $Y_w\pm15$\,mm, sampled Hann weights $\omega_j=\tfrac12[1-\cos(2\pi j/(n+1))]$, $j=1,\ldots,n$, suppress abrupt vertical changes. Sagittal tapering uses $t(z)=\cos[\clip(\pi z/(2z_h),-\pi/2,\pi/2)]$, where $z_h$ is the maximum occupied $|Z|$, bounded below by 1\,mm. At each $(Y,Z)$, the left and right torso limits move inward by $\omega_jd_Lt(z)$ and $\omega_jd_Rt(z)$. Only occupancy inside the traced torso interval expanded by $1.2$ is eligible for deletion; exterior material is retained. Since $0\leq\omega_jt(z)\leq1$ and $0\leq d\leq0.40w_{\rm loc}$, the displacement is bounded and the adjusted occupancy is a subset of the input. A zero displacement is a no-op and cannot add section area. Actual section-area change is $\Delta A=h^2(N_{\rm before}-N_{\rm after})\geq0$. These bounds establish the operation's direction, not the correctness of the deleted anatomy. The attenuation factor, cap and 15\,mm band are design parameters; global $Z=0$ is the taper origin and can give an asymmetric effect on an off-centre section. The rule is a bounded occupancy heuristic, with no anatomical identification theorem.
+
+\section{Section Measurement and Surface Export}
+\subsection{Conditioning and conic recovery}
+The nearest $XZ$ slice is selected for each measurement level, giving a level quantization error no greater than $h/2$ within the sampled range. After torso clipping and any conditional depth cap, an OpenCV elliptical closing with nominal radius 4\,mm fills small gaps. The largest eight-connected section component is retained and opened with radius $r=0.9\min(W/2,D/2)$, rounded to grid units with a minimum of two pixels. In set notation, closing is $(S\oplus B)\ominus B$ and opening is $(S\ominus B)\oplus B$. The latter imposes substantial section rounding, which influences the reported circumference.
+
+All contour points are retained, and the contour of largest area is converted to metric $(X,Z)$ coordinates. A Graham scan~\cite{graham1972efficient} deduplicates points, sorts by polar angle, retains the farther collinear point, and removes non-left turns. Complexity is $O(n\log n)$. At least five hull vertices are required. Convexification discards section concavities before fitting.
+
+Let $p_i$ be hull vertices, $\bar p$ their mean, and
+$\rho=[n^{-1}\sum_i\|p_i-\bar p\|^2]^{1/2}$ their isotropic coordinate scale.
+The corrected reference uses $v_i=(p_i-\bar p)/\rho=(\xi_i,\eta_i)^T$ and solves
+\begin{equation}
+ \min_\beta\|M\beta+\mathbf1\|^2,\qquad
+ M_i=(\xi_i^2,\xi_i\eta_i,\eta_i^2,\xi_i,\eta_i).
+ \label{eq:fit}
+\end{equation}
+An SVD-backed least-squares solve avoids forming normal equations. The design must have rank five at the solver's relative rank threshold. Nonfinite coordinates, fewer than five distinct points and zero coordinate spread are rejected. If $\beta=(\beta_1,\ldots,\beta_5)^T$, physical coefficients are
+$\phi=(\beta_1/\rho^2,\beta_2/\rho^2,\beta_3/\rho^2,\beta_4/\rho,\beta_5/\rho)^T=(A,B,C,D,E)^T$.
+They describe the fixed-constant conic $Ax^2+Bxz+Cz^2+Dx+Ez+1=0$ in millimetres relative to $\bar p$. Equal hull-vertex weights are used. An unrestricted algebraic fit may be a non-ellipse; ellipse-specific constrained fitting provides a relevant alternative~\cite{fitzgibbon1999direct}.
+\begin{equation}
+ Q=\begin{pmatrix}A&B/2\\B/2&C\end{pmatrix},\quad l=\binom DE,
+ \quad \mu=-\tfrac12Q^{-1}l,\quad
+ F=\tfrac14l^TQ^{-1}l-1.
+ \label{eq:recover}
+\end{equation}
+Completing the square gives $(u-\mu)^TQ(u-\mu)=F$. The reference solves $Qq=l$ rather than explicitly forming $Q^{-1}$. Eigenvectors determine orientation; the positive ratios $F/\lambda_i$ give squared semi-axes, sorted $a\geq b>0$, with centre $\bar p+\mu$. The quadratic form must be definite, and each eigenvalue magnitude must exceed $10^{-12}\|Q\|_2$. Invalid axis ratios cause rejection. The scaled design condition number is recorded; acceptance of a fit supplies no accuracy guarantee at untested conditioning or incomplete arcs. Residual RMS is dimensionless. The fitted ellipse can extend beyond its source section.
+
+Ramanujan's approximation~\cite{ramanujan1914modular} supplies the perimeter in millimetres,
+\begin{equation}
+ P(a,b)=\pi[3(a+b)-\sqrt{(3a+b)(a+3b)}],\qquad C=P(a,b)/10\text{ cm}.
+ \label{eq:perimeter}
+\end{equation}
+The reference replaces the historical axis-recovery expression and normal-equation solver. Their exact difference, historical outputs and source hashes are archived. Those human estimates are excluded from corrected-method results; the application has not been patched or re-evaluated end-to-end.
+
+\subsection{Shoulder path and linear proxy}
+At the engineering acromion level $Y_a=0.182H_m$, let $W,D$ be unexpanded traced width and profile depth. When $W,D>0$ and $D/W\leq0.6$, shoulder length is $S=\tfrac12P(W/2,D/2)$. This half-perimeter assumes that shoulder endpoints coincide with the transverse extrema of a symmetric section and that the posterior path is elliptical. Its contribution is a specified path model with explicit applicability checks; a tape trajectory can differ from these assumptions.
+
+When this path cannot be computed, frontal silhouette tips are sought between $Y_s-20$\,mm and $Y_s+0.4(Y_e-Y_s)$, where $Y_e$ is the lower available elbow level. Missing elbows give an upper limit $Y_s+0.18(Y_h-Y_s)$. The trace retains the arm-fused prefix, applies a quadratic Savitzky--Golay window of at most nine rows, and selects each half-width maximum. A post-peak taper of at least 5\,mm on each side marks reliable tips. Their two-dimensional Euclidean separation gives projected breadth; a tip-to-landmark breadth ratio outside $[1,1.5]$ is advisory. Otherwise the fallback is the shoulder-landmark chord multiplied by $s_f$. The legacy fallback label can cover either breadth method, so the method must accompany the value. The output historically named inseam is $Y_{\rm ankle}-Y_{\rm hip}$, a vertical hip-to-ankle proxy without a corresponding tape reference in the historical development records.
+
+\subsection{Display geometry and retained outputs}
+Display rounding is applied to a separate volume. Each $XZ$ component is opened with a Euclidean distance-transform element of radius $0.9$ times its smaller half-extent, with a two-pixel minimum; an empty opening retains the component. Limb seeds satisfy frontal vertical thickness divided by profile-core depth $<0.5$, grow through ratios $<0.85$, and require frontal area at least $2000$\,mm$^2$. Limb $YZ$ openings are united with the rounded $XZ$ result. Distance-transform erosion uses $d_{\rm background}>r$ and dilation uses distance to the eroded set $\leq r$, with padding exceeding $r$. These elements differ from the rasterized OpenCV elements used for section measurement.
+
+Junction repair attempts chessboard-distance closings of 20, 40, 60, and 100\,mm, intersecting the result with the unrounded profile volume. Processing stops at one component or residual components totalling at most $0.5\%$. The largest component is exported, with an advisory if more than $1\%$ is removed. Zero padding of $\lceil3\sigma_g\rceil+1$ voxels precedes Gaussian smoothing with $\sigma_g=1$ voxel and marching cubes at isovalue $0.5$ with spacing $h$~\cite{lorensen1987marching}. Origin and padding offsets are undone, and $(x,y,z)$ maps to $(x,z,y_{\max}-y)$ for a floor-based, vertical-$Z$ display frame. The largest mesh component is retained; a watertight mesh with negative signed volume is inverted. Twelve Taubin passes~\cite{taubin1995signal} use $\lambda=0.5$ and $\nu=-0.53$ under the applicable library convention. Optional simplification targets 150\,000 faces.
+
+Historical outputs retain masks, occupancy and measurement records, while some advisory messages remain only in logs; retaining image/model identifiers and numerical settings is therefore necessary. Dense Boolean occupancy consumes approximately $N_XN_YN_Z$ bytes, and each full double-precision coordinate array adds eight times this storage. Chunking limits temporary arrays while retaining dense output storage.
+
+The research record contract separates endpoint and method identity, preventing a shoulder breadth fallback from being labelled as a posterior path. Records carry attempt identifier, units, source branch, level, fallback reason, geometry flags, rejection status and sensitivity availability. Rejected attempts have null measurements and remain in the attempted-input denominator. Schema tests reject ambiguous labels and unavailable sensitivity encoded as zero. The unchanged application does not automatically implement this contract.
+
+\begin{table}[htbp]
+\centering
+\caption{Source geometry and defined outputs. Exported display surfaces supply no measurement in this table.}
+\label{tab:branches}
+\small
+\begin{tabular}{p{0.34\linewidth}p{0.57\linewidth}}
+\toprule
+Output & Source and interpretation\\
+\midrule
+Chest-level girth & Profile-column occupancy; conventional hull only as a flagged fallback.\\
+Waist-proxy/hip-landmark girth & Waist-adjusted conventional occupancy at the specified levels.\\
+Posterior shoulder path & Half-ellipse model from frontal width and profile depth.\\
+Projected shoulder breadth & Silhouette tips or landmark chord, identified separately from path.\\
+Hip-to-ankle vertical proxy & Frontal landmark heights; no inseam interpretation.\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For the stated display coordinate map, the linear part has determinant $+1$ and preserves Euclidean distance; a known-object contract test verifies the mapping and floor offset. Mesh smoothing and junction repair alter the displayed surface, so this coordinate check supplies no anatomical surface-accuracy evidence. There is no full-resolution human runtime or peak-memory benchmark in this study; computational results are restricted to the synthetic kernels and grids actually executed.
+
+\section{Conditional Sensitivity}
+Let $g_b(q)$ denote the complete measurement for a fixed source branch $b$, where $q$ contains its mask coordinates, stature, levels and settings. First-order propagation, $\operatorname{Var}(g_b)\simeq J_b\Sigma_qJ_b^T$, requires a differentiable branch and a justified input covariance~\cite{jcgm2008}. The present verification does not estimate that covariance from human images. Component selection, rasterized morphology and rejection can make $g_b$ nonsmooth. The historical five-term root-sum-square index is excluded from the proposed reporting method; no confidence interval or coverage is claimed.
+
+Within the ellipse model, write $q_e=(3a+b)(a+3b)$. Exact derivatives of the approximation in Eq.~\eqref{eq:perimeter} are
+\begin{equation}
+ P_a=\pi\left(3-\frac{3a+5b}{\sqrt{q_e}}\right),\qquad
+ P_b=\pi\left(3-\frac{5a+3b}{\sqrt{q_e}}\right).
+ \label{eq:derivative}
+\end{equation}
+For axis perturbations $(\Delta a,\Delta b)$, $\Delta P\simeq P_a\Delta a+P_b\Delta b$. This is a conditional ellipse calculation: a depth perturbation in a rotated section need not change only $b$. For the explicitly axis-aligned shoulder model $S=P(W/2,D/2)/2$, the corresponding derivatives are $\partial S/\partial W=P_a/4$ and $\partial S/\partial D=P_b/4$. A common stature perturbation gives $\Delta P/P\simeq\Delta H/H$ in the continuous scale-equivariant model; it is one shared contribution, and is not duplicated as independent view noise. A smoothly varying section also gives $\Delta C\simeq C'(Y)\Delta Y$ under a small level displacement. None of these identities supplies missing camera or path-model error.
+
+The reference offers a conditional algebraic diagnostic. With normalized design $M$, residual $r=M\beta+\mathbf1$ and $n>5$, it computes $\hat\sigma^2=r^Tr/(n-5)$ and $\Sigma_\beta=\hat\sigma^2(M^TM)^{-1}$ through the SVD factors. This covariance assumes a fixed design and independent equal-variance algebraic residuals; it is not a statistical model of noisy contour coordinates. If $T=\operatorname{diag}(\rho^{-2},\rho^{-2},\rho^{-2},\rho^{-1},\rho^{-1})$, then $\Sigma_\phi=T\Sigma_\beta T^T$ and a numerical conic-perimeter Jacobian gives the diagnostic $\sqrt{J_\phi\Sigma_\phi J_\phi^T}$. Central differences use steps $\max(10^{-5}|\phi_i|,10^{-12})$ in the coefficient's own units and the corrected recovery in Eq.~\eqref{eq:recover}. Five-point fits, invalid perturbations and nonfinite covariance produce an explicit unavailable status with a reason and a null value. A successfully evaluated zero residual is a different state. No combined statistic is formed from unavailable terms.
+
+The former auxiliary-area and frontal-only shoulder budgets are omitted because they were not derivatives of the outputs. Waist displacement is rerun with voxel/area changes recorded; its section-fit/perimeter response remains untested. Complete branch sensitivity requires paired perturbations with fixed endpoint definitions, recorded branch changes/rejections and empirical capture variation before a physical uncertainty interpretation.
+
+\section{Numerical Verification and Evidence Scope}
+\subsection{Ellipse recovery and perimeter}
+The reference suite uses random seed 20261021. An ellipse with axes $(160,100)$\,mm at eleven nonuniform angles is subjected to 27 combinations of scale ($0.01$, $1$, $100$), rotation ($0$, $0.47$, $1.2$ radians) and translation ($(0,0)$, $(20,-10)$, $(10^6,-2\times10^6)$\,mm). Maximum relative axis error is $3.35\times10^{-11}$. Exact aspect ratios 10 and 100 with full and short-arc samples have errors below $4.92\times10^{-12}$ and scaled design condition at most $1.58\times10^4$. These checks do not guarantee stability for noisy partial contours. Insufficient/repeated/collinear/nonfinite points and a hyperbolic quadratic form exercise rejection.
+
+Thirty trials at each independent Gaussian coordinate-noise level ($0.2$, $1$, $3$\,mm standard deviation) use 180 nonuniform ellipse samples at rotation $0.47$ radians. Perimeter RMSE against the exact generating ellipse is $0.109$, $0.597$ and $1.759$\,mm, respectively. This fixed-shape noise experiment supplies no physical uncertainty calibration. Five-point fits and invalid coefficient perturbations return unavailable sensitivity; exact fits retain an available, near-zero diagnostic.
+
+The perimeter reference is $4aE(m)$, where $m=1-b^2/a^2$ and $E$ is the complete elliptic integral in the parameter convention. Across 901 equally spaced ratios $b/a\in[0.1,1]$, the maximum relative error of Eq.~\eqref{eq:perimeter} is $8.42\times10^{-4}$, occurring at $b/a=0.1$. The analytic derivatives in Eq.~\eqref{eq:derivative} agree with central differences to less than $10^{-7}$ for tested axes $(100,100)$, $(160,100)$ and $(200,20)$\,mm. The approximation error and the fitting error are distinct; neither bounds errors caused by a non-elliptical body section.
+
+\subsection{Section morphology and fitted perimeter}
+Thirty-two fixed cases cross known elliptical and rectangular sections with grid spacing $h\in\{2,4\}$\,mm, opening fractions $\{0,0.25,0.5,0.9\}$ and 4\,mm closing on/off. Both shapes have half-extents $(160,100)$\,mm. The source morphology and Graham scan are frozen historical functions; the corrected reference fits the resulting hull vertices. Fraction zero bypasses opening. The reference perimeter is the exact elliptic integral for the ellipse and $4(a+b)=1040$\,mm for the rectangle. Closing has no effect on these clean inputs; all 32 attempts remain in the record.
+
+\begin{table}[htbp]
+\centering
+\caption{Fitted perimeter error in millimetres after section opening. Each entry covers closing on/off, which agree here. Four unrounded rectangle attempts fail the five-hull-vertex requirement.}
+\label{tab:morphology}
+\small
+\begin{tabular}{rrrrr}
+\toprule
+Opening fraction & Ellipse, 2\,mm & Ellipse, 4\,mm & Box, 2\,mm & Box, 4\,mm\\
+\midrule
+0    &$-0.97$&$-2.73$&Rejected&Rejected\\
+0.25 &$-1.37$&$-4.15$&$+49.11$&$+53.45$\\
+0.50 &$-1.35$&$-3.46$&$-39.02$&$-22.01$\\
+0.90 &$-44.92$&$-37.77$&$-137.09$&$-131.26$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The 0.9 opening substantially shortens an already elliptical section (Table~\ref{tab:morphology}); smaller errors on other test configurations do not justify a new default. For a true rectangle, replacing its perimeter with a fitted ellipse changes the measurand. These results require reassessment of the opening prior and fitted-girth behavior before integrated validation. They do not identify the cause of any archived human error. Errors here combine discretization, morphology and conic/perimeter modelling; no human anatomical benefit follows.
+
+\subsection{Profile-constraint experiments}
+Controlled experiments use a $151\times200\times121$ grid with 4\,mm spacing over an 800\,mm-high box torso and prescribed limbs. The torso half-width is 100\,mm and its baseline depth is 120\,mm; horizontal limbs have 40\,mm vertical and sagittal extent. Binary frontal and profile silhouettes are exact projections of these primitives. Additional cases introduce a separate profile run, merged contamination, true depth variation, or displaced/vertical limbs. The oblique case changes the frontal limb centre by 0.6\,mm per lateral millimetre while keeping its prescribed vertical and sagittal thicknesses. Frozen historical profile-filtering and run-length kernels are used. Perception, torso-level selection, section morphology and girth fitting are excluded from this experiment.
+
+\begin{table}[htbp]
+\centering
+\caption{Synthetic occupancy intersection-over-union against prescribed truth. H: conventional all-run hull; W: widest profile run without filtering; F: filtered interval without column cap; C: filtered interval with column cap. F and C use the numerical membership tolerance specified in the text.}
+\label{tab:synthetic}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Case & H & W & F & C\\
+\midrule
+Horizontal limbs &0.94769&0.94769&0.94769&1.00000\\
+Extra profile run &0.90682&0.94769&0.94769&1.00000\\
+Merged artifact &0.81423&0.81423&0.94769&1.00000\\
+True depth bulge &0.87533&0.87533&0.82112&0.86010\\
+Sagittally displaced limb &0.90682&0.89322&0.89322&0.94107\\
+Oblique constructed prism &0.94769&0.94769&0.94769&1.00000\\
+Vertical limb &0.90914&0.90914&0.90914&0.90914\\
+Smooth depth variation &0.96696&0.96696&0.81606&0.85810\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:synthetic} separates favorable mechanisms from counterexamples. Selecting one run removes separated contamination; filtering removes the constructed merged artifact, and the column cap removes replicated limb depth. Genuine depth variation is also smoothed: on the smooth-depth case, full coupling reduces IoU from 0.96696 to 0.85810. A vertical limb receives no improvement, and a shared sagittal midpoint leaves displaced limb voxels incorrectly positioned. Perfect overlap in the oblique constructed prism follows its chosen vertical/depth thicknesses and does not establish robustness for anatomically oblique arms. Repeating the smooth-depth primitive with the same pixel-window settings at 2, 4 and 8\,mm spacing gives coupled IoUs 0.97738, 0.85810 and 0.80972. This variation demonstrates the dependence on physical filter bandwidth and sampling.
+
+A numerical regression exposed floating-point drift when Savitzky--Golay filtering nominally constant, grid-aligned endpoints. Direct interval comparison removed boundary layers: the clean case's historical coupled IoU was 0.96862. The research kernel admits $z\in[z_- -\epsilon,z_++\epsilon]$ with $\epsilon=10^{-8}h$ in the same length units as $h$, giving the intended clean occupancy in Table~\ref{tab:synthetic}. This is an arithmetic tolerance, eight orders below one cell, and supplies no physical error allowance. Tests at $h=2$, 4 and 8\,mm recover boundaries drifted by $10^{-12}h$, preserve the loss caused by a genuine $10^{-5}h$ inset and add no adjacent voxel layer. Raw historical and tolerance-based results are both retained; this kernel revision is separate from the unchanged full application.
+
+Waist tests use a prescribed half-width $w(Y)=80+0.001(Y-500)^2$\,mm and an otherwise box-like section. The rule gives $\kappa=0.002$\,mm$^{-1}$ and $d=20.8712$\,mm over a 400\,mm trace span. At zero displacement no voxels change. At half, full and capped stronger displacements, no voxels are added and respectively 4736, 8298 and 11984 are removed. Shifting the sagittal coordinates by 40\,mm changes the full-displacement deletion to 9060 voxels. The same silhouettes admit an unadjusted truth or one constructed from the deletion prior: the rule worsens overlap with the former and improves it with the latter. This counterexample shows why deletion bounds alone cannot establish anatomical benefit. A matched human waist/morphology ablation remains necessary.
+
+The component-selection test also loses 729 voxels representing a deliberately disconnected valid limb. An empty profile is rejected. Missing pose and clipping after alignment have not been exercised end-to-end. The supplied tests account for their constructed cases; they do not estimate the attempted-capture failure rate of a human system. Analytic camera examples likewise illustrate a conditional effect: a $(160,100)$\,mm elliptical section viewed at $10^\circ$ yaw has an apparent frontal half-width 0.923\% smaller under orthographic projection. This is not a validated pose tolerance.
+
+\subsection{Interpretation and requirements for human evaluation}
+Archived historical observations precede the corrected reference and have undocumented endpoints/acquisition metadata. Source comments confirm that rounding was checked on development photographs; these subjects cannot constitute an untouched test set. Settings are frozen for the supplied synthetic experiments. No corrected integrated human pipeline or held-out human result is established.
+
+Physical validation requires matched tape/image levels and shoulder endpoints, separate breadth evaluation, documented tape procedure/operators/repeats, and preserved reference intervals/missingness. Repeated sites do not increase the independent participant count; agreement analysis must respect endpoint definitions and sampling~\cite{bland1986}. Utility requires independent, ethically governed acquisition retaining every attempted capture.
+
+\section{Conclusion}
+The pipeline couples filtered profile intervals to frontal column thickness and defines branch-specific measurements. Synthetic tests verify the corrected conic reference and expose geometry and morphology failure cases. The waist and shoulder models require matched physical references. Independent evaluation remains necessary to establish anthropometric accuracy or an advantage over prior methods.
+
+\paragraph{Availability and declarations.}
+The review package provides the manuscript, corrected conic reference, synthetic tests/results and audit manifest distinguishing them from historical application kernels. It is not an integrated public pipeline release and includes no human images. Authorship/affiliation/contact, funding and conflict declarations remain to be supplied. Historical consent/privacy arrangements and applicable ethics approval, exemption or review status are unestablished. These author-dependent requirements must be completed before submission; no permission or clearance is inferred.
+
+\begin{thebibliography}{99}
+\small
+\setlength{\itemsep}{0.1em}
+\setlength{\parskip}{0pt}
+\bibitem{iso8559}
+International Organization for Standardization, \emph{Size designation of clothes---Part 1: Anthropometric definitions for body measurement}, ISO 8559-1:2017, 2017. [Online]. Available: \url{https://www.iso.org/standard/61686.html}.
+
+\bibitem{meunier2000}
+P.~Meunier and S.~Yin, ``Performance of a 2D image-based anthropometric measurement and clothing sizing system,'' \emph{Applied Ergonomics}, vol.~31, no.~5, pp.~445--451, 2000. doi: \href{https://doi.org/10.1016/S0003-6870(00)00023-5}{10.1016/S0003-6870(00)00023-5}.
+
+\bibitem{hung2004}
+P.~C.-Y.~Hung, C.~P.~Witana, and R.~S.~Goonetilleke, ``Anthropometric measurements from photographic images,'' in \emph{Work with Computing Systems 2004}, H.~M.~Khalid, M.~G.~Helander, and A.~W.~Yeo, Eds. Kuala Lumpur: Damai Sciences, 2004, pp.~764--769. [Online]. Available: \url{https://www.ieda.ust.hk/dfaculty/ravi/papers/wwcs2004_1.pdf}.
+
+\bibitem{aslam2017}
+M.~Aslam, F.~Rajbdad, S.~Khattak, and S.~Azmat, ``Automatic measurement of anthropometric dimensions using frontal and lateral silhouettes,'' \emph{IET Computer Vision}, vol.~11, no.~6, pp.~434--447, 2017. doi: \href{https://doi.org/10.1049/iet-cvi.2016.0406}{10.1049/iet-cvi.2016.0406}.
+
+\bibitem{laurentini1994visual}
+A.~Laurentini, ``The visual hull concept for silhouette-based image understanding,'' \emph{IEEE Transactions on Pattern Analysis and Machine Intelligence}, vol.~16, no.~2, pp.~150--162, 1994.
+
+\bibitem{loper2015smpl}
+M.~Loper, N.~Mahmood, J.~Romero, G.~Pons-Moll, and M.~J.~Black, ``SMPL: A skinned multi-person linear model,'' \emph{ACM Transactions on Graphics}, vol.~34, no.~6, article~248, 2015.
+
+\bibitem{varol2018bodynet}
+G.~Varol, D.~Ceylan, B.~Russell, J.~Yang, E.~Yumer, I.~Laptev, and C.~Schmid, ``BodyNet: Volumetric inference of 3D human body shapes,'' in \emph{Proceedings of ECCV}, pp.~20--36, 2018.
+
+\bibitem{ji2019}
+Z.~Ji, X.~Qi, Y.~Wang, G.~Xu, P.~Du, X.~Wu, and Q.~Wu, ``Human body shape reconstruction from binary silhouette images,'' \emph{Computer Aided Geometric Design}, vol.~71, pp.~231--243, 2019. doi: \href{https://doi.org/10.1016/j.cagd.2019.04.019}{10.1016/j.cagd.2019.04.019}.
+
+\bibitem{chen2025compact}
+Q.~Chen, L.~Song, X.~Zhang, G.~Zhang, H.~Lu, J.~Liu, Y.~Pan, and W.~Luo, ``Accurate 3D anthropometric measurement using compact multi-view imaging,'' \emph{Measurement}, vol.~247, article~116777, 2025. doi: \href{https://doi.org/10.1016/j.measurement.2025.116777}{10.1016/j.measurement.2025.116777}.
+
+\bibitem{lugaresi2019mediapipe}
+C.~Lugaresi et al., ``MediaPipe: A framework for building perception pipelines,'' arXiv:1906.08172, 2019.
+
+\bibitem{mediapipeguide}
+Google AI Edge, ``Pose landmark detection guide.'' [Online]. Available: \url{https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker}. Accessed October 17, 2026.
+
+\bibitem{rother2004grabcut}
+C.~Rother, V.~Kolmogorov, and A.~Blake, ``GrabCut: Interactive foreground extraction using iterated graph cuts,'' \emph{ACM Transactions on Graphics}, vol.~23, no.~3, pp.~309--314, 2004.
+
+\bibitem{schonemann1966generalized}
+P.~H.~Sch\"onemann, ``A generalized solution of the orthogonal Procrustes problem,'' \emph{Psychometrika}, vol.~31, pp.~1--10, 1966.
+
+\bibitem{savitzky1964smoothing}
+A.~Savitzky and M.~J.~E.~Golay, ``Smoothing and differentiation of data by simplified least squares procedures,'' \emph{Analytical Chemistry}, vol.~36, no.~8, pp.~1627--1639, 1964.
+
+\bibitem{graham1972efficient}
+R.~L.~Graham, ``An efficient algorithm for determining the convex hull of a finite planar set,'' \emph{Information Processing Letters}, vol.~1, no.~4, pp.~132--133, 1972.
+
+\bibitem{fitzgibbon1999direct}
+A.~Fitzgibbon, M.~Pilu, and R.~B.~Fisher, ``Direct least square fitting of ellipses,'' \emph{IEEE Transactions on Pattern Analysis and Machine Intelligence}, vol.~21, no.~5, pp.~476--480, 1999.
+
+\bibitem{ramanujan1914modular}
+S.~Ramanujan, ``Modular equations and approximations to $\pi$,'' \emph{Quarterly Journal of Mathematics}, vol.~45, pp.~350--372, 1914.
+
+\bibitem{lorensen1987marching}
+W.~E.~Lorensen and H.~E.~Cline, ``Marching cubes: A high resolution 3D surface construction algorithm,'' \emph{ACM SIGGRAPH Computer Graphics}, vol.~21, no.~4, pp.~163--169, 1987.
+
+\bibitem{taubin1995signal}
+G.~Taubin, ``A signal processing approach to fair surface design,'' in \emph{Proceedings of SIGGRAPH}, pp.~351--358, 1995.
+
+\bibitem{jcgm2008}
+Joint Committee for Guides in Metrology, \emph{Evaluation of measurement data---Guide to the expression of uncertainty in measurement}, JCGM~100:2008. [Online]. Available: \url{https://doi.org/10.59161/JCGM100-2008E}.
+
+\bibitem{bland1986}
+J.~M.~Bland and D.~G.~Altman, ``Statistical methods for assessing agreement between two methods of clinical measurement,'' \emph{The Lancet}, vol.~327, no.~8476, pp.~307--310, 1986. doi: \href{https://doi.org/10.1016/S0140-6736(86)90837-8}{10.1016/S0140-6736(86)90837-8}.
+\end{thebibliography}
+\end{document}

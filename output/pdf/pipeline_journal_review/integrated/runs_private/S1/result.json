@@ -1,0 +1,79 @@
+{
+  "version": "integrated-candidates-v3.0",
+  "attempt_id": "S1",
+  "evidence_class": "development_rgb_not_independent",
+  "input_mode": "rgb",
+  "height_cm": 172.0,
+  "status": "rejected",
+  "reason": "input_mask_border_contact",
+  "policy": {
+    "version": "integrated-candidates-v3.0",
+    "candidate_selection": "report_all_named_candidates_no_oracle_selection",
+    "base_waist_deletion": false,
+    "base_section_opening": false,
+    "base_section_closing": false,
+    "whole_volume_component_deletion": false,
+    "whole_volume_extent_smoothing": false,
+    "conditional_depth_cap": false,
+    "front_torso_clip_multiplier": 1.15,
+    "fragment_rejection_fraction": 0.01,
+    "mask_threshold": 0.5,
+    "minimum_frame_foreground_fraction": 0.02,
+    "silhouette_level_fractions_from_crown": {
+      "shoulder": 0.182,
+      "hip": 0.47,
+      "ankle": 0.961
+    },
+    "waist_shoulder_hip_fraction": 0.688,
+    "chest_shoulder_waist_fraction": 0.35,
+    "profile_membership_epsilon_over_h": 1e-08,
+    "sensitivity": "unavailable_not_calibrated; no legacy RSS",
+    "display_export": "not executed; measurements do not depend on a mesh"
+  },
+  "stages": [
+    {
+      "stage": "front_perception",
+      "elapsed_seconds": 1.5122394999489188
+    },
+    {
+      "stage": "side_perception",
+      "elapsed_seconds": 0.16443370003253222
+    }
+  ],
+  "inputs": {
+    "front_sha256": "69aeaedbc760503f4b1d3db26e5cb5880b34226a05ac27de80dde2d30525b696",
+    "side_sha256": "b6b0bbb7463dea545251057ed96b46d4c104cb780cc34ee4d578a16903a4179d"
+  },
+  "runtime_environment": {
+    "python": "3.12.9",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel"
+  },
+  "sections": {},
+  "physical_uncertainty": {
+    "available": false,
+    "value_mm": null,
+    "reason": "not_calibrated"
+  },
+  "model_sha256": "64437af838a65d18e5ba7a0d39b465540069bc8aae8308de3e318aad31fcbc7b",
+  "exception_type": "ValueError",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\SUMANTH S SHETTY\\Documents\\GitHub\\Anthropometry-V2\\output\\pdf\\pipeline_journal_review\\integrated\\run_pipeline.py\", line 164, in execute\n    side,side_lm,side_info=stage('side_perception',lambda:raw_view(args.side,args.model))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\SUMANTH S SHETTY\\Documents\\GitHub\\Anthropometry-V2\\output\\pdf\\pipeline_journal_review\\integrated\\run_pipeline.py\", line 155, in stage\n    try:return fn()\n               ^^^^\n  File \"C:\\Users\\SUMANTH S SHETTY\\Documents\\GitHub\\Anthropometry-V2\\output\\pdf\\pipeline_journal_review\\integrated\\run_pipeline.py\", line 164, in <lambda>\n    side,side_lm,side_info=stage('side_perception',lambda:raw_view(args.side,args.model))\n                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\SUMANTH S SHETTY\\Documents\\GitHub\\Anthropometry-V2\\output\\pdf\\pipeline_journal_review\\integrated\\run_pipeline.py\", line 109, in raw_view\n    if border(mask):raise ValueError('input_mask_border_contact')\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: input_mask_border_contact\n",
+  "elapsed_seconds": 2.079932799912058,
+  "process_memory": {
+    "available": true,
+    "peak_working_set_bytes": 491216896,
+    "peak_pagefile_bytes": 1531351040,
+    "method": "Windows GetProcessMemoryInfo; process lifetime"
+  },
+  "source_hashes": {
+    "source\\measurement_extraction.py": "8446152e67b02c29049372fda83788fb054627e7006a3fe24ae3881da52279a7",
+    "source\\mediapipe_silhouette.py": "37812ef74ca6456276878ca68afcf7b85a23977d8413936c8979613d98743014",
+    "source\\pose_normalization.py": "ef2cb5927814f34644461c00ccf98c4d3ad00d7b0d4393c8abd9e26a70711f27",
+    "source\\profile_carve.py": "bc17a726abfd73f266700dec8771d0ad46bf4a4aaa0b5c896b9eae370b292cc7",
+    "source\\visual_hull.py": "852f88d8877dea8b4b36050c51f2303d0266b51def9d10edf6ee1b878efb9720",
+    "source\\voxel_memory.py": "403fd1d30370d991d90fb1b280aa7b31d575da9b633ee866c408c134c0387e4a",
+    "source\\waist_correction.py": "32cdf21fcce5f20cc99eb38c37ce83be6eb7287551618239c9cd31520cec2489"
+  },
+  "candidate_module_sha256": "f21dca3207f1456ea112def5ca7642d4bfd3e1352d9295753642655a0ea3383b",
+  "driver_sha256": "93f0057c686ebb7162b1c40de07f4d8de5d79bb90fd5fa9a6650084acb76ccb6"
+}

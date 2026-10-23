@@ -132,10 +132,10 @@ class BrowserPreprocessingTests(unittest.TestCase):
             expected=cv2.resize(values,(case['padded'],case['h']),interpolation=cv2.INTER_LINEAR)[:,:case['w']]>0.5
             np.testing.assert_array_equal(result, expected.ravel())
 
-    def test_browser_refines_crop_and_sends_only_binary_mask_and_points(self):
+    def run_browser_preparation(self, scenario='refined'):
         result=self.node("""
             const fs=require('fs'),vm=require('vm');
-            JSON.parse(fs.readFileSync(0,'utf8'));
+            const {scenario}=JSON.parse(fs.readFileSync(0,'utf8'));
             require('./static/anthropometry-preprocessing.js');
             global.window=global;
             const created=[],preview={naturalWidth:71,naturalHeight:91,decode:async()=>{}};
@@ -147,15 +147,22 @@ class BrowserPreprocessingTests(unittest.TestCase):
               canvas.toBlob=(callback,type)=>callback({type,pixels:Array.from(canvas.pixels)});
               created.push(canvas);return canvas;
             }};
-            let calls=0,closed=0;
+            let calls=0,closed=0,detectorsClosed=0;
             const values=new Float32Array(72*91);
             for(let y=10;y<81;y++)for(let x=20;x<51;x++)values[y*72+x]=1;
             const mask=()=>({width:72,height:91,getAsFloat32Array:()=>values,close:()=>closed++});
             const detector={detect:()=>{
               const crop=calls++%2===1;
+              if(crop && scenario==='throw') throw new Error('Simulated WASM abort');
               return {landmarks:[Array.from({length:33},()=>({x:crop?0.4:0.1,y:crop?0.6:0.1,visibility:0.9}))],
                 segmentationMasks:[mask()]};
-            }};
+            },close:()=>{detectorsClosed++;throw new Error('Aborted runtime cannot close');}};
+            const detect=detector.detect;
+            detector.detect=(canvas)=>{
+              const result=detect(canvas);
+              if(calls%2===0 && scenario==='missing') result.landmarks=[];
+              return result;
+            };
             const html=fs.readFileSync('./templates/index.html','utf8');
             const script=[...html.matchAll(/<script([^>]*)>([\\s\\S]*?)<\\/script>/g)]
               .find(m=>m[2].includes('const MEDIAPIPE_VERSION'))[2];
@@ -164,21 +171,57 @@ class BrowserPreprocessingTests(unittest.TestCase):
             prepareAnthropometryInputs({type:'image/jpeg'},{type:'image/jpeg'},()=>{}).then(result=>{
               const landmarks=JSON.parse(result.front.landmarks);
               console.log(JSON.stringify({calls,closed,preprocessing:result.preprocessing,
+                detectorsClosed,refinement:result.front.refinement,
                 cropWidth:created[1].width,cropHeight:created[1].height,
                 point:landmarks.left_shoulder,keys:Object.keys(result.front),
                 binary:result.front.silhouette.pixels.every(v=>v===0||v===255)}));
             }).catch(e=>{console.error(e);process.exitCode=1;});
-        """,{})
+        """,{'scenario':scenario})
+        return result
+
+    def test_browser_refines_crop_and_sends_only_binary_mask_and_points(self):
+        result=self.run_browser_preparation()
         self.assertEqual(result['calls'],4)
         self.assertEqual(result['closed'],4)
         self.assertEqual(result['preprocessing'],'browser-v2')
-        self.assertEqual(result['keys'],['silhouette','landmarks'])
+        self.assertEqual(result['keys'],['silhouette','landmarks','refinement'])
+        self.assertEqual(result['refinement'],'cropped')
+        self.assertEqual(result['cropWidth']%4,0)
         self.assertTrue(result['binary'])
         self.assertGreater(result['cropHeight'],91)
         # The crop is x=16..54, y=0..90; coordinates must map back to 71x91.
         scale=1024/91
-        self.assertAlmostEqual(result['point']['x'],(16+0.4*int(39*scale)/scale)/71)
+        raster_width=int(39*scale)
+        padded_width=raster_width+(-raster_width)%4
+        self.assertAlmostEqual(result['point']['x'],(16+0.4*padded_width*39/raster_width)/71)
         self.assertAlmostEqual(result['point']['y'],0.6)
+
+    def test_crop_inference_failure_keeps_full_frame_pose_for_both_photos(self):
+        result=self.run_browser_preparation('throw')
+        self.assertEqual(result['calls'],4)
+        self.assertEqual(result['closed'],2)
+        self.assertEqual(result['detectorsClosed'],2)
+        self.assertEqual(result['refinement'],'full_frame_fallback')
+        self.assertAlmostEqual(result['point']['x'],0.1*72/71)
+        self.assertAlmostEqual(result['point']['y'],0.1)
+
+    def test_empty_crop_landmarks_keep_full_frame_pose(self):
+        result=self.run_browser_preparation('missing')
+        self.assertEqual(result['calls'],4)
+        self.assertEqual(result['closed'],4)
+        self.assertEqual(result['refinement'],'full_frame_fallback')
+        self.assertAlmostEqual(result['point']['x'],0.1*72/71)
+        self.assertAlmostEqual(result['point']['y'],0.1)
+
+    def test_served_page_has_current_refinement_code_and_is_not_cached(self):
+        import app
+        with app.app.test_client() as client:
+            response=client.get('/')
+        self.assertEqual(response.status_code,200)
+        self.assertTrue(response.cache_control.no_store)
+        self.assertEqual(response.headers['X-Anthropometry-Frontend'],'aligned-pose-crop-v3')
+        self.assertIn(b'paddedCropWidth',response.data)
+        self.assertNotIn(b'Could not refine the ${label} pose.',response.data)
 
 
 if __name__=='__main__':

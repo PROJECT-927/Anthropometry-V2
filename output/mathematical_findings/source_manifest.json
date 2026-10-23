@@ -1,0 +1,41 @@
+{
+  "prepared": "2026-10-18",
+  "source_pdf": "C:\\Users\\SUMANTH S SHETTY\\Downloads\\posa_idea.pdf",
+  "source_pdf_sha256": "98a2411d321623c27674e8879134ba2e889e6760057b2330fe5446125cc35de4",
+  "scope": "Short mathematical note plus claim/proof review; no application source changes.",
+  "source_claims_and_proof_steps_reviewed": 52,
+  "compiled_pages": 6,
+  "references": 10,
+  "references_in_first_citation_order": [
+    "hung",
+    "aslam",
+    "schneider",
+    "baudrier",
+    "kiderlen",
+    "kodmon",
+    "iso",
+    "lobo",
+    "trefethen",
+    "clarabel"
+  ],
+  "all_labels_unique_and_resolved": true,
+  "external_tex_assets_required": false,
+  "document_layout_warning_counts": {
+    "Overfull": 0,
+    "Underfull": 0,
+    "Missing character": 0
+  },
+  "visual_review_all_pages_completed": true,
+  "compiler": "Tectonic 0.17.0 (XeTeX); complete standard LaTeX article source",
+  "human_dataset_experiments_reproduced": false,
+  "numerical_scope": "Synthetic checks only; solver values are not interval-arithmetic certificates.",
+  "checks": "verification_results.json",
+  "files": {
+    "main.tex": "e28b5eb61a6b74e1fd670e9de43fba2deed889370d935002077745003bf5e150",
+    "main.pdf": "0071c8a99f260b7e0664ca5d82e13dec66132cf1ec3e6fd7b4d5a393eeb3ecec",
+    "claim_review.md": "6128e6bc4c79d6224a0cbd276475cb5361dad2307e8b11c4ab684dc5ee9ca4e4",
+    "perimeter_bounds.py": "8816b2f1ab0a4ec9d25801e5f30deb38985c3bdc358f94dd76e8bc8e243eaf53",
+    "verify_math.py": "60c0e39228b8cf448de521cea5854fd66f346331218ee5c5386cf0ede20a0ed5",
+    "verification_results.json": "23f7525ce323c290bdfeb99b31788816ffa8cf82322e234654be22ea204946f7"
+  }
+}

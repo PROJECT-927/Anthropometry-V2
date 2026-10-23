@@ -1,0 +1,66 @@
+{
+  "scope": "Selected deterministic kernel examples reproduced; no perception, human capture, fitted girth or display meshing validation.",
+  "cases": [
+    {
+      "case": "clean_horizontal_limbs",
+      "recorded_result_reproduced": true,
+      "conventional_iou": 0.9476896251089799,
+      "stable_coupled_iou": 1.0
+    },
+    {
+      "case": "true_depth_bulge",
+      "recorded_result_reproduced": true,
+      "conventional_iou": 0.8753289929353096,
+      "stable_coupled_iou": 0.8601044469061561
+    },
+    {
+      "case": "smooth_depth_variation",
+      "recorded_result_reproduced": true,
+      "conventional_iou": 0.9669627780632847,
+      "stable_coupled_iou": 0.8581046267990244
+    }
+  ],
+  "source_hashes_match": {
+    "profile_carve.py": true,
+    "waist_correction.py": true,
+    "visual_hull.py": true
+  },
+  "boundary_regressions": [
+    {
+      "spacing_mm": 2.0,
+      "epsilon_mm": 2e-08,
+      "aligned_count": 11,
+      "drift_repaired_count": 11,
+      "genuine_inset_count": 9,
+      "adjacent_layer_added": false
+    },
+    {
+      "spacing_mm": 4.0,
+      "epsilon_mm": 4e-08,
+      "aligned_count": 11,
+      "drift_repaired_count": 11,
+      "genuine_inset_count": 9,
+      "adjacent_layer_added": false
+    },
+    {
+      "spacing_mm": 8.0,
+      "epsilon_mm": 8e-08,
+      "aligned_count": 11,
+      "drift_repaired_count": 11,
+      "genuine_inset_count": 9,
+      "adjacent_layer_added": false
+    }
+  ],
+  "component_coordinate_checks": {
+    "coordinate_inverse_exact": true,
+    "coordinate_determinant": 1.0,
+    "pairwise_distances_preserved": true,
+    "display_floor_mm": 0.0,
+    "display_height_mm": 800.0,
+    "component_input_voxels": 8729,
+    "component_retained_voxels": 8000,
+    "disconnected_valid_limb_voxels_lost": 729,
+    "scope": "Known-box coordinate identity and largest-component counterexample; no actual marching-cubes or camera pipeline was evaluated."
+  },
+  "waist_interpretation": "The constructed prior-conditioned truth is an identifiability illustration. Its perfect match does not demonstrate independent correction efficacy."
+}

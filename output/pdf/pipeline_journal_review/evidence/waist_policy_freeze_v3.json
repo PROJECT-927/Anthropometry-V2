@@ -1,0 +1,52 @@
+{
+  "plan": {
+    "version": "waist-policy-verification-v3.0",
+    "base_policy": "unadjusted_never_overwritten",
+    "trace_cases": [
+      "positive_quadratic",
+      "flat",
+      "negative_quadratic",
+      "short_three_rows",
+      "near_endpoint"
+    ],
+    "section_families": [
+      "ellipse",
+      "box",
+      "superellipse4",
+      "concave"
+    ],
+    "grid_mm": 2,
+    "displacement_mm": [
+      0,
+      5,
+      10,
+      20
+    ],
+    "sagittal_offsets_mm": [
+      0,
+      40
+    ],
+    "band_mm": 15,
+    "taper_origin_z_mm": 0,
+    "invalid_cases": [
+      "negative_displacement",
+      "over_bound"
+    ],
+    "metrics": [
+      "all_attempts",
+      "actual_deleted_voxels",
+      "actual_section_area_and_perimeter_changes",
+      "base_unchanged",
+      "subset_and_convex_perimeter_nonincrease",
+      "hypothesis_rejections"
+    ],
+    "physical_scope": "Geometric admissibility and optional reporting only; no anatomical correctness"
+  },
+  "source_sha256": {
+    "waist_policy_v3.py": "590bfe1f933eea621c1c12ec579cbc9e4f4e488896d445fd15ca93f3c0ba2413",
+    "verify_waist_policy_v3.py": "9a4d5329ac2e1e066926390cd7fe3ef51992ebd42444b9f82d736e260deb4332",
+    "historical_profile_kernel.py": "d36bbdfbf90edcb994589ce168b6ada7afb23d778a060908dfc4e0e7dcc35fcf",
+    "section_candidates_v3.py": "f21dca3207f1456ea112def5ca7642d4bfd3e1352d9295753642655a0ea3383b"
+  },
+  "freeze_utc": "2026-10-22T02:36:23.420240+00:00"
+}

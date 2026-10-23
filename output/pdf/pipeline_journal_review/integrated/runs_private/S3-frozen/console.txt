@@ -1,0 +1,25 @@
+[grid] visual hull: (154, 173, 138), 3,676,596 cells, 3.5 MiB per boolean grid
+[grid] visual hull: (735, 865, 420), 267,025,500 cells, 254.7 MiB per boolean grid
+[grid] profile carve: (807, 865, 169), 117,971,295 cells, 112.5 MiB per boolean grid
+{
+  "attempt_id": "S3",
+  "status": "computed_candidate_set",
+  "reason": null,
+  "elapsed_seconds": 6.340867799939588,
+  "peak_memory": {
+    "available": true,
+    "peak_working_set_bytes": 1795821568,
+    "peak_pagefile_bytes": 2903486464,
+    "method": "Windows GetProcessMemoryInfo; process lifetime"
+  }
+}
+
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+WARNING: Logging before InitGoogle() is written to STDERR
+W0000 00:00:1792637569.459514   25780 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1792637569.506881   25780 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1792637569.585886   14768 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+W0000 00:00:1792637569.694347   31232 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1792637569.736749   31232 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1792637570.055827    9224 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1792637570.101752    9224 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.

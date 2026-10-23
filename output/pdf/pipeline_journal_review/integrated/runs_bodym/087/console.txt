@@ -1,0 +1,16 @@
+[grid] visual hull: (142, 172, 66), 1,611,984 cells, 1.5 MiB per boolean grid
+[grid] visual hull: (685, 860, 240), 141,384,000 cells, 134.8 MiB per boolean grid
+[grid] profile carve: (858, 860, 190), 140,197,200 cells, 133.7 MiB per boolean grid
+{
+  "attempt_id": "BodyM-A-087",
+  "status": "computed_candidate_set",
+  "reason": null,
+  "elapsed_seconds": 4.310488699935377,
+  "peak_memory": {
+    "available": true,
+    "peak_working_set_bytes": 964603904,
+    "peak_pagefile_bytes": 2084601856,
+    "method": "Windows GetProcessMemoryInfo; process lifetime"
+  }
+}
+

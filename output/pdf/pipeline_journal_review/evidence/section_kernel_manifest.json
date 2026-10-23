@@ -1,0 +1,13 @@
+{
+  "source_path": "C:\\Users\\SUMANTH S SHETTY\\Documents\\Anthropometry\\measurement_extraction.py",
+  "source_sha256": "3b2d3d5e101c4b2505ec85a617283a0423c9c3993e763ab06582e8b5002f5df0",
+  "functions": [
+    "_adaptive_radius_mm",
+    "_cross",
+    "_round_corners",
+    "graham_scan"
+  ],
+  "extraction": "Python AST named function source segments, unchanged bodies",
+  "kernel_sha256": "8e6b4e55d330f38bf4520bf18698874ecdbff81c64c0f44d65ee284a9ae97225",
+  "scope": "2D section morphology/convex hull only; corrected fit supplied separately"
+}

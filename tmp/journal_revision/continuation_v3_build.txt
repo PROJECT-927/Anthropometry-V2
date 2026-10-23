@@ -1,0 +1,9 @@
+note: using only cached resource files
+note: Running TeX ...
+Fontconfig error: Cannot load default config file: No such file: (null)
+note: Rerunning TeX because "main.aux" changed ...
+note: Running xdvipdfmx ...
+note: Writing `output/pdf/pipeline_journal_review\main.out` (4.322265625 KiB)
+note: Writing `output/pdf/pipeline_journal_review\main.pdf` (124.4521484375 KiB)
+note: Writing `output/pdf/pipeline_journal_review\main.aux` (8.0859375 KiB)
+note: Writing `output/pdf/pipeline_journal_review\main.log` (17.5029296875 KiB)

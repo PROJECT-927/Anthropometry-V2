@@ -1,0 +1,66 @@
+{
+  "cases": [
+    {
+      "axes_mm": [
+        100.0,
+        100.0
+      ],
+      "formula": [
+        3.141592653589793,
+        3.141592653589793
+      ],
+      "central_difference": [
+        3.141592653605585,
+        3.141592653605585
+      ],
+      "max_absolute_difference": 1.5791812302268227e-11
+    },
+    {
+      "axes_mm": [
+        160.0,
+        100.0
+      ],
+      "formula": [
+        3.4642935948191336,
+        2.734385462735153
+      ],
+      "central_difference": [
+        3.464293594731771,
+        2.734385462758837
+      ],
+      "max_absolute_difference": 8.736256162933387e-11
+    },
+    {
+      "axes_mm": [
+        200.0,
+        20.0
+      ],
+      "formula": [
+        3.955705743011415,
+        1.0826843708948084
+      ],
+      "central_difference": [
+        3.9557057430670284,
+        1.082684370771858
+      ],
+      "max_absolute_difference": 1.229503165944834e-10
+    },
+    {
+      "axes_mm": [
+        100.001,
+        100.0
+      ],
+      "formula": [
+        3.1416005075525346,
+        3.1415847995975508
+      ],
+      "central_difference": [
+        3.141600507547082,
+        3.1415847996072443
+      ],
+      "max_absolute_difference": 9.693579272607167e-12
+    }
+  ],
+  "all_checks_passed": true,
+  "scope": "Exact model derivative identities only; not physical uncertainty or full-pipeline sensitivity"
+}

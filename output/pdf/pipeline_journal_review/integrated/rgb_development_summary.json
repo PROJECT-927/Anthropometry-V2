@@ -1,0 +1,81 @@
+{
+  "scope": "3developmentvolunteers; rawRGB allstages exercised on2; notindependentaccuracy; timingsconcurrentwithBodyMbatch",
+  "attempts": [
+    {
+      "attempt_id": "S1",
+      "status": "rejected",
+      "reason": "input_mask_border_contact",
+      "elapsed_seconds": 1.7207132000476122,
+      "process_memory": {
+        "available": true,
+        "peak_working_set_bytes": 491782144,
+        "peak_pagefile_bytes": 1532772352,
+        "method": "Windows GetProcessMemoryInfo; process lifetime"
+      },
+      "driver_sha256": "9a856c4ecf00e65e95bbd7192f27c412de42fad1b7179bba89da3c4bf278c944",
+      "nested_candidate_counts": {}
+    },
+    {
+      "attempt_id": "S2",
+      "status": "computed_candidate_set",
+      "reason": null,
+      "elapsed_seconds": 8.183285199920647,
+      "process_memory": {
+        "available": true,
+        "peak_working_set_bytes": 2215276544,
+        "peak_pagefile_bytes": 3321651200,
+        "method": "Windows GetProcessMemoryInfo; process lifetime"
+      },
+      "driver_sha256": "9a856c4ecf00e65e95bbd7192f27c412de42fad1b7179bba89da3c4bf278c944",
+      "nested_candidate_counts": {
+        "chest_level": {
+          "conventional": 5,
+          "profile": 6
+        },
+        "waist_proxy": {
+          "conventional": 5,
+          "profile": 5
+        },
+        "hip_level": {
+          "conventional": 5,
+          "profile": 6
+        }
+      }
+    },
+    {
+      "attempt_id": "S3",
+      "status": "computed_candidate_set",
+      "reason": null,
+      "elapsed_seconds": 6.340867799939588,
+      "process_memory": {
+        "available": true,
+        "peak_working_set_bytes": 1795821568,
+        "peak_pagefile_bytes": 2903486464,
+        "method": "Windows GetProcessMemoryInfo; process lifetime"
+      },
+      "driver_sha256": "9a856c4ecf00e65e95bbd7192f27c412de42fad1b7179bba89da3c4bf278c944",
+      "nested_candidate_counts": {
+        "chest_level": {
+          "conventional": 5,
+          "profile": 6
+        },
+        "waist_proxy": {
+          "conventional": 5,
+          "profile": 5
+        },
+        "hip_level": {
+          "conventional": 5,
+          "profile": 6
+        }
+      }
+    }
+  ],
+  "versions": {
+    "numpy": "2.5.2",
+    "scipy": "1.18.1",
+    "opencv-python": "5.0.0.93",
+    "mediapipe": "1.0.1",
+    "scikit-image": "0.26.0",
+    "trimesh": "5.1.0"
+  }
+}

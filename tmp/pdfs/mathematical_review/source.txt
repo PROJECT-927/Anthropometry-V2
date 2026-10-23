@@ -1,0 +1,1122 @@
+=== PAGE 1 ===
+What Sparse Silhouettes Determine About Body Girth:
+Sharp Bounds, an Identifiability Limit, and an Error Budget
+Author One Author Two Author Three Supervisor
+Department of Computer Science and Engineering, Institution Name
+{author1, author2, author3}@institution.edu
+Abstract
+Estimating body girths from a small number of silhouettes is a
+standard vision task, and essentially every system solves it the
+same way: take the widthWand depthDof a horizontal slice
+from two orthogonal silhouettes, assume the cross-section is
+an ellipse, and report its perimeter. We show that this practice
+conceals a determinacy question that has not been asked, and
+we answer it.
+Using Cauchy’s formula, the perimeter of a convex cross-
+section isexactlythe integral of its own silhouette widths, so
+estimating girth fromkviews is quadrature fromksamples
+rather than shape fitting. Three consequences follow. First,
+the girths consistent with two orthogonal silhouettes form the
+sharp interval[ 2
+√
+W 2+D2,2(W+D) ], both endpoints at-
+tained, and a one-parameter family of bodies that arephoto-
+graphically identicalsweeps it; on a measured chest this in-
+terval is31cm wide, so no function of(W, D)— ellipse, su-
+perellipse, regression or network — can have smaller worst-
+case error than15.5cm. Second, for anykthe admissible in-
+terval is the value of a linear program, which measures what
+a view is worth with no shape model and no population: each
+view up to four roughly halves the ambiguity, and two views
+plus the population prior are worth about as much as four to
+six views without it. Third, the quantity that limits two views
+is the even-harmonic content of the width function, and it en-
+ters the observations only in the same combination as the girth
+itself; it is thereforeunidentifiable, and a correction built on
+the aspect ratioD/W— which carries only odd harmonics
+— must fail to transfer. We confirm this prediction: aD/W
+correction fitted on1,500model bodies is worse than no cor-
+rection on held-out real scans.
+We then measure the error budget an actual imaging pipeline
+incurs. Pixel quantisation is negligible (0.10cm at2mm/px)
+and perspective is small beyond2m (0.27cm), but a one-
+pixel systematic segmentation boundary offset costs2πbs=
+1.25cm of girth — comparable to the1.59cm that going from
+two views to four buys back, and exceeding it at video reso-
+lution. For sparse-view anthropometry, boundary accuracy is
+worth at least as much as view count.
+Finally we place the bound beside published results on the
+public BodyM benchmark. Every error reported for it lies a
+factor of1.3to17inside the two-view ambiguity measured on
+its own silhouettes, which quantifies how much of that accu-
+racy the restriction to human shape must supply; and its own
+ablation shows one weight measurement worth3.0×an en-
+tire additional silhouette — the ordering our identifiability re-
+sult predicts, weight bearing on exactly the fullness that two
+widths leave undetermined. Experiments use270raw scans
+from MPI-FAUST,1,500SMPL bodies and87BodyM sub-
+jects; we report what we did not test as explicitly as what we
+did.
+1 Introduction
+Measuring a person’s chest, waist and hip girth from pho-
+tographs is an established computer-vision problem, motivated
+by made-to-measure clothing, remote fitting and health track-
+ing. The dominant approaches learn a mapping from silhou-
+ettes or images to measurements, or to the parameters of a sta-
+tistical body model [?,?,?,?,?,?]. A second family is purely
+geometric: reconstruct a visual hull from two orthogonal sil-
+houettes [?], slice it, and measure.
+Both families share a step whose consequences are seldom
+examined. Two orthogonal silhouettes determine, for each
+horizontal slice, exactly two numbers: the widthWfrom the
+frontal view and the depthDfrom the lateral one. A girth
+is the perimeter of a closed curve inscribed in thatW×D
+box, and the box does not determine the curve. Systems close
+the gap by assuming an ellipse and evaluating Ramanujan’s
+perimeter approximation [?]. The practice is long-standing [?]
+and remains current: a 2026 study of monocular measurement
+reaches for the same two-view ellipse approximation in its sil-
+houette pipeline [?].
+That the elliptical model is imperfect is known; prior work
+attributes circumference error to silhouette extraction inaccu-
+racy and to the gap between real cross-sections and a fixed
+ellipse [?]. What has not been asked, to our knowledge, is the
+determinacyquestion underneath it: not how well an ellipse
+fits, but which girths the observations admit at all, and which
+of them no estimator can distinguish. Rather than proposing a
+better shape family, we characterise what the observations per-
+mit, what they can never resolve, and what an additional view
+buys.
+The reframing.For a convex region, Cauchy’s formula
+from integral geometry [?,?] states
+P=
+∫︂π
+0
+w(θ)dθ,(1)
+wherew(θ)is the width of the silhouette cast in direction
+θ. A photograph taken from directionθmeasures precisely
+w(θ). Two orthogonal photographs therefore do not “fail to
+1
+
+=== PAGE 2 ===
+determine the shape”; they supply two samples of the function
+whose integral is wanted. Sparse-view girth estimation isnu-
+merical quadrature, and quadrature has an exact error theory
+that a shape assumption does not.
+Contributions.
+1.A sharp interval and a worst-case bound(Theorem 1).
+The girths consistent with two orthogonal silhouettes
+form[2
+√
+W 2+D2,2(W+D)], both endpoints attained.
+A one-parameter family of photographically identical
+bodies sweeps it (Corollary 2), which yields a no-free-
+lunch bound: no estimator that sees only(W, D)can beat
+half the interval width in the worst case (Proposition 3).
+2.The value of a view, as a linear program(Theorem 4).
+For anykviews the admissible interval is an LP, because
+the constraint that a functionisa width function is linear
+and Cauchy’s formula makes girth linear in it. Solving it
+quantifies what a photograph buys with no shape model
+and no population (Table 2).
+3.An identifiability result that predicts a failure(Sec-
+tion 4). The even-harmonic content ofwenters the ob-
+servations only in the same combination as the girth, and
+is therefore unidentifiable from two views;W−Dcarries
+odd harmonics exclusively. AD/Wcorrection is thus
+structurally mis-targeted, which we confirm on held-out
+subjects (Table 4).
+4.An image-formation error budget(Section 6). We mea-
+sure what quantisation, segmentation bias, subject yaw
+and perspective each cost, and find that boundary bias
+dominates view count by a factor of three.
+5.A measurement of what the prior supplies, on a pub-
+lic benchmark(Section 3.3). On BodyM [?] we place
+the bound beside errors published for it: all of them lie
+a factor of1.3to17inside the two-view ambiguity mea-
+sured on the benchmark’s own silhouettes, and its abla-
+tion shows one weight measurement worth3.0×an entire
+additional silhouette — the ordering the identifiability re-
+sult predicts (Table 1).
+What this paper is not.It is not a new measurement system,
+and it reports no improvement over a published baseline: we
+compare against published results in order to measure what
+their priors supply, not to outrank them, and Section 3.3 says
+why a ranked entry would not be a like-for-like comparison.
+Two of its central results are negative. We state scope limits in
+Section 9 rather than leaving them to be discovered.
+2 Related Work
+Shape from silhouette.The visual hull [?,?] is the maxi-
+mal volume consistent with a set of silhouettes and is an upper
+bound on the true shape; it converges only with many views
+and never recovers concavities no silhouette exposes. Efficient
+formulations [?] address speed, not determinacy. With two
+orthogonal views the bound is weak: the intersection of two
+orthographic prisms is, at every height, a rectangle whose cor-
+ners are unconstrained. We accept that limit and characterise
+it quantitatively.
+Body measurement from images.Boisvert et al. [?] recon-
+struct shape from silhouettes via a statistical prior; Dibra et
+al. [?] and Smith et al. [?] learn silhouette-to-shape mappings;
+Ruiz et al. [?] introduce a large paired dataset and regress
+measurements directly. These methods are accurate where
+their training distribution is dense. Our results apply to all of
+them in one respect: any method whoseobservationsreduce to
+(W, D)per slice inherits the bound of Theorem 1, regardless
+of how the mapping is learned.
+Statistical body models.SCAPE [?] and SMPL [?] sup-
+ply low-dimensional shape spaces that regularise reconstruc-
+tion [?,?]. We use SMPL only as a source of geometry, and
+we treat that use as a hazard rather than a convenience: a shape
+law fitted on a low-rank model can describe the model rather
+than the population. Section 5 shows a case where the two
+disagree by a factor of four.
+Integral geometry.Cauchy’s formula and the support-
+function characterisation of convex bodies are classical [?,?].
+The embedded-rule device we use in Section 7 is standard in
+adaptive quadrature [?]. Our contribution is not these tools but
+their application to sparse-view anthropometry, and the mea-
+surements that follow.
+3 What Sparse Views Determine
+3.1 A sharp interval from two views
+Theorem 1(Two silhouettes do not determine girth).LetKbe
+a compact convex set in the plane whose axis-aligned bound-
+ing box has widthW >0and depthD >0. Then
+2
+√︁
+W 2 +D 2 ≤P(K)≤2(W+D),(2)
+and both bounds are attained — the lower by the rhombus with
+diagonalsWandD, the upper by the rectangle.
+Proof. Upper bound.Klies inside its bounding box and
+perimeter is monotone under inclusion for convex sets, so
+P(K)≤2(W+D), with equality only for the box.
+Lower bound.PickL, R∈Kwithx-coordinates∓W/2
+andy-coordinatesl, r, andB, T∈Kwithy-coordinates
+∓D/2. None of the four is interior to the hull of the others:
+B, for instance, attains the minimum ofyoverK, so it cannot
+lie strictly inside a triangle whose vertices all havey≥y B.
+Extreme points in the directions−x,−y,+x,+yoccur in that
+cyclic order on the boundary, soconv{L, B, R, T}is the (pos-
+sibly degenerate) quadrilateralLBRTand, by monotonicity
+again,P(K)≥ |LB|+|BR|+|RT|+|T L|.
+2
+
+=== PAGE 3 ===
+Bound each half by a reflection. Letσreflect across the
+liney=−D/2, which fixesB; then|BR|=|Bσ(R)|with
+σ(R) = (W/2,−D−r), and the two displacements now add
+rather than cancel:
+|LB|+|BR|=|LB|+|Bσ(R)| ≥ |Lσ(R)|=
+√︁
+W 2 + (l+r+D)2.
+Reflecting the upper half acrossy= +D/2, which fixesT,
+gives|RT|+|T L| ≥
+√︁
+W 2 + (D−l−r)2 in the same way.
+(Applying the triangle inequality directly, without reflecting,
+yields only
+√︁
+W 2 + (r−l) 2, because the vertical displace-
+ments have opposite signs; the reflection is what makes them
+add.)
+Withs=l+r∈[−D, D]the sum of the two right-hand
+sides is a sum of convex functions ofs, hence convex, and
+is symmetric abouts= 0, so it is minimised there, giving
+P(K)≥2
+√
+W 2 +D 2.
+Attainment.The rhombus with vertices(±W/2,0),
+(0,±D/2)has bounding boxW×Dand perimeter
+4
+√︁
+(W/2)2 + (D/2)2 = 2
+√
+W 2 +D 2.
+We verified the bound numerically over2×10 6 placements
+of the four contact points: no violation, and the infimum ap-
+proached to2×10 −3 mm. We note the argument doesnotpro-
+ceed via a pointwise bound onw(θ)— the separation between
+two points spanningWinxhas an unknowny-component, so
+its projection onto an oblique direction cannot be bounded be-
+low byW|cosθ|. An earlier version of this proof made that
+step and was invalid, though its conclusion was correct.
+Corollary 2(Photographically identical bodies).The Lam ´e
+bodiesK n ={|x/a| n +|y/b| n ≤1}witha=W/2,b=D/2
+andn∈[1,∞)are convex, all have bounding boxW×D,
+and their perimeter increases continuously and strictly mono-
+tonically from2
+√
+W 2 +D 2 atn= 1to2(W+D)asn→ ∞.
+Proof.K n is the unit ball of theℓ n norm on the rescaled co-
+ordinates, hence convex forn≥1. Settingy= 0gives
+x=±aand|x/a| n ≤1forces|x| ≤a, so the box is
+2a×2b=W×Dfor everyn. The family isnested: if
+u, v∈[0,1]andu n1 +v n1 ≤1withn 2 > n 1, thenu n2 ≤u n1
+andv n2 ≤v n1, sou n2 +v n2 ≤1; henceK n1 ⊊K n2.
+Monotonicity of perimeter under inclusion for convex sets
+then gives strict monotonicity inn. Atn= 1the body is
+the rhombus of Theorem 1, with perimeter2
+√
+W 2 +D 2; as
+n→ ∞,K n increases to the open box, so the perimeter tends
+to2(W+D).
+On a chest box measured from a real scan (W= 330,
+D= 224mm) the interval is[79.8,110.8]cm —31.0cm wide
+— and the family passes through79.8atn=1,87.8atn=2
+(the ellipse,25.9%of the interval),105.1atn=10and110.5at
+n=200(99.0%). Every member casts identical front and side
+silhouettes. Computing these perimeters requires care: the an-
+gular parametrisationx=acos 2/n tis unusable in double
+precision for largen, because the corner transition occupies
+the region wherecost∼10 −31; we parametrise byxinstead
+and validate against the two members with closed forms.
+figures/witness_family.png
+[figure placeholder]
+Figure 1: The identifiability gap, drawn.A.Four bodies inscribed in
+one bounding box, measured from a real chest section (W= 329,
+D= 224mm). Every curve touches all four sides, so every one
+castsidenticalfront and side silhouettes: the two numbers a two-view
+system observes are the same for all of them, while their perime-
+ters run from79.7to110.7cm.B.The same bodies placed on the
+admissible interval of Theorem 1, with the band real torsos occupy
+(q= 0.353±0.076, Section 3.2) shaded. The width of the inter-
+val is what the geometry permits; the width of the band is what the
+population supplies. The difference between them is the prior every
+two-view method is using.
+Proposition 3(No free lunch for two-view estimators).Letf
+be any function of the observations(W, D). Then
+sup
+K: box(K)=W×D
+⃓⃓f(W, D)−P(K)
+⃓⃓≥(W+D)−
+√︁
+W 2 +D 2,
+with equality for the interval midpoint ˆP=
+√
+W 2+D2 +W+
+D.
+Proof.By Theorem 1 the rhombus and the rectangle both have
+bounding boxW×D, so both are admissible and both produce
+the same observations(W, D), while their perimeters differ by
+U−L. An estimator sees only those observations and returns
+a single numberf(W, D), somax(|f−L|,|f−U|)≥(U−
+L)/2. The midpoint attains equality. (Corollary 2 supplies a
+continuum of intermediate bodies, but the bound needs only
+the two extremes.)
+This applies to an ellipse, a superellipse, a fitted regression
+3
+
+=== PAGE 4 ===
+and a neural network alike: they are differentpriorsinside the
+same information limit, not different degrees of correctness.
+Averaged over all241chest sections the bound is17.4cm; on
+the single box used above it is15.5cm.
+The bound constrains only theworst caseover the admissi-
+ble class, which is why methods achieve far better in practice:
+real bodies are not adversarial. Quantifying that gap is the sub-
+ject of Section 3.2.
+We stress that the minimax estimator is a bound, not a rec-
+ommendation. Its measured error on real bodies is5.13cm,
+worse than the plain ellipse’s3.50cm, because real sections
+are not distributed uniformly in the interval — which is the
+subject of the next subsection.
+3.2 Where real bodies sit, and what the prior
+supplies
+Define the normalised position of a section within its own ad-
+missible interval,
+q= P−L
+U−L ∈[0,1],(3)
+soq= 0is the rhombus andq= 1the rectangle. The interval
+is what the observation permits;qis what human bodies do.
+Measured on raw scan sections,q= 0.353±0.076at the
+chest,0.305±0.041at the waist and0.293±0.046at the
+hip. Real torsos occupy a narrow band of the geometrically
+possible range, and that concentration — not the geometry —
+is what makes two-view anthropometry viable.
+Eq. (3) also reframes the ellipse. An ellipse is admissi-
+ble, so it corresponds to someq, and across torso aspect ra-
+tios that value is nearly constant:0.261,0.263,0.263at the
+three sites. The ellipse is therefore not a neutral default but
+a specific choice ofq, one that sitsbelowthe human value at
+every site. Its systematic under-estimate, previously three site-
+specific numbers, is a single statement.
+An estimator follows, ˆP=L+q(U−L), using a population
+qin place of a shape family. We report it because it is the
+theorem’s direct consequence and becauseq∈[0,1]makes
+it incapable of returning an inadmissible girth, but not as an
+improvement: under a subject-disjoint split it ties the scaled
+ellipse (2.24vs2.20cm at the chest,1.05vs1.08at the waist,
+1.49vs1.51at the hip). Its interest is interpretive.
+3.3 What published methods draw from the
+prior
+Proposition 3 bounds the worst case; a benchmark reports the
+average case. Measuring both on the same bodies turns the
+distance between them into a number.
+BodyM [?] supplies frontal and lateral silhouettes for2505
+subjects with height, weight and fourteen measurements. We
+readWandDfrom the benchmark’s own silhouettes — the
+site located in the frontal view as the extremum of breadth
+within a stature-referenced band, which is the tape convention
+of Sec. 5, the lateral view read at the same height above the
+floor, each view scaled by its own silhouette so that differing
+chest waist hip
+Two-view ambiguity, half-width162.7 144.5 164.4
+Published MAE on BodyM Test-A[?]
+BMnet,1silhouette34.0 31.9 31.0
+BMnet,2silhouettes28.7 27.3 28.3
++height19.4 18.7 16.0
++weight15.2 13.7 10.5
++both15.9 15.4 9.7
+SPIN / STRAPS / Sengupta53–82 53–108 47–65
+Best published:half-width1:10.7 1:10.6 1:16.9
+Table 1: The two-view ambiguity beside published errors on BodyM
+Test-A, in mm. The half-width is the minimax error of any esti-
+mator of a planar section perimeter that sees only the two silhou-
+ette widths (Prop. 3), measured here on the benchmark’s own sil-
+houettes. The three mesh-recovery methods are quoted as evaluated
+in [?]. BodyM’s target is a curve along fixed vertex paths of an
+SMPL-registered mesh, not a planar section, so these are magnitudes
+placed side by side and not a containment test.
+crops and camera distances cancel — and form the interval
+of Theorem 1 for each subject. On Test-A (87subjects,246
+sections) the half-width is162.7mm at the chest,144.5at the
+waist and164.4at the hip, against174.0,166.6and179.4on
+our FAUST sections: two populations and two extraction paths
+agreeing to within13%. Every error published for the bench-
+mark is a factor of1.3to17below that floor (Table 1).
+This is not a deficiency of the bound; it is the measurement
+the bound exists to make. Proposition 3 is a worst case over
+convex bodies and human sections are not adversarial, so the
+factor is no evidence that any method exceeds its information.
+It is the share of the reported accuracy for which the restriction
+to human shape, rather than the silhouettes, has to account.
+Section 3.2 says as much intrinsically throughq; Table 1 says
+it against numbers reported by others.
+Which input carries the information.The benchmark’s
+own ablation separates the contributions, and does so inside a
+single table — one model, one training set, varying only what
+the network is shown — so the reading does not depend on
+how the target is defined. A second silhouette lowers the waist
+error from31.93to27.32mm; weight alone lowers it from
+27.32to13.69. One scalar is worth3.0×an entire additional
+view.
+That ordering is the one our analysis predicts. Two widths
+fix the bounding box and leave undetermined how fully the
+section fills it — theqof Eq. (3), equivalently the even-
+harmonic content that Eq. (6) shows two views alias. A mass
+measurement bears on precisely that residual: within the Lam´e
+family inscribed in a fixed box, area and perimeter increase to-
+gether, so constraining area to±5%narrows the admissible
+perimeter range from334.8to58.7mm, and±2%narrows it
+to23.2. A further projection, by contrast, refines a box that has
+already been observed. We claim the ordering and not the fac-
+tor: weight constrains whole-body volume rather than the area
+of a nominated section, and the link between them is itself a
+4
+
+=== PAGE 5 ===
+population regularity, so3.0is not derived. The direction is the
+part that is not obvious — an extra view is an extra projection
+of the shape, whereas weight is one number.
+What this comparison is not.BodyM’s ground truth is the
+length of a curve along pre-specified vertex paths of anSMPL-
+registeredmesh [?], neither planar nor convex. Theorem 1
+does not bound it and no containment is asserted; we use it
+only to check the extracted widths, for which it serves well,
+falling inside the interval for243of246sections. Neither is
+this a ranked entry: our widths are read from the benchmark’s
+silhouettes, whereas a submission to it is scored from a pho-
+tograph, so a shared column would flatter us on input while
+penalising us on prior. The quantity compared is a magnitude.
+3.4 The value of an additional view
+Theorem 1 is thek= 2case of a general question.
+Theorem 4(Admissible girths fromkwidths).Let widths
+w1, . . . , wk be observed at anglesθ 1, . . . , θk. The girths of
+convex bodies consistent with those observations form exactly
+the interval[L k, Uk], where
+Lk = min
+w
+∫︂π
+0
+w dθ, U k = max
+w
+∫︂π
+0
+w dθ,
+s.t.w >0, w ′′ +w≥0, w(θ i) =w i.
+(4)
+Both are linear programs whose extremal solutions are poly-
+gons.
+Proof.Aπ-periodic function is the width function of a con-
+vex body exactly when it is positive andw ′′ +w≥0dis-
+tributionally. In one direction,w(θ) =h(θ) +h(θ+π)
+for the support functionhofK, sow/2is the support func-
+tion of the central symmetral 1
+2(K⊕ −K), whose radius of
+curvaturew ′′/2 +w/2is non-negative; conversely any such
+wmakesh=w/2a support function with periodπ, and
+the centrally symmetric body it defines has width function
+h(θ) +h(θ+π) =w.
+The feasible set is non-empty (the observed body’s own
+width function lies in it) and, provided at least two of theθ i
+are distinct moduloπ, bounded: any feasible body lies in the
+intersection of the corresponding slabs, which is a bounded
+convex region, sow(θ)≤ ∑︁
+i wi uniformly. Eq. (1) makes
+the objective linear inw, and all bodies sharing a width func-
+tion share a perimeter, so the attainable set ofPis the image
+of a linear functional over a non-empty compact convex set —
+a closed interval, with endpoints attained at extreme points of
+that set. At an extreme point the measurew ′′ +wis atomic,
+which is exactly the condition for the corresponding body to
+be a polygon; consistently, the two extremes atk= 2are the
+rhombus and the rectangle.
+Discretisation.We solve Eq. (4) on a uniform grid with a
+cyclic second difference. Two checks establish that the grid is
+fine enough to report the numbers below. Against the closed
+form of Theorem 1 atk= 2, the error falls quadratically with
+Table 2: Sharp bounds on girth fromkequally spaced silhouette
+widths, solved by Eq. (4) on real scan sections. No shape model
+and no population enters; this is what remains geometrically possi-
+ble. Widths in cm. The LP is run on a subset (nper site) because
+each entry is two linear programs; over all241sections thek=2in-
+terval, which Theorem 1 gives in closed form, averages34.8,33.3
+and35.9cm, so the subset is representative but slightly narrow.
+Site viewsL k Uk interval gain
+chest 2 83.5 114.8 31.3 —
+(n=8) 3 90.1 104.0 13.9 17.3
+4 90.6 97.7 7.2 6.8
+6 92.2 95.2 3.1 4.1
+waist 2 71.4 98.9 27.6 —
+(n=8) 3 76.0 87.7 11.8 15.8
+4 77.6 83.8 6.2 5.5
+6 78.6 81.4 2.8 3.5
+hip 2 78.8 109.6 30.8 —
+(n=7) 3 85.8 99.0 13.3 17.5
+4 86.0 92.9 6.9 6.3
+6 87.6 90.5 2.9 4.0
+grid spacing —0.054,0.006,0.001and0.0002mm atN=
+90,180,360,720— so atN= 360the endpoints are accurate
+to about10 −3 mm on quantities of order10 3 mm. Fork >
+2no closed form exists, so we check self-convergence on a
+fixed synthetic body: the interval width changes by less than
+0.007mm betweenN= 360andN= 1440atk= 3,4and6.
+Since Table 2 reports to0.1cm, the discretisation contributes
+about10 −3 of the reported precision. All requested angles
+land exactly on theN= 360grid for thekused here, so no
+interpolation error is incurred either.
+Table 2 then measures what a view is worth.
+Table 2 bounds what ispossible; Table 3 reports what is
+achieved, by the trapezoid rule of Eq. (5) against the true sec-
+tion perimeter.
+Two readings of Table 3 matter.More views do not con-
+verge on the girth; they converge on theconvex hull’sgirth,
+which under-reads by the concavity, which is why the eight-
+view bias remains−0.44to−0.65cm. Andthree views
+minimise error at chest and waist by arithmetic accident,
+not principle: the three-view aliasing bias (+0.50cm, from
+m= 3) nearly cancels the concavity deficit (−0.55), while
+four views aliasm= 4, whose sign is opposite, so there the
+two errors add. We would not expect that cancellation to hold
+on a different population. Pooled across sites, going from two
+views to four reduces MAE from2.44to0.84cm.
+Three consequences, none requiring a shape model.Each
+additional view up to four roughly halves the ambiguity
+(factors of2.25and1.93at the chest; the step from four to six
+halves it again but costs two views), and the third view alone is
+worth16–18cm, more than all later views combined.Spacing
+matters more than count: three views at60 ◦ leave13.9cm,
+three at{0 ◦,45 ◦,90 ◦}leave23.6cm. Given views already at
+0andπ/2the best third angle is45 ◦ (we swept it; the interval
+is symmetric about that value), but a system free to choose all
+5
+
+=== PAGE 6 ===
+Table 3: Error of thek-view estimator against thetruesection perime-
+ter, on 241 sections from 10 subjects. cm. The last row of each block
+is the concavity term, which no silhouette method can remove and
+which every estimator inherits — note that the eight-view estimate is
+still low by roughly that amount.
+Site Estimator bias MAE RMSE
+chest 2 views−3.7843.950 4.488
+3 views−0.0520.677 0.877
+4 views−1.0031.049 1.248
+8 views−0.6510.657 0.848
+ellipse (2v)−3.1283.475 3.987
+concavity+0.5540.554 0.750
+waist 2 views−1.7381.886 2.239
+3 views+0.0190.524 0.659
+4 views−0.8330.871 1.040
+8 views−0.4380.438 0.523
+ellipse (2v)−1.3211.522 1.873
+concavity+0.3820.382 0.459
+hip 2 views−1.5072.048 2.347
+3 views+0.1520.766 1.022
+4 views−0.6090.654 0.881
+8 views−0.4660.470 0.633
+ellipse (2v)−0.9851.627 1.920
+concavity+0.4500.450 0.604
+three should not start at0andπ/2.The population prior is
+worth two to four extra views: two views leave31cm, the
+measured concentration ofqnarrows it to roughly±2.4cm at
+one standard deviation, and the geometry alone does not reach
+that until between four and six views.
+4 What Two Views Cannot Identify
+Thek-view estimate is the trapezoid rule on a periodic grid,
+Pk = π
+k
+k−1∑︂
+j=0
+w
+(︃jπ
+k
+)︃
+.(5)
+Expand theπ-periodic width function asw(θ) =∑︁
+m cme2imθ withc −m = cm. Evaluating Eq. (5)
+on the shifted gridθ j =φ+jπ/kgivesP k(φ) =
+π ∑︁
+m≡0 (k) cme2imφ, since ∑︁
+j e2imjπ/k iskwhenk|m
+and zero otherwise. WithP=πc 0 the error is exactly
+Pk −P= 2π(Rec k + Rec 2k +· · ·).(6)
+Two views therefore alias theevenharmonicsm= 2,4,6, . . .,
+notm= 2alone. How farm= 2dominates is empirical, not
+mathematical: it carries about80%of the two-view chest error,
+withm= 4and them≥6tail supplying the rest (up to45%
+at the waist).
+Eq. (6) is not merely explanatory. Predicting each section’s
+two-view error from its own harmonics reproduces the mea-
+sured error atr= 0.9959andr= 0.9960on the two scan
+sets, with mean absolute discrepancies of1.65and1.56mm
+on a metre of girth. Fig. 2 shows the decomposition on one
+section.
+figures/width_function_aliasing.png
+[figure placeholder]
+Figure 2: The argument of Eqs. (1)–(6) on one real chest section
+(FAUSTtr scan 033, selected as themediantwo-view error of its
+site, not the best case).A.SinceP=
+∫︁
+w, thek-point rule estimates
+girth by the mean of its samples timesπ, so the error is the vertical gap
+between the sampled mean and the true mean. Two views sample the
+peak and trough ofwand fall3.34cm short.B.The largest harmonic
+by far,m= 1, is integratedexactlyby two views; the error comes
+entirely from the small even harmonics, which is precisely the set
+W−Dcannot see.
+4.1 Unequally spaced views
+Eq. (6) assumes the anglesjπ/k. The general case is worth
+stating, because a real rig never hits its nominal angles ex-
+actly. Any rule fromksilhouettes is ˆP= ∑︁
+j ajw(θj), and
+substituting the expansion gives, exactly,
+ˆP−P=c 0(M0−π) +
+∑︂
+m̸=0
+cmMm, M m =
+∑︂
+j
+aje2imθj ,
+(7)
+soM m is the aliasing amplitude at harmonicmand the de-
+sign question is to make|M m|small where|c m|is large. (The
+m= 0term vanishes only when the weights already integrate
+a constant correctly; omitting it is an easy error, and one we
+made.) We verified Eq. (7) against direct evaluation over 200
+random rules to5×10 −13 mm.
+Equal spacing is special, for a reason that is classical in nu-
+merical analysis [?]: witha j =π/kthe geometric series gives
+Mm =πwhenk|mandexactlyzero otherwise, so it an-
+nihilates infinitely many harmonics without spending any de-
+grees of freedom. A generic configuration cannot. Imposing
+Mm = 0form= 1..Mcosts2Mreal conditions against
+kweights, one already spent onM 0 =π, so a generic set
+reaches onlyM=⌊(k−1)/2⌋; we confirmed this ceiling by
+construction fork= 2,3,4,5,6,8. Atk= 4, equal spacing
+annihilatesm= 1,2,3and first fails atm= 4, whereas a
+6
+
+=== PAGE 7 ===
+generic set with optimised weights annihilatesm= 1alone.
+Aim error and spacing error are different failures.Per-
+turbing toθ j =jπ/k+ε j with uniform weights,M m ≈
+π[k|m] + (2imπ/k) ∑︁
+j εje2imjπ/k (verified; the residual
+scales asε 2). For aglobalerror,ε j =δ, the sum collapses
+to zero unlessk|m: a uniformly mis-aimed rig introducesno
+new harmonics at all. This is exact rather than first order, since
+Pk(φ) =π ∑︁
+k|m cme2imφ; we confirm|M m|<2×10 −14
+for everymnot divisible bykover 200 random rotations. A
+global error still moves the estimate, because it rotates the
+phaseof the harmonics already aliased. Arelativeerror does
+that and additionally leaksm= 1, the largest harmonic in the
+spectrum.
+Measured on 101 real sections atk= 4, a1 ◦ RMS relative
+error shifts the girth by1.76mm against0.69mm for a global
+error of the same size; the ratio is2.5×and is stable from1 ◦
+to10 ◦. Relative alignment is thus the more valuable thing to
+control, though not overwhelmingly so — a synthetic single-
+spectrum experiment suggested a factor of twenty, and the real
+sections do not support it.
+Repair.Angles one cannot choose can still be weighted cor-
+rectly: solve ∑︁
+j aj =πwithM m = 0form= 1..Mand
+use those weights instead ofπ/k. This needs only the angles,
+which floor marks or a calibration target supply, and on real
+sections with placement errors ofσ= 1 ◦ to5 ◦ it recovers
+46–49%of the induced error.
+Equal spacing is not optimal.Scoring configurations by
+mean absolute girth error over real sections, a random search
+with local refinement findsk= 4angle sets that beat equal
+spacing. The gain survives a split bysubject— five people
+used to choose the angles, five different people to score them
+— by17.6%and44.5%in the two directions. The mechanism
+is visible in Eq. (7): an uneven set leaks atm= 2,3but can ar-
+range those leaks to oppose them= 4leak that equal spacing
+suffers in full, and torso spectra are consistent enough across
+people for that cancellation to hold.
+We nonetheless donotrecommend tuned angles, for two
+reasons the experiment itself supplies. The chosen angles are
+unstable: the two subject-disjoint folds select sets differing by
+up to13 ◦, so the benefit transfers but the configuration does
+not, and no specific protocol can be read off. And the absolute
+gain is about2mm of girth, which Section 6 shows is an order
+of magnitude below the12.6mm that one pixel of segmenta-
+tion bias costs at2mm/px. Equal spacing remains the right
+default: it is well-conditioned, requires no population, and its
+shortfall is buried beneath the dominant error term. The find-
+ing is that the default isa default, not an optimum.
+The identifiability limit.Evaluating the expansion at the
+two measured angles and adding and subtracting,
+W+D= 2c 0 + 4 (Rec2 + Rec 4 +· · ·),(8)
+W−D= 4 (Rec 1 + Rec 3 +· · ·),(9)
+while the quantity sought isP=πc 0. Both identities hold on
+the measured sections to−1.15and+1.55mm, the residuals
+being the truncated tails.
+Eq. (8) is the crux: the even-harmonic sum enters the obser-
+vationsonlyin the same linear combination asc 0, the quantity
+being estimated. Two orthogonal views cannot separate them,
+so the even sum isnot identifiablefrom(W, D). Every two-
+view girth estimator is therefore aprioron the even-harmonic
+content of the width function, never an inference from the mea-
+surement.
+By Eq. (9) the only other independent observable,W−D,
+carriesoddharmonics exclusively. A correction built on the
+aspect ratio can reach the even sum only through whatever cor-
+relation links odd and even harmonics within the fitting pop-
+ulation — a population property, not an anatomical law. We
+stress what this does not say:D/Wis a nonlinear function of
+the whole spectrum and is not equal to any single coefficient.
+The claim is that its information about the error term is indirect
+while the direct information is absent by construction.
+5 A Predicted Failure, Confirmed
+Section 4 predicts that aD/Wcorrection cannot transfer
+across populations. We had already built one and found it
+worked; the prediction says it should not survive a change of
+subjects.
+The estimator isC=P ell(W/2, D/2) (k0 +k 1D/W), an
+ellipse with a correction linear in aspect ratio. Cross-validated
+on1,500SMPL bodies it reduces chest error from2.838to
+0.760cm (3.7×), waist from1.127to0.240(4.7×) and hip
+from0.824to0.419(2.0×). Those figures, reported alone,
+would be this paper’s headline.
+Applied unchanged to270raw FAUST scans — disjoint
+people, and a model mesh against a real scan — they do not
+survive (Table 4). The two-parameter correction isworse than
+no correctionat chest and waist. Restricting the test to the
+D/Wrange SMPL spans, so the model is not judged on ex-
+trapolation, repairs it only to parity.
+The mechanism is measurable.D/Wcorrelates with the
+odd-harmonic content at−0.943and−0.961on our two scan
+sets, but with the even harmonic that drives the error at only
++0.338and+0.476— and the coupling between them is it-
+self unstable, moving from−0.210to−0.420. Splitting by
+subject, five people against five different people, and fitting
+theD/W→Rec 2 relation on one group to predict the other:
+at the chest the transferred fit gives RMSE3.295mm against
+3.114for simply assuming a constant — worse than not using
+D/Wat all. At the waist it is indistinguishable from a con-
+stant (1.981vs1.995); only at the hip does it help (2.623vs
+2.679).
+What does transfer is a single multiplicative constant. That
+is the correct conclusion from Eq. (8): the unobservable term
+has a stable population mean and an unstable dependence on
+the observables, so a constant captures the former without in-
+heriting the latter.
+7
+
+=== PAGE 8 ===
+Table 4: SMPL→FAUST transfer: constants fitted on1,500model bodies applied to raw scans with no refitting. MAE in cm;×is
+improvement over the ellipse.
+Chest Waist Hip
+ModelMAE×MAE×MAE×
+ellipse 3.382 1.0 1.174 1.0 2.498 1.0
+scaled ellipse 2.6021.30.9641.22.136 1.2
+superellipse 2.598 1.3 0.968 1.2 2.152 1.2
+linear inW, D3.835 0.9 1.337 0.9 2.123 1.2
+D/W-corrected 4.051 0.8 1.378 0.9 2.0241.2
+A better shape family is not the answer either.Before cal-
+ibrating we tested whether the torso is simply a superellipse,
+which would make Corollary 2’s family a model rather than
+a counterexample. The exponent is over-determined: it can
+be estimated from a section’s perimeter, from its area fraction,
+and from a least-squares fit to its boundary, and if the section
+were a Lam ´e curve all three would agree. On raw scans they
+disagree by0.20to0.39with radial residuals of7–12mm, and
+disagreemorethan on the statistical model — the direction
+that matters, since the model was flattering the hypothesis.
+Robustness to the site convention.A girth site can be de-
+fined as the extremum of girth within an anatomical band,
+which is the tape convention, or at a fixed fraction of stature.
+The two select different sections, so we ran the study both
+ways rather than choosing. Thequalitativeconclusions are
+unaffected: the three estimators disagree under both (spread
+0.20–0.39by the tape convention,0.21–0.26at fixed height),
+and the ellipse under-estimates girth at every site under both.
+Themagnitudesare not convention-free and we do not present
+them as such — the ellipse deficit at the hip is−2.24cm un-
+der the tape convention and−1.12cm at fixed height, because
+the extremum rule lands on the fuller and less elliptical sec-
+tion. Where a single number is quoted in this paper it is the
+tape convention, which is what a tape measure would read;
+the quadrature and harmonic studies use fixed height, because
+their results hold for any cross-section and the extremum rule
+actively seeks the height at which an arm merges into the trunk.
+The harmonic view sharpens this considerably.Since
+P=πc 0, the exponent implied by a section’sperimeteris
+exactly the exponent implied by itsc 0. Perimeter is not spe-
+cial: every harmonicc m implies its own exponentn m, namely
+the one whose Lam ´e curve of the same bounding box repro-
+duces that coefficient, and a genuine Lam´e curve would give a
+single number. The three-estimator test is thus them= 0case
+plus two non-harmonic proxies, where the spectrum supplies
+an unbounded family of independent tests.
+Fed actual Lam ´e curves at five exponents and three aspect
+ratios, the estimator recovers the input to10 −3, so that is its
+noise floor. On real sections the exponents disagree by1.05–
+1.91, three orders of magnitude above it. Rotation of the mea-
+surement frame changesRec m, so we re-test in the frame most
+favourable to the symmetric family: choosing the rotation that
+best symmetrises each section still leaves a spread of0.38–
+1.44. The family fails for reasons no orientation repairs.
+The same frame control disposes of a tempting but weaker
+argument. A Lam ´e curve is symmetric, so in the body frame
+itsc m are real, and we measured imaginary parts at16–51%of
+the coefficient magnitudes — a falsification requiring no fitting
+at all. Most of that is an artefact: a frame rotated byδmaps
+cm →c me2imδ and manufactures an imaginary part from a
+perfectly symmetric body. After optimal alignment only3–5%
+survives. It is still nonzero, and no symmetric family at any
+orientation reproduces it, but we report the controlled figure
+rather than the raw one.
+We state the conclusion narrowly: a single symmetric Lam´e
+curve with one exponent per section cannot simultaneously re-
+produce a section’s boundary, area and perimeter, nor its har-
+monic spectrum. That is enough to rule out the estimator, and
+it is why Section 4 asks what is identifiable rather than which
+family fits.
+6 The Image-Formation Error Budget
+Everything above concerns geometry. A vision system does
+not observew(θ); it observes a thresholded silhouette and
+reads a width off a pixel mask. This section measures what
+that substitution costs, on the same real scan sections, so each
+term is attributable.
+We separate the concavity a silhouette can never see.
+Cauchy’s formula holds for the convex hull, and support
+widths determine a convex body only up to its hull, so a sec-
+tion’s concave part is not recoverable from widths at any num-
+ber of views. On our sample it measures0.38–0.55cm of
+girth; that magnitude is a property of ten European adults, not
+a universal constant, but the impossibility is structural.
+All four effects in Table 5 are reported as theshiftthey cause
+relative to the exact-geometry estimate, not as error against
+ground truth. This matters: thek=4estimate already carries a
+−0.78cm concavity bias, which a positive segmentation bias
+partly cancels. An earlier version of this analysis reported er-
+ror against truth and appeared to show that over-segmenting
+the silhouetteimprovesaccuracy, and that rotating the subject
+improves it too. Both were artefacts of that cancellation, and
+we report the shift precisely so that no such cancellation can
+flatter a result.
+8
+
+=== PAGE 9 ===
+Table 5: Image-formation error budget, measured on 101 real scan
+sections. Each row is the shift caused relative to exact geometry. Seg-
+mentation bias dominates every other term, including the geometric
+ambiguity that additional views remove.
+Source Condition Girth shift
+Pixel quantisation0.5mm/px 0.02 cm
+2.0mm/px 0.10 cm
+4.0mm/px 0.18 cm
+Perspective1.5m 0.55 cm
+2.0m 0.27 cm
+3.0m 0.08 cm
+≥5m<0.01cm
+Subject yaw (k=4)5 ◦ 0.34 cm
+10◦ 0.63 cm
+Subject yaw (k=2)5 ◦ 0.70 cm
+10◦ 1.31 cm
+Segmentation bias1px @2mm/px1.25 cm
+2px @2mm/px2.51 cm
+1px @4mm/px2.52 cm
+Quantisation is benign.A width read from a pixel mask is
+an integer number of pixel pitches, but the rounding errors at
+different angles are independent and average out: the mean
+shift is below0.01cm at every resolution tested and the mean
+absolute shift is0.18cm even at a coarse4mm/px.
+Segmentation bias is not.A segmenter that systematically
+cutsbpixels inside or outside the true boundary changes ev-
+ery width by2bsand therefore, by Eq. (5), changes girth by
+exactly2πbsregardless ofk. The measurement confirms the
+prediction to three decimals: ats= 2mm/px andb=−2
+we measure−2.515cm against a predicted−2.513.This is
+the dominant term in the budget, and no number of views
+removes it.
+The comparison worth making is against what extra views
+actually buy inerror, not in admissible interval. By Table 3,
+going from two views to four reduces mean absolute error
+from2.44to0.84cm pooled across sites, a gain of1.6cm.
+A one-pixel boundary bias costs1.25cm at2mm/px — com-
+parable — and2.52cm at4mm/px, which exceeds it. Bound-
+ary accuracy is therefore at least as valuable as two additional
+photographs, and strictly more valuable at video resolution.
+We state it this way because the looser comparison, against
+the0.7cm of interval shrinkage in Table 2, would be compar-
+ing a geometric ambiguity with a measured error and would
+overstate the case.
+Yaw and perspective are second-order but not negligible.
+Four equally spaced views are roughly twice as yaw-tolerant
+as two (0.34vs0.70cm at5 ◦). Perspective inflates every width
+because the silhouette edge is a tangent ray; at2m it adds
+0.27cm, falling below0.01cm by5m. A capture protocol at
+3m or more makes it negligible.
+A partial check on real photographs.The terms above are
+modelled, not measured through a camera. One end-to-end
+check is available from the three photographed subjects, be-
+cause every geometric term is now known: writing the ellipse’s
+measured deficit against the true perimeter as∆, a tape read-
+ing and a photograph together giveb= (pipeline−tape+
+∆)/(2πs). Carried out on the eight usable subject-site pairs,
+the residual is equivalent to a boundary offset ofb=−5.7px
+ats≈1.6mm/px — the segmenter cutting inside the true
+boundary — worth roughly5.7cm of girth.
+We report this as a bound on the image-side error,notas a
+measurement of segmentation bias, because it does not isolate
+one: the impliedbranges from−0.8to−11.1px across sub-
+jects, a factor of thirteen, so the residual is evidently a bucket
+holding slice placement, carve error, tape error and the as-
+sumption that the scan-derived∆transfers to these subjects.
+What it does establish is the ordering that matters here: on real
+photographs the image-side error is several centimetres, an or-
+der of magnitude above every geometric term in Table 5 and
+above everything additional views can recover.
+The practical conclusion.For sparse-view anthropometry,
+boundary accuracy dominates view count. A system with a
+one-pixel segmentation bias gains less from a third and fourth
+photograph than it would from removing that bias. This inverts
+the intuitive priority, and it is the recommendation we would
+give a practitioner.
+7 Method: View Schedule and a Sam-
+pling Certificate
+The theory yields a capture procedure whose error term is
+partly observable.
+Rotating the sampling grid byπ/4multiplies them-th har-
+monic byi m, which for evenmis(−1) m/2 and thereforeal-
+ternates. Hence
+1
+2(P2 +P ′
+2) =P 4,
+1
+2(P2 −P ′
+2) = 2π(Rec 2 + Rec 6 + Rec 10 +· · ·).(10)
+The half-difference isnot2πRec 2, and it is not the whole two-
+view error, which by Eq. (6) contains every even harmonic.
+What it is, exactly and by construction, is
+P2 −P⏞ ⏟⏟ ⏞
+2-view error
+= 1
+2(P2 −P ′
+2)⏞ ⏟⏟ ⏞
+certificate
++P 4 −P⏞ ⏟⏟ ⏞
+4-view error
+,(11)
+the classical embedded-rule identity: the gap between a coarse
+rule and a finer one measures the coarse rule’s error exactly to
+the extent the finer rule’s own error is negligible.
+Procedure.Photograph at0andπ/2; photograph again at
+π/4and3π/4; reportP 4 as the estimate and 1
+2 |P2 −P ′
+2|as a
+certificate on the sampling error. If it exceeds tolerance, dou-
+ble to eight views, which then certifiesP 4.
+9
+
+=== PAGE 10 ===
+What it delivers.The certificate tracks the true two-view er-
+ror atr= 0.982,0.934and0.975at the three sites, and ac-
+counts for86%,67%and85%of it (mean signed certificate
+over mean signed error; on magnitudes,86%,80%,95%).
+Its useful property is selectivity: thresholding at0.5cm ac-
+cepts15.8%of sections whose actual two-view error averages
+0.57cm and rejects the rest, whose error averages2.44cm —
+separating well-measured from badly-measured sectionswith-
+out ground truth. A two-view system has no way to know
+whether it is wrong; this one does.
+What it does not deliver.The certificate covers them≡2
+(mod 4)part of the aliasing only. It carries little information
+about the residual it cannot see: correlations of0.59,−0.02
+and0.09with the four-view error, so it cannot be inflated to
+cover it, and we do not attempt that. It is also blind to the
+concavity bias and to segmentation bias, which are larger (Sec-
+tion 6). For these reasons we call it asampling-error certificate
+and not an error bar: it is not a confidence interval for girth.
+8 Experimental Setup
+Data.MPI-FAUST[?]:300raw 3D scans of10people in30
+poses. We use thescansdirectories only — the accompany-
+ingregistrationsare a template fitted to each scan, and
+measuring those would reproduce the statistical-model answer
+while appearing to confirm it. After pose screening,270scans
+yield764usable sections.SMPL[?]:1,500bodies (500male,
+500female,500neutral) sampled from the shape space in rest
+pose, used as the fitting population for Section 5.BodyM[?]:
+frontal and lateral silhouettes with height, weight and four-
+teen measurements; we use the87-subject Test-A split in Sec-
+tion 3.3, three silhouette pairs per subject, to place our bound
+beside errors published for a public benchmark. Its measure-
+ments are curve lengths along fixed vertex paths of an SMPL-
+registered mesh, so they are used as magnitudes and as a check
+on extracted widths, never as ground truth for a planar section.
+Section extraction.Raw scans expose three failure modes a
+watertight model mesh hides. Assigning width and depth from
+the mesh’s global extent silently swaps them when a subject
+stands rotated (5of23scans;4stand more than10 ◦ off-axis),
+so we take the lateral axis from the mid-torso point cloud’s
+principal axis. A tape girth is defined only when the arm is
+clear of the trunk; when it is not, the two merge into one loop
+with an armpit notch, and we reject sections whose perimeter
+exceeds1.02×their convex hull’s (measured separation: clean
+sections reach at most1.0924, merged ones begin at1.0943).
+A horizontal plane through a body bent at the hips cuts the
+trunk obliquely and vertical extent does not detect it, so we
+reject sections whose trunk centroid drifts more than0.40mm
+per mm of height. Finally, a section whose width falls outside
+[0.12,0.30]of stature is not a torso section; this removes13
+chest and1waist section, chiefly three scans where the trunk
+centreline misses the trunk and the enclosing loop is an arm.
+Subject-level evaluation.FAUST is10people in30poses.
+Its training and test sets are disjoint inscansbut not insub-
+jects, so we do not use that division for any generalisation
+claim. Where such a claim is made, the split is by subject:
+five people against five different people. Grouping is verified
+on waist girth rather than stature, because FAUST’s crouching
+poses change vertical extent by more than people differ from
+one another — grouping on stature ranks the poses and gets
+the answer backwards.
+9 Scope and Limitations
+We separate what the resultsarefrom where theyfall short,
+because conflating the two misrepresents both.
+9.1 What rests on proof, and what on data
+Theorem 1, Corollary 2, Proposition 3, Theorem 4, the alias-
+ing identity Eq. (6) and the identifiability result of Section 4
+aretheorems. They hold for every convex cross-section and re-
+quire no dataset. The numerical work reported alongside them
+—2×10 6 contact-point configurations, the LP reproducing
+the closed form to10 −3 mm, the exponent estimator recover-
+ing known curves to10−3 — verifies our implementations, not
+the mathematics.
+The quantitative claims are empirical and rest on270scans
+of real people: the31cm interval width,q= 0.29–0.35, the
+0.38–0.55cm concavity term, the view-count schedule, the
+failedD/Wtransfer, and the insufficiency of a single Lam ´e
+exponent. These are measurements of human anatomy, not of
+a model.
+The hypotheses of the theorems — convexity for Cauchy’s
+formula, at least two distinct angles for Theorem 4 — are
+stated where they are used. They bound what the results say;
+they are not defects.
+9.2 Genuine limitations
+1.Ten subjects.764sections is a large section count and a
+smallsubjectcount; the population is European and adult.
+Every magnitude we report depends on that sample, and
+section counts overstate the evidence for between-person
+claims. This is the limitation we would most want re-
+moved.
+2.The measurement chain is modelled, not run.We com-
+pute each width from the mesh; a deployed system reads
+it from a segmented photograph. Section 6 models that
+step, and the one end-to-end check available — three pho-
+tographed subjects with tape ground truth — bounds the
+image-side error without isolating its parts, the implied
+boundary offset varying by a factor of thirteen between
+subjects. A capture at four angles with tape ground truth
+would settle it; we have not been able to obtain one.
+3.No end-to-end entry on a public leaderboard.Our
+baselines are our own implementations, although the
+principal one — an ellipse evaluated by Ramanujan’s
+10
+
+=== PAGE 11 ===
+approximation — is the practice the literature actually
+reports [?,?], not a strawman of our construction. A
+ranked submission we do not attempt, and the reason is
+not effort: a benchmark entry is scored on a photograph,
+whereas our input is an exact width pair at a located sec-
+tion, so the two error budgets are not commensurable and
+a shared column would flatter us on input while penalis-
+ing us on prior. Section 3.3 therefore compares the quan-
+tity that is commensurable — the size of the two-view
+ambiguity against the errors published methods report on
+the same bodies.
+4.Transfer tested in one direction(model to scans), on
+one population. Clothed and non-European scan popula-
+tions are untested.
+9.3 Scope of specific claims
+These bound what is asserted rather than marking a shortfall.
+Site definition is a choice, not a fact: results are reported un-
+der both the tape-extremum and fixed-height conventions, the
+qualitative conclusions hold under each, and the magnitudes
+differ by up to a factor of two at the hip. The Lam ´e result
+rejects asingle symmetriccurve withone exponent per sec-
+tion; asymmetric members, per-quadrant exponents and mix-
+tures are untested. Section 4.1 characterises unequal spacing
+exactly but extracts no capture protocol from it, because the
+better angle sets are unstable across subject-disjoint folds and
+the gain is an order of magnitude below the segmentation term.
+The embedded-rule device of Section 7 is classical [?]; what
+is ours is its application here and the measurement of how far
+it gets.
+10 Conclusion
+Two silhouettes fix only the bounding box of a cross-section,
+so every method in this family rests on an assumption about a
+boundary it never observes. We characterised that assumption
+instead of replacing it. The girths compatible with two orthog-
+onal views form a sharp31cm interval on a real chest, swept
+by bodies that are photographically identical, so no estimator
+of(W, D)can beat15.5cm in the worst case. For anykthe
+admissible interval is a linear program, and solving it prices a
+photograph without any model: each view roughly halves the
+ambiguity, and two views plus the population prior are worth
+about as much as four to six views without it. The term that
+limits two views is unidentifiable from two views, which pre-
+dicts — before the experiment — that an aspect-ratio correc-
+tion cannot transfer, as ours did not.
+For practitioners the operative finding is elsewhere. Once
+the measurement chain is modelled end to end, a one-pixel
+systematic segmentation bias costs1.25cm of girth at2mm/px
+and2.52cm at4mm/px, against the1.59cm that a third and
+fourth photograph return. Sparse-view anthropometry is lim-
+ited by boundary accuracy at least as much as by view count,
+and more so at video resolution.
+Reproducibility.All figures and tables are produced by the
+accompanying code from the cited public datasets. Numeri-
+cal results for the witness family are validated against the two
+members with closed forms; the LP of Theorem 4 is validated
+against Theorem 1; the bound of Theorem 1 is checked over
+2×10 6 configurations. Where an earlier version of an analysis
+was wrong, we say so in the text rather than silently correcting
+it.
+References
+11

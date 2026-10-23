@@ -1,0 +1,253 @@
+% Complete standalone article. No external figures or bibliography files.
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=20mm]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs,array,microtype,xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newenvironment{proof}{\par\noindent\textit{Proof.}\ }{\hfill$\square$\par\medskip}
+\newcommand{\R}{\mathbb R}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\Rea}{Re}
+\title{Sharp Perimeter Intervals from Sparse Silhouette Widths:\\
+Finite Convex Formulations and Valid Error Certificates}
+\author{Author details to be completed}
+\date{}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Directional silhouette widths constrain a convex section's perimeter without uniquely determining its boundary. This note establishes the scope of that information and gives a finite procedure for computing sharp perimeter intervals. A short variation argument proves the two-view bounds, and Minkowski interpolation supplies an exact family attaining every intermediate perimeter. For arbitrary known directions, the upper endpoint is the perimeter of a centered strip intersection; the lower endpoint is a finite second-order cone program over supporting contact points. The formulation extends directly to interval-valued width observations, avoiding angular-grid discretization. A largest-gap argument gives sharp relative minimax guarantees and a precise worst-case interpretation of uniform view spacing. Fourier identities explain aliasing, while a smooth convex counterexample shows why an embedded-rule difference alone cannot certify error. Synthetic numerical checks support the implementation. The results concern convex planar perimeter and do not establish anatomical accuracy, population transfer, or universal priorities between segmentation and view count.
+\end{abstract}
+
+\noindent\textbf{Keywords:} directional width; convex perimeter; geometric identifiability; second-order cone programming; silhouette measurement.
+
+\section{Problem and relation to prior work}
+Photographic anthropometry often converts frontal and lateral extents to circumference through an elliptical or composite section model~\cite{hung,aslam}. Here the observation model is deliberately narrower: the input consists only of metric widths of one planar section at known projection directions. The target is its convex perimeter. Conclusions for this observation model need not apply to systems that also use full images, neighboring sections, stature, mass, or anatomical priors.
+
+Cauchy's perimeter formula, support functions, and Minkowski addition provide the classical geometric foundation~\cite{schneider}. Perimeter inference from projections has been studied previously, including richer tomographic observations~\cite{baudrier}. Sharp Crofton-quadrature error bounds and associated-zonotope constructions are also established~\cite{kiderlen}. Minimum-perimeter inscribed polygons form a related computational problem~\cite{kodmon}. Accordingly, this note makes no priority claim for sparse-projection perimeter estimation or quadrature itself. Its focus is a constructive finite formulation, its extension to uncertain widths, and the distinction between a computable discrepancy and a guaranteed error bound.
+
+Let $u(\theta)=(\cos\theta,\sin\theta)$ and let $K\subset\R^2$ be nonempty, compact, and convex. Define
+\begin{equation}
+h_K(\theta)=\max_{x\in K}x\cdot u(\theta),\qquad
+w_K(\theta)=h_K(\theta)+h_K(\theta+\pi),\qquad
+P(K)=\int_0^\pi w_K(\theta)\,d\theta.
+\label{eq:cauchy}
+\end{equation}
+Perimeter is understood continuously for degenerate sets: a segment of length $s$ has $P=2s$. This convention makes the feasible class closed. For full-dimensional sections, all bounds remain sharp as bounds or limiting bounds.
+
+Widths are invariant under translation. Moreover, the central symmetral $K^s=(K+(-K))/2$ has the same widths and perimeter as $K$. Thus restricting the optimization to centered, centrally symmetric sets loses no perimeter information. Even all widths generally determine only this symmetral, rather than the original convex shape. For nonconvex sections, widths yield the perimeter of their convex hull, rather than the full boundary length. Agreement with an anatomical tape path additionally requires a consistent measurement definition~\cite{iso}.
+
+\section{Two-view bounds and minimax estimates}
+\begin{theorem}[Sharp two-view interval]
+\label{thm:two}
+For bounding dimensions $W,D>0$, the attainable convex perimeters are exactly
+\begin{equation}
+[L_2,U_2]=[2\sqrt{W^2+D^2},\,2(W+D)].
+\label{eq:two}
+\end{equation}
+\end{theorem}
+\begin{proof}
+For a convex polygon with edge increments $(\Delta x_j,\Delta y_j)$, the total coordinate variations are $\sum_j|\Delta x_j|=2W$ and $\sum_j|\Delta y_j|=2D$. The triangle inequality and $\sqrt{x^2+y^2}\le |x|+|y|$ give
+\begin{equation}
+2\sqrt{W^2+D^2}
+=\norm{\sum_j(|\Delta x_j|,|\Delta y_j|)}_2
+\le \sum_j\norm{(\Delta x_j,\Delta y_j)}_2
+\le2(W+D).
+\end{equation}
+Polygonal approximation extends this to compact convex sets. The centered rhombus with vertices $(\pm W/2,0),(0,\pm D/2)$ attains $L_2$, and the rectangle of dimensions $W,D$ attains $U_2$. Write these sets as $A,B$. For $0\le t\le1$, the Minkowski combination $K_t=(1-t)A+tB$ preserves both widths and, by Eq.~\eqref{eq:cauchy}, has
+\begin{equation}
+P(K_t)=(1-t)L_2+tU_2.
+\label{eq:witness}
+\end{equation}
+Every intermediate value is therefore attained.
+\end{proof}
+
+Equation~\eqref{eq:witness} replaces a numerically integrated witness family with an exact linear parameterization. Each centered section has identical orthogonal projection intervals. It does not assert that arbitrary photographs of human bodies contain only those two numbers.
+
+\begin{proposition}[Optimal point estimates from an attainable interval]
+\label{prop:minimax}
+Given $0<L\le P\le U$ with both endpoints attainable under the same observations, the unique absolute-error minimax estimate for $L<U$ is $(L+U)/2$, with error $(U-L)/2$. For relative loss $|a-P|/P$, the optimum is
+\begin{equation}
+a_{\rm rel}=\frac{2LU}{L+U},\qquad
+r_{\rm rel}=\frac{U-L}{U+L}.
+\label{eq:relative}
+\end{equation}
+\end{proposition}
+\begin{proof}
+For absolute loss the endpoint errors are balanced at the arithmetic midpoint. For relative loss an optimizer lies in $[L,U]$, where the largest loss is $\max\{a/L-1,1-a/U\}$. Equating these terms gives Eq.~\eqref{eq:relative}. The maximum over the whole interval occurs at an endpoint.
+\end{proof}
+
+For illustration, $W=330$\,mm and $D=224$\,mm give $[797.687,1108.000]$\,mm and absolute minimax error $155.157$\,mm. These are geometric values for this specified box, not estimates of typical human error. A restricted anatomical class can have a much smaller interval.
+
+\section{An exact finite formulation for several views}
+Assume $k\ge2$ known directions $0\le\theta_0<\cdots<\theta_{k-1}<\pi$ and width intervals $0<\ell_i\le w_K(\theta_i)\le b_i$. Exact observations are the special case $\ell_i=b_i$. Two distinct directions modulo $\pi$ bound the centered feasible sets. Nearly parallel directions can give a large bound; there is no angle-independent inequality $w(\theta)\le\sum_i w_i$.
+
+\begin{theorem}[Finite sharp interval, including width uncertainty]
+\label{thm:finite}
+Let
+\begin{equation}
+H_b=\{x\in\R^2:|u(\theta_i)\cdot x|\le b_i/2\ \text{for all }i\}.
+\label{eq:strip}
+\end{equation}
+The interval observations are feasible if and only if $w_{H_b}(\theta_i)\ge\ell_i$ for every $i$. When feasible, their maximum perimeter is $U=P(H_b)$. Their minimum perimeter is the value of the finite convex program
+\begin{align}
+L=\min_{p_i,c_i,t_i}\quad &2\sum_{i=0}^{k-1}t_i,\nonumber\\
+\text{subject to}\quad
+&\ell_i/2\le c_i\le b_i/2,\quad u(\theta_i)\cdot p_i=c_i,\nonumber\\
+&|u(\theta_j)\cdot p_i|\le c_j\quad(0\le i,j<k),\label{eq:socp}\\
+&\norm{p_{i+1}-p_i}_2\le t_i\quad(0\le i<k),\quad p_k=-p_0.\nonumber
+\end{align}
+All perimeters in $[L,U]$ are attainable. In particular, a minimizer can be chosen as a centrally symmetric polygon with at most $2k$ vertices.
+\end{theorem}
+\begin{proof}
+Central symmetrization preserves the observed widths and perimeter. Every symmetral consistent with the upper bounds lies inside $H_b$. Inclusion increases convex perimeter by Eq.~\eqref{eq:cauchy}; thus $P\le P(H_b)$. Feasibility requires $w_{H_b}(\theta_i)\ge\ell_i$. Conversely, if these inequalities hold, $H_b$ itself is feasible and attains the upper endpoint.
+
+For any feasible centrally symmetric $S$, choose a positive supporting contact $p_i\in S$ in direction $u(\theta_i)$, and set $c_i=w_S(\theta_i)/2$. The contacts and their negatives, listed in circular support order, form an inscribed convex polygon $Q\subseteq S$. Its perimeter is $2\sum_i\norm{p_{i+1}-p_i}_2$, allowing repeated or collinear contacts. Therefore the program's minimum is no greater than the minimum feasible perimeter.
+
+Conversely, feasible contacts in Eq.~\eqref{eq:socp} lie on the corresponding ordered supporting faces of $H_c=\{x:|u(\theta_j)\cdot x|\le c_j\}$. Their boundary order is the support-direction order. The polygon $Q=\conv\{\pm p_i\}$ has widths exactly $2c_i$: the inequalities bound every vertex and $p_i$ attains each positive bound. Its perimeter equals the displayed cyclic sum, so it realizes the program's objective at optimal epigraph values. This proves equality of the minima. Compactness of the contact and width domains gives attainment. Minkowski interpolation between the endpoint sets preserves every width interval and varies perimeter linearly, proving the interval statement.
+\end{proof}
+
+The norm constraints make Eq.~\eqref{eq:socp} a second-order cone program~\cite{lobo}. It uses $4k$ scalar variables and $O(k^2)$ linear constraints in the interval case. With fixed widths, the contacts lie on known polygon faces and can each be parameterized by one scalar, reducing the epigraph formulation to $2k$ variables after face construction. The relation to minimum-perimeter inscribed polygons~\cite{kodmon} is explicit; a general claim of new algorithmic priority is not made. The advantage over a sampled constraint $w''+w\ge0$ is exact finite representation, rather than a universal claim about solver runtime.
+
+\begin{corollary}[Exact upper endpoint]
+\label{cor:upper}
+Suppose the exact widths are geometrically consistent. Set $\theta_k=\theta_0+\pi$ and $w_k=w_0$, and define cyclic gaps $\delta_i=\theta_{i+1}-\theta_i$. Then the upper endpoint is
+\begin{equation}
+U=\sum_{i=0}^{k-1}(w_i+w_{i+1})\tan(\delta_i/2).
+\label{eq:upper}
+\end{equation}
+\end{corollary}
+\begin{proof}
+Consistency ensures each strip boundary supports $H_w$, possibly at a vertex. With half-widths $h_i=w_i/2$, the two adjacent vertices give face length
+\[
+s_i=\frac{h_{i-1}-h_i\cos\delta_{i-1}}{\sin\delta_{i-1}}
++\frac{h_{i+1}-h_i\cos\delta_i}{\sin\delta_i}.
+\]
+Sum over the $2k$ cyclic faces and use $(1-\cos\delta)/\sin\delta=\tan(\delta/2)$ to obtain Eq.~\eqref{eq:upper}. Zero-length faces follow by continuity.
+\end{proof}
+For interval data, an upper strip may be redundant. Its polygon must then be intersected explicitly, rather than substituting inconsistent upper bounds into Eq.~\eqref{eq:upper}.
+
+\section{Worst-case view design and a stopping rule}
+\begin{theorem}[Sharp largest-gap relative guarantee]
+\label{thm:angles}
+Let $\Delta<\pi$ be the largest cyclic gap between the fixed exact directions, and put $c=\cos(\Delta/2)$. Every consistent data vector satisfies $cU\le P\le U$. Consider the estimator
+\begin{equation}
+\widehat P_\Delta=\frac{2c}{1+c}U
+\end{equation}
+has worst-case relative error $\tan^2(\Delta/4)$ over nonzero compact convex sections. No estimator based on these widths, including a nonlinear estimator, has a smaller worst-case relative error. Hence uniformly spaced directions minimize this unrestricted worst-case loss, giving
+\begin{equation}
+r_k^*=\tan^2\!\left(\frac{\pi}{4k}\right),\qquad
+\widehat P_k^*=4\tan\!\left(\frac{\pi}{4k}\right)\sum_{i=0}^{k-1}w_i.
+\label{eq:uniform}
+\end{equation}
+\end{theorem}
+\begin{proof}
+A planar centrally symmetric set is a zonoid~\cite{schneider}; its width and perimeter have the representation
+\begin{equation}
+w(\theta)=\int_0^\pi|\cos(\theta-\phi)|\,\mu(d\phi),\qquad P=2\mu([0,\pi)),\quad\mu\ge0.
+\label{eq:zonoid}
+\end{equation}
+For completeness, $\rho=w''+w$ is a nonnegative periodic measure and $(|\sin\theta|)''+|\sin\theta|=2\delta_0$ on the $\pi$-periodic circle. Thus $w=\tfrac12\int|\sin(\theta-t)|\rho(dt)$: the difference solves $f''+f=0$, whose only $\pi$-periodic solution is zero. Rotating $t$ gives Eq.~\eqref{eq:zonoid}.
+
+Partition generator directions at $\alpha_i=\theta_i+\pi/2$ modulo $\pi$. On a sector $[\alpha,\beta]$ of length $\delta$, the sampled kernel vector $a(\phi)=(|\cos(\theta_i-\phi)|)_i$ has constant signs before absolute values and satisfies
+\begin{equation}
+a(\phi)=\lambda a(\alpha)+\eta a(\beta),\quad
+\lambda=\frac{\sin(\beta-\phi)}{\sin\delta},\quad
+\eta=\frac{\sin(\phi-\alpha)}{\sin\delta}.
+\end{equation}
+For a unit segment at a sector endpoint, one observed width vanishes; the corresponding strip intersection is that segment, so the linear functional in Eq.~\eqref{eq:upper} equals $2$. Consequently
+\[
+U(a(\phi))=2(\lambda+\eta)
+=\frac{2\cos(\phi-(\alpha+\beta)/2)}{\cos(\delta/2)}
+\in[2,2\sec(\Delta/2)].
+\]
+Integrating against $\mu$ gives $P\le U\le P/c$. Formula~\eqref{eq:relative} applied to $[cU,U]$ proves the stated guarantee.
+
+A unit segment directed along the midpoint of a largest generator sector has $P=2$ and $U=2/c$. It and its strip polygon give identical positive sampled widths and attain the ratio $U/P=1/c$. Proposition~\ref{prop:minimax} therefore rules out a smaller worst-case relative loss for any estimator. Full-dimensional approximations give the same supremum if segments are excluded. Finally $\Delta\ge\pi/k$, with equality exactly for uniform gaps. Substituting Eq.~\eqref{eq:upper} gives Eq.~\eqref{eq:uniform}.
+\end{proof}
+
+This argument is consistent with classical sharp projection-quadrature bounds~\cite{kiderlen}; Eq.~\eqref{eq:uniform} balances their endpoint relative losses rather than enforcing exactness on circles. Population-specific mean error is a different objective, so tuned nonuniform schedules can improve a dataset average without contradicting Theorem~\ref{thm:angles}.
+
+The data-specific interval from Theorem~\ref{thm:finite} can be narrower than $[cU,U]$. A valid absolute-error stopping condition is $U-L\le2\varepsilon$ when reporting the midpoint; a relative condition is $(U-L)/(U+L)\le\varepsilon$ when reporting the harmonic mean. Added observations shrink the interval only when they retain the previous constraints. Uniform three- and four-view grids are not nested, so their intervals need not shrink monotonically. In numerical certification, endpoints require validated outward error allowances in addition to a solver's displayed tolerances.
+
+\section{Fourier aliasing and embedded discrepancies}
+Write $w(\theta)=\sum_{m\in\mathbb Z}c_m e^{2im\theta}$, with $c_{-m}=\overline{c_m}$. Since $w''+w$ is a finite measure, $c_m=O(m^{-2})$, so the series converges absolutely. The uniform rule and its shifted version obey
+\begin{align}
+Q_k(\varphi)&=\frac\pi k\sum_{j=0}^{k-1}w(\varphi+j\pi/k)
+=\pi\sum_{k\mid m}c_m e^{2im\varphi},\label{eq:alias}\\
+Q_k(0)-P&=2\pi\sum_{r\ge1}\Rea(c_{rk}).\nonumber
+\end{align}
+The finite geometric sum proves these identities; they are the standard Fourier interpretation of periodic quadrature~\cite{trefethen}. For a general rule $\widehat P=\sum_j a_jw(\theta_j)$, the exact error is $c_0(M_0-\pi)+\sum_{m\ne0}c_mM_m$, where $M_m=\sum_j a_je^{2im\theta_j}$. Its constant term disappears only if $\sum_j a_j=\pi$.
+
+For two orthogonal widths, set $E=\sum_{r\ge1}\Rea(c_{2r})$ and $O=\sum_{r\ge0}\Rea(c_{2r+1})$. Then
+\begin{equation}
+W+D=2c_0+4E,\qquad W-D=4O,\qquad
+\frac DW=\frac{c_0+2E-2O}{c_0+2E+2O}.
+\end{equation}
+Thus the difference isolates an odd-indexed sum, whereas the ratio depends on the mean and even sum as well. Theorem~\ref{thm:two} proves that $(W,D)$ cannot determine $P$ on the unrestricted class. It does not imply that a fitted correction must fail to transfer: an elliptical family, for example, remains identifiable from its two axes at every scale. Nor does it imply that a scalar population correction must transfer.
+
+\begin{proposition}[An embedded discrepancy is not an error bound]
+Let $Q'_2=Q_2(\pi/4)$ and $\xi=|Q_2-Q'_2|/2$. Although
+\begin{equation}
+Q_4=(Q_2+Q'_2)/2,\qquad Q_2-P=(Q_2-Q'_2)/2+(Q_4-P),
+\end{equation}
+$\xi=0$ does not imply zero or small absolute perimeter error.
+\end{proposition}
+\begin{proof}
+Take $w(\theta)=R+a(\cos8\theta-1)$ with $R>0$ and $0<a<R/64$. Its curvature measure has density $w''+w=R-a-63a\cos8\theta>0$, so $w/2$ is the support function of a smooth strictly convex centrally symmetric body. At the four sampled angles $w=R$, giving $Q_2=Q'_2=Q_4=\pi R$ and $\xi=0$. However, $P=\pi(R-a)$, so the error is $\pi a$. Scaling $R,a$ makes this absolute error arbitrarily large while $\xi$ remains zero.
+\end{proof}
+The discrepancy remains a useful diagnostic under an additional smoothness or tail model. The feasible interval supplies the guarantee without that assumption.
+
+\section{Numerical checks and measurement scope}
+The accompanying code evaluates Eq.~\eqref{eq:socp} with Clarabel~\cite{clarabel}. Forty random two-view boxes reproduce Eq.~\eqref{eq:two} within $1.97\times10^{-7}$\,mm. Forty random convex polygons, using $k\in\{2,3,4,6,8\}$ and nonuniform directions, show no perimeter-containment violations at $10^{-4}$\,mm tolerance; the strip-polygon and closed upper values differ by at most $3.19\times10^{-12}$\,mm. Across these and five ellipse cases, the largest reported primal--dual gap is $2.19\times10^{-8}$\,mm. An inconsistent width vector is rejected. These floating-point checks support implementation consistency; the proofs establish exactness, and the numerical values are not interval-arithmetic certificates.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Synthetic ellipse with semiaxes $165,112$\,mm and perimeter $878.204$\,mm. The geometric bounds do not assume ellipticity. The last column is the uniform-design worst-case guarantee over the full convex class.}
+\begin{tabular}{rrrrr}
+\toprule
+Views $k$ & $L$ (mm) & $U$ (mm) & $U-L$ (mm) & $100r_k^*$ (\%)\\
+\midrule
+2 & 797.687 & 1108.000 & 310.313 & 17.157\\
+3 & 839.341 & 969.187 & 129.846 & 7.180\\
+4 & 855.920 & 926.223 & 70.303 & 3.957\\
+6 & 868.209 & 898.832 & 30.623 & 1.733\\
+8 & 872.572 & 889.667 & 17.095 & 0.970\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For the interval observations $W\in[328,332]$\,mm and $D\in[222,226]$\,mm, the program returns
+\[
+[L,U]=[792.131,1116.000]\ \mathrm{mm},
+\]
+matching the monotone two-view formulas. The embedded-rule counterexample with $R=100$\,mm and $a=1$\,mm has $\xi=0$ and error $3.142$\,mm.
+
+The theoretical input is a width, not a generic displaced image contour. If an ideal measurement model adds the same $2\tau$ to every width, a constant-exact quadrature rule shifts by $2\pi\tau$. Outward parallel expansion $K+\tau B$ realizes this model for $\tau\ge0$. Inward erosion or dilation of a photographed silhouette at a fixed image row need not do so. Similarly, nearest-grid rounding of each endpoint with pitch $s$ gives width error at most $s$ and positive constant-exact quadrature error at most $\pi s$; independence across views requires a separate stochastic model. No universal camera distance or superiority of segmentation refinement over additional views follows from the geometric theorems.
+
+\section{Conclusion}
+Sparse directional widths admit exact perimeter intervals with constructive extremizers. The finite contact formulation provides a practical replacement for angular-grid optimization and accommodates bounded width uncertainty. The largest-gap analysis distinguishes worst-case view design from population-specific fitting, while the smooth counterexample distinguishes an embedded discrepancy from a certificate. The computational and robust formulations are the principal directions for further methodological evaluation; their priority and anthropometric benefit require comparison with the cited projection and inscribed-polygon literature and independent measurement data.
+
+\begin{thebibliography}{99}
+\small\raggedright\setlength{\itemsep}{0.15em}
+\bibitem{hung} P.~C.-Y.~Hung, C.~P.~Witana, and R.~S.~Goonetilleke, ``Anthropometric measurements from photographic images,'' in \emph{Work with Computing Systems 2004}, pp.~764--769, 2004. \url{https://www.ieda.ust.hk/dfaculty/ravi/papers/wwcs2004_1.pdf}.
+\bibitem{aslam} M.~Aslam, F.~Rajbdad, S.~Khattak, and S.~Azmat, ``Automatic measurement of anthropometric dimensions using frontal and lateral silhouettes,'' \emph{IET Computer Vision}, vol.~11, no.~6, pp.~434--447, 2017. doi: 10.1049/iet-cvi.2016.0406.
+\bibitem{schneider} R.~Schneider, \emph{Convex Bodies: The Brunn--Minkowski Theory}, 2nd expanded ed. Cambridge University Press, 2014.
+\bibitem{baudrier} E.~Baudrier, M.~Tajine, and A.~Daurat, ``Polygonal estimation of planar convex-set perimeter from its two projections,'' \emph{Discrete Applied Mathematics}, vol.~161, no.~15, pp.~2252--2268, 2013. doi: 10.1016/j.dam.2012.07.005.
+\bibitem{kiderlen} M.~Kiderlen and D.~Meschenmoser, ``Error bounds for surface area estimators based on Crofton's formula,'' \emph{Image Analysis and Stereology}, vol.~28, no.~3, pp.~165--177, 2009. doi: 10.5566/ias.v28.p165-177.
+\bibitem{kodmon} C.~L.~K\"odm\"on and Z.~L\'angi, ``Extremal convex polygons inscribed in a given convex polygon,'' \emph{Computational Geometry}, vol.~102, article~101844, 2022. doi: 10.1016/j.comgeo.2021.101844.
+\bibitem{iso} International Organization for Standardization, \emph{Size designation of clothes---Part 1: Anthropometric definitions for body measurement}, ISO 8559-1:2017, 2017.
+\bibitem{lobo} M.~S.~Lobo, L.~Vandenberghe, S.~Boyd, and H.~Lebret, ``Applications of second-order cone programming,'' \emph{Linear Algebra and its Applications}, vol.~284, pp.~193--228, 1998. \url{https://web.stanford.edu/~boyd/papers/socp.html}.
+\bibitem{trefethen} L.~N.~Trefethen and J.~A.~C.~Weideman, ``The exponentially convergent trapezoidal rule,'' \emph{SIAM Review}, vol.~56, no.~3, pp.~385--458, 2014. doi: 10.1137/130932132.
+\bibitem{clarabel} Clarabel developers, ``Getting started: Python interface,'' software documentation, accessed October~18, 2026. \url{https://clarabel.org/stable/python/getting_started_py/}.
+\end{thebibliography}
+\end{document}

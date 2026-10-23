@@ -1,0 +1,51 @@
+{
+  "scope": "mocked perception control paths, not real capture success or accuracy",
+  "cases": [
+    {
+      "case": "missing_pose",
+      "expected": "missing_pose",
+      "observed": "missing_pose",
+      "pass": true
+    },
+    {
+      "case": "missing_segmentation",
+      "expected": "missing_segmentation",
+      "observed": "missing_segmentation",
+      "pass": true
+    },
+    {
+      "case": "canvas_clipping",
+      "expected": "foreground_lost_by_alignment_canvas",
+      "observed": "foreground_lost_by_alignment_canvas",
+      "pass": true
+    },
+    {
+      "case": "input_border",
+      "expected": "input_mask_border_contact",
+      "observed": "input_mask_border_contact",
+      "pass": true
+    },
+    {
+      "case": "material_fragment",
+      "expected": "ambiguous_foreground_components_material_fraction",
+      "observed": "ambiguous_foreground_components_material_fraction",
+      "pass": true
+    },
+    {
+      "case": "empty",
+      "expected": "empty_foreground",
+      "observed": "empty_foreground",
+      "pass": true
+    },
+    {
+      "case": "grid_budget",
+      "expected": "limit",
+      "observed": "voxel grid needs 401,000,000 cells (limit 400,000,000). Check silhouette framing and height, or increase MAX_GRID_VOXELS only after measuring available server memory. Resolution was not changed.",
+      "pass": true
+    },
+    {
+      "case": "invalid_stature_attempt_record",
+      "pass": true
+    }
+  ]
+}

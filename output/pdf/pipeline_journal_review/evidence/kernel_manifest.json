@@ -1,0 +1,35 @@
+{
+  "profile_carve.py": {
+    "original_path": "C:\\Users\\SUMANTH S SHETTY\\Documents\\Anthropometry\\profile_carve.py",
+    "source_sha256": "0fe4b09e7304b7cdaee554603998ed08be1b0b33953b882b674af6b7574b6e38",
+    "extracted_top_level_definitions": [
+      "DEPTH_OUTLIER_K",
+      "CENTRE_OUTLIER_MADS",
+      "CENTRE_OUTLIER_MIN_PX",
+      "REJECT_DILATION_ROWS",
+      "EDGE_MEDIAN_ROWS",
+      "_row_runs",
+      "_smooth",
+      "_column_run_lengths",
+      "body_depth_profile"
+    ]
+  },
+  "waist_correction.py": {
+    "original_path": "C:\\Users\\SUMANTH S SHETTY\\Documents\\Anthropometry\\waist_correction.py",
+    "source_sha256": "32cdf21fcce5f20cc99eb38c37ce83be6eb7287551618239c9cd31520cec2489",
+    "extracted_top_level_definitions": [
+      "_concavity_region",
+      "_region_curvature",
+      "_refine_local_minimum",
+      "correction_depth",
+      "apply_waist_correction"
+    ]
+  },
+  "visual_hull.py": {
+    "original_path": "C:\\Users\\SUMANTH S SHETTY\\Documents\\Anthropometry\\visual_hull.py",
+    "source_sha256": "8ac89032400016a34a6dd8498d2063e7d3aade5f5f3380d9341a4f2726e78834",
+    "extracted_top_level_definitions": [
+      "keep_largest_3d_component"
+    ]
+  }
+}

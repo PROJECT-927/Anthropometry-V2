@@ -1,0 +1,17 @@
+{
+  "id": "R22",
+  "severity": "major",
+  "location": "Section 3.2 hard interval membership; evidence/profile_results.json clean_horizontal_limbs",
+  "excerpt": "Filtered constant endpoint depth error is about 1e-12 mm, yet clean filtered-with-column-cap IoU is 0.968620055 rather than the intended exact discrete match.",
+  "title": "Floating-point endpoint drift can delete grid-aligned boundary layers",
+  "reason": "New coordinator-run source-based synthetic evidence shows that nearly constant Savitzky-Golay endpoint outputs drift across exactly aligned voxel coordinates. Hard Z>=lower and Z<=upper tests then remove whole boundary layers despite negligible physical endpoint change. This is a numerical reproducibility defect, not evidence of anatomical shape uncertainty.",
+  "criterion": "Document and test a coordinate/grid-scaled numerical tolerance for interval membership, distinguish it from physical mask dilation or model error, and compare legacy and corrected reference results. Test aligned and near-boundary endpoints at multiple voxel spacings; verify tolerance does not add arbitrary layers or mask real geometric changes. Keep the legacy kernel unchanged in the archive.",
+  "evidence": "Versioned reference-membership change, synthetic regression tests and both legacy/reference output tables with precise tolerance and units.",
+  "work": [
+    "code",
+    "math",
+    "prose"
+  ],
+  "status": "OPEN",
+  "discovery": "Discovered after initial round-1 report from coordinator-generated deterministic kernel ablations; this is an explicit new finding, not an unstated change to acceptance criteria."
+}

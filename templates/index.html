@@ -356,6 +356,7 @@ async function preparePhoto(file, label) {
     masks?.forEach(mask => mask.close());
     throw new Error(`Could not find a person in the ${label} photo. Use a clear, full-body photo.`);
   }
+  const fullFramePoints = result.landmarks[0];
   let cleaned;
   try {
     const processor = window.AnthropometryPreprocessing;
@@ -367,33 +368,65 @@ async function preparePhoto(file, label) {
   } finally {
     masks.forEach(mask => mask.close());
   }
+  // The first result contains a segmentation tensor that is no longer needed.
+  // Release its reference before running the second, crop-sized inference.
+  result = null;
 
   // Match the old landmark pass: crop around the cleaned subject with 15%
   // margin, upscale small crops, and map the detected coordinates back.
   const crop = cleaned.crop;
   const cropScale = Math.max(1, 1024 / Math.max(crop.width, crop.height));
+  const cropWidth = Math.max(1, Math.floor(crop.width * cropScale));
+  const cropHeight = Math.max(1, Math.floor(crop.height * cropScale));
+  // Segmentation uses aligned float-mask rows. Pad the crop exactly as the
+  // full image; an unaligned width can abort the MediaPipe WASM runtime.
+  const paddedCropWidth = cropWidth + (4 - cropWidth % 4) % 4;
   const cropCanvas = document.createElement("canvas");
-  cropCanvas.width = Math.max(1, Math.floor(crop.width * cropScale));
-  cropCanvas.height = Math.max(1, Math.floor(crop.height * cropScale));
+  cropCanvas.width = paddedCropWidth;
+  cropCanvas.height = cropHeight;
   const cropCtx = cropCanvas.getContext("2d");
   cropCtx.imageSmoothingQuality = "high";
   cropCtx.drawImage(source, crop.x, crop.y, crop.width, crop.height,
-                    0, 0, cropCanvas.width, cropCanvas.height);
-  let refined;
-  try { refined = detector.detect(cropCanvas); }
-  catch (_) { throw new Error(`Could not refine the ${label} pose. Use a clear, full-body photo.`); }
-  const points = refined.landmarks?.[0];
-  refined.segmentationMasks?.forEach(mask => mask.close());
-  if (!points?.length) throw new Error(`Could not locate the ${label} pose in the subject crop.`);
+                    0, 0, cropWidth, cropHeight);
+  if (paddedCropWidth > cropWidth) {
+    cropCtx.drawImage(cropCanvas, cropWidth - 1, 0, 1, cropHeight,
+                      cropWidth, 0, paddedCropWidth - cropWidth, cropHeight);
+  }
+  let points = fullFramePoints;
+  let pointToOriginal = p => ({ x: p.x * paddedWidth, y: p.y * height });
+  let refinement = "full_frame_fallback";
+  try {
+    const refined = detector.detect(cropCanvas);
+    refined.segmentationMasks?.forEach(mask => mask.close());
+    if (refined.landmarks?.[0]?.length) {
+      points = refined.landmarks[0];
+      pointToOriginal = p => ({
+        x: crop.x + p.x * paddedCropWidth * crop.width / cropWidth,
+        y: crop.y + p.y * crop.height,
+      });
+      refinement = "cropped";
+    } else {
+      console.warn(`[anthropometry] ${label} crop refinement returned no landmarks; using full-frame landmarks.`);
+    }
+  } catch (error) {
+    // The original full-frame inference succeeded. Keep this input usable and
+    // preserve the actual exception for browser diagnostics.
+    console.warn(`[anthropometry] ${label} crop refinement failed; using full-frame landmarks.`, error);
+    // A native WASM abort can invalidate the detector. The next photo must
+    // obtain a fresh instance instead of reusing the failed runtime.
+    landmarkerPromise = null;
+    try { detector.close?.(); } catch (_) { /* The runtime may already be aborted. */ }
+  }
   const landmarks = {};
   for (const [name, index] of Object.entries(LANDMARK_MAP)) {
     const p = points[index];
     if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) {
       throw new Error(`Could not locate ${name.replaceAll("_", " ")} in the ${label} photo.`);
     }
+    const original = pointToOriginal(p);
     landmarks[name] = {
-      x: (crop.x + p.x * cropCanvas.width / cropScale) / width,
-      y: (crop.y + p.y * cropCanvas.height / cropScale) / height,
+      x: original.x / width,
+      y: original.y / height,
       visibility: p.visibility ?? 1,
     };
   }
@@ -417,14 +450,20 @@ async function preparePhoto(file, label) {
   }
   ctx.putImageData(pixels, 0, 0);
   const silhouette = await toBlob(canvas);
-  return { silhouette, landmarks: JSON.stringify(landmarks) };
+  return { silhouette, landmarks: JSON.stringify(landmarks), refinement };
 }
 
 window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
   onProgress("Loading on-device pose model…");
   const front = await preparePhoto(frontFile, "front");
+  if (front.refinement !== "cropped") {
+    onProgress("Front pose crop refinement failed; continuing with the full-image pose.");
+  }
   onProgress("Extracting side silhouette on this device…");
   const side = await preparePhoto(sideFile, "side");
+  if (side.refinement !== "cropped") {
+    onProgress("Side pose crop refinement failed; continuing with the full-image pose.");
+  }
   return { front, side, preprocessing: "browser-v2" };
 };
 </script>

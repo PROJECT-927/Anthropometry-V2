@@ -1,0 +1,112 @@
+{
+  "scope": "isolated schema and affine mapping contracts, not production pipeline integration",
+  "accepted_records": [
+    {
+      "schema_version": "research-reference-1",
+      "attempt_id": "synthetic-schema-001",
+      "endpoint_id": "posterior_shoulder_path",
+      "method_id": "ellipse_half_perimeter",
+      "source_branch": "front_profile_widths",
+      "units": "mm",
+      "value": 400.0,
+      "level_mm": 300.0,
+      "fallback_reason": null,
+      "flags": {
+        "interpolated_profile": false,
+        "depth_capped": false,
+        "waist_adjusted": false,
+        "rejected": false
+      },
+      "sensitivity": {
+        "available": false,
+        "reason": "no_physical_covariance",
+        "value_mm": null,
+        "kind": "conditional_only"
+      }
+    },
+    {
+      "schema_version": "research-reference-1",
+      "attempt_id": "synthetic-schema-001",
+      "endpoint_id": "projected_shoulder_breadth",
+      "method_id": "landmark_chord",
+      "source_branch": "frontal_mask_landmarks",
+      "units": "mm",
+      "value": 350.0,
+      "level_mm": 300.0,
+      "fallback_reason": "shoulder_path_unavailable",
+      "flags": {
+        "interpolated_profile": false,
+        "depth_capped": false,
+        "waist_adjusted": false,
+        "rejected": false
+      },
+      "sensitivity": {
+        "available": false,
+        "reason": "no_physical_covariance",
+        "value_mm": null,
+        "kind": "conditional_only"
+      }
+    },
+    {
+      "schema_version": "research-reference-1",
+      "attempt_id": "synthetic-schema-002",
+      "endpoint_id": "posterior_shoulder_path",
+      "method_id": "ellipse_half_perimeter",
+      "source_branch": "front_profile_widths",
+      "units": "mm",
+      "value": null,
+      "level_mm": 300.0,
+      "fallback_reason": "missing_required_landmarks",
+      "flags": {
+        "interpolated_profile": false,
+        "depth_capped": false,
+        "waist_adjusted": false,
+        "rejected": true
+      },
+      "sensitivity": {
+        "available": false,
+        "reason": "no_physical_covariance",
+        "value_mm": null,
+        "kind": "conditional_only"
+      }
+    },
+    {
+      "schema_version": "research-reference-1",
+      "attempt_id": "synthetic-schema-001",
+      "endpoint_id": "posterior_shoulder_path",
+      "method_id": "ellipse_half_perimeter",
+      "source_branch": "front_profile_widths",
+      "units": "mm",
+      "value": 400.0,
+      "level_mm": 300.0,
+      "fallback_reason": null,
+      "flags": {
+        "interpolated_profile": false,
+        "depth_capped": false,
+        "waist_adjusted": false,
+        "rejected": false
+      },
+      "sensitivity": {
+        "available": true,
+        "reason": "exact_algebraic_fit",
+        "value_mm": 0.0,
+        "kind": "conditional_algebraic"
+      }
+    }
+  ],
+  "rejected_invalid_records": {
+    "breadth_as_path": true,
+    "unavailable_zero": true,
+    "rejected_with_value": true,
+    "ambiguous_legacy_endpoint": true,
+    "missing_flags": true,
+    "wrong_source": true
+  },
+  "coordinate_mapping": {
+    "pairwise_distance_max_error_mm": 0.0,
+    "orientation_determinant": 1.0,
+    "crown_maps_to_z_mm": 1700.0,
+    "floor_ymax_maps_to_z_mm": 0.0
+  },
+  "all_tests_passed": true
+}

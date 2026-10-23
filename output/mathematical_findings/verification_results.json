@@ -1,0 +1,118 @@
+{
+  "seed": 20261018,
+  "human_datasets_used": false,
+  "two_view_closed_form_cases": 40,
+  "max_two_view_lower_error_mm": 1.9602498468884733e-07,
+  "random_polygon_cases": 40,
+  "max_containment_violation_mm": 0,
+  "max_upper_polygon_formula_difference_mm": 3.183231456205249e-12,
+  "max_primal_dual_gap_mm": 2.1808802707429546e-08,
+  "solver_status_counts": {
+    "Solved": 85
+  },
+  "ellipse_example": [
+    {
+      "k": 2,
+      "lower_mm": 797.6866552702402,
+      "upper_mm": 1108.0,
+      "true_mm": 878.2041190162006,
+      "optimal_uniform_relative_bound": 0.1715728752538099
+    },
+    {
+      "k": 3,
+      "lower_mm": 839.3407503676391,
+      "upper_mm": 969.1872163500817,
+      "true_mm": 878.2041190162006,
+      "optimal_uniform_relative_bound": 0.07179676972449082
+    },
+    {
+      "k": 4,
+      "lower_mm": 855.9196059688238,
+      "upper_mm": 926.2226512440511,
+      "true_mm": 878.2041190162006,
+      "optimal_uniform_relative_bound": 0.03956612989658004
+    },
+    {
+      "k": 6,
+      "lower_mm": 868.2093222277207,
+      "upper_mm": 898.8318269052381,
+      "true_mm": 878.2041190162006,
+      "optimal_uniform_relative_bound": 0.017332380120999264
+    },
+    {
+      "k": 8,
+      "lower_mm": 872.5721407951813,
+      "upper_mm": 889.6667218279346,
+      "true_mm": 878.2041190162006,
+      "optimal_uniform_relative_bound": 0.009700556535263624
+    }
+  ],
+  "superellipse_perimeters_mm": {
+    "1": 797.6866552726077,
+    "2": 878.2041190162004,
+    "10": 1051.0147043675886,
+    "200": 1105.018662358359,
+    "inf": 1108
+  },
+  "sharp_view_design_witnesses": [
+    {
+      "k": 2,
+      "lower_mm": 199.99999999941053,
+      "upper_mm": 282.842712474619,
+      "expected_relative_risk": 0.1715728752538099
+    },
+    {
+      "k": 3,
+      "lower_mm": 199.9999999975462,
+      "upper_mm": 230.94010767585033,
+      "expected_relative_risk": 0.07179676972449082
+    },
+    {
+      "k": 4,
+      "lower_mm": 199.99999998812817,
+      "upper_mm": 216.47844005847875,
+      "expected_relative_risk": 0.03956612989658004
+    },
+    {
+      "k": 6,
+      "lower_mm": 199.9999999959802,
+      "upper_mm": 207.05523608201665,
+      "expected_relative_risk": 0.017332380120999264
+    },
+    {
+      "k": 8,
+      "lower_mm": 199.99999999786036,
+      "upper_mm": 203.91823164166357,
+      "expected_relative_risk": 0.009700556535263624
+    }
+  ],
+  "interval_two_view": {
+    "lower": 792.131302218913,
+    "upper": 1116.0,
+    "duality_gap": 6.03019856271203e-10
+  },
+  "inconsistent_widths_rejected": true,
+  "zero_embedded_difference_counterexample": {
+    "R_mm": 100,
+    "a_mm": 1,
+    "width_samples_mm": [
+      100,
+      100,
+      100,
+      100
+    ],
+    "Q2_mm": 314.1592653589793,
+    "Q4_mm": 314.1592653589793,
+    "P_mm": 311.01767270538954,
+    "embedded_difference_mm": 0,
+    "actual_error_mm": 3.141592653589793
+  },
+  "elapsed_seconds": 0.8065202999860048,
+  "versions": {
+    "python": "3.12.9",
+    "numpy": "2.5.2",
+    "scipy": "1.18.1",
+    "clarabel": "0.11.1"
+  },
+  "interpretation": "Floating-point checks support implementation consistency; proofs establish the mathematical statements."
+}

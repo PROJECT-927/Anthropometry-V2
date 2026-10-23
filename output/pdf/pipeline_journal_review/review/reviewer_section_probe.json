@@ -1,0 +1,71 @@
+{
+  "scope": "Selected 2D morphology/convex-hull/corrected-fit cases reproduced; no human or full-pipeline inference.",
+  "source_and_kernel_hashes_match": true,
+  "selected_cases_reproduced": [
+    {
+      "shape": "ellipse",
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.0,
+      "accepted": true,
+      "error_mm": -0.9735865427161343,
+      "failure_reason": null
+    },
+    {
+      "shape": "ellipse",
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.9,
+      "accepted": true,
+      "error_mm": -44.917541760380686,
+      "failure_reason": null
+    },
+    {
+      "shape": "ellipse",
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.0,
+      "accepted": true,
+      "error_mm": -2.734106283389224,
+      "failure_reason": null
+    },
+    {
+      "shape": "ellipse",
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.9,
+      "accepted": true,
+      "error_mm": -37.773930134484544,
+      "failure_reason": null
+    },
+    {
+      "shape": "box",
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.0,
+      "accepted": false,
+      "error_mm": null,
+      "failure_reason": "fewer_than_five_hull_vertices"
+    },
+    {
+      "shape": "box",
+      "spacing_mm": 2.0,
+      "opening_fraction": 0.9,
+      "accepted": true,
+      "error_mm": -137.09282004605313,
+      "failure_reason": null
+    },
+    {
+      "shape": "box",
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.0,
+      "accepted": false,
+      "error_mm": null,
+      "failure_reason": "fewer_than_five_hull_vertices"
+    },
+    {
+      "shape": "box",
+      "spacing_mm": 4.0,
+      "opening_fraction": 0.9,
+      "accepted": true,
+      "error_mm": -131.25748337314462,
+      "failure_reason": null
+    }
+  ],
+  "interpretation": "The 0.9 opening fraction substantially underestimates this known ellipse; box fit failure at fraction zero and shape-model mismatch prevent a simple universal parameter recommendation. No replacement default is justified from these synthetic cases alone."
+}

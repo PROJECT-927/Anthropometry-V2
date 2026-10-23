@@ -1,0 +1,9 @@
+{
+  "overleaf_zip_valid": true,
+  "review_zip_valid": true,
+  "review_package_files": 307,
+  "source_sha256": "03148ff769f40486770c8600106c63006cfc74d3a34b8bd8665b1bf29fcae49b",
+  "pdf_sha256": "e6301ef2140cccd13c54ad7019aedcbb67000a875ddc1295edd37d0198249827",
+  "no_private_photos_or_model_binaries": true,
+  "uncompleted_TestB_work_excluded": true
+}

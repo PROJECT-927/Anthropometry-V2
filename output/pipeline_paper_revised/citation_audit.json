@@ -1,0 +1,142 @@
+[
+  {
+    "number": 1,
+    "key": "iso8559",
+    "reference": "ISO 8559-1:2017",
+    "source_url": "https://www.iso.org/standard/61686.html",
+    "supported_scope": "Anatomical measurement definitions for clothing; no claim that the pilot follows the complete standard."
+  },
+  {
+    "number": 2,
+    "key": "meunier2000",
+    "reference": "Meunier and Yin (2000)",
+    "source_url": "https://doi.org/10.1016/S0003-6870(00)00023-5",
+    "supported_scope": "Earlier image-based anthropometry evaluated against trained manual measurement."
+  },
+  {
+    "number": 3,
+    "key": "hung2004",
+    "reference": "Hung et al. (2004)",
+    "source_url": "https://www.ieda.ust.hk/dfaculty/ravi/papers/wwcs2004_1.pdf",
+    "supported_scope": "Photographic widths/depths and elliptical/composite circumference models; direct prior art for ellipse-based measurement."
+  },
+  {
+    "number": 4,
+    "key": "aslam2017",
+    "reference": "Aslam et al. (2017)",
+    "source_url": "https://doi.org/10.1049/iet-cvi.2016.0406",
+    "supported_scope": "Automatic feature-point measurement from frontal/lateral silhouettes; relevant comparison for claimed automation and girth estimation."
+  },
+  {
+    "number": 5,
+    "key": "laurentini1994visual",
+    "reference": "Laurentini (1994)",
+    "source_url": "https://doi.org/10.1109/34.273735",
+    "supported_scope": "Visual-hull geometry; does not establish anatomical accuracy from only two views."
+  },
+  {
+    "number": 6,
+    "key": "loper2015smpl",
+    "reference": "Loper et al. (2015)",
+    "source_url": "https://smpl.is.tue.mpg.de/",
+    "supported_scope": "Statistical body representation used for methodological context; SMPL is not used in this pipeline."
+  },
+  {
+    "number": 7,
+    "key": "varol2018bodynet",
+    "reference": "Varol et al. (2018)",
+    "source_url": "https://arxiv.org/abs/1804.04875",
+    "supported_scope": "Learned volumetric human-body inference used as context, not as an executed baseline."
+  },
+  {
+    "number": 8,
+    "key": "ji2019",
+    "reference": "Ji et al. (2019)",
+    "source_url": "https://doi.org/10.1016/j.cagd.2019.04.019",
+    "supported_scope": "Learned body reconstruction from orthographic silhouette views; prior art for two-view inputs."
+  },
+  {
+    "number": 9,
+    "key": "lugaresi2019mediapipe",
+    "reference": "Lugaresi et al. (2019)",
+    "source_url": "https://arxiv.org/abs/1906.08172",
+    "supported_scope": "MediaPipe perception framework. Specific pose/mask capabilities are attributed to the separate official guide."
+  },
+  {
+    "number": 10,
+    "key": "mediapipeguide",
+    "reference": "Google AI Edge Pose Landmarker guide",
+    "source_url": "https://developers.google.com/edge/mediapipe/solutions/vision/pose_landmarker",
+    "supported_scope": "Pretrained pose models, landmark outputs, and optional segmentation masks; local thresholds/crops come from implementation inspection."
+  },
+  {
+    "number": 11,
+    "key": "rother2004grabcut",
+    "reference": "Rother et al. (2004)",
+    "source_url": "https://www.microsoft.com/en-us/research/publication/grabcut-interactive-foreground-extraction-using-iterated-graph-cuts/",
+    "supported_scope": "Appearance-based iterative graph-cut segmentation and baseline energy; does not support quantitative claims about this dataset."
+  },
+  {
+    "number": 12,
+    "key": "schonemann1966generalized",
+    "reference": "Schoenemann (1966)",
+    "source_url": "https://doi.org/10.1007/BF02289451",
+    "supported_scope": "Orthogonal Procrustes foundation. The weighted similarity equations are derived in the manuscript."
+  },
+  {
+    "number": 13,
+    "key": "savitzky1964smoothing",
+    "reference": "Savitzky and Golay (1964)",
+    "source_url": "https://doi.org/10.1021/ac60214a047",
+    "supported_scope": "Local polynomial smoothing and differentiation; filter windows are implementation settings."
+  },
+  {
+    "number": 14,
+    "key": "graham1972efficient",
+    "reference": "Graham (1972)",
+    "source_url": "https://doi.org/10.1016/0020-0190(72)90045-2",
+    "supported_scope": "Planar convex-hull algorithm used in section extraction."
+  },
+  {
+    "number": 15,
+    "key": "fitzgibbon1999direct",
+    "reference": "Fitzgibbon et al. (1999)",
+    "source_url": "https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/ellipse-pami.pdf",
+    "supported_scope": "Ellipse-constrained fitting cited as a comparison. The implemented fixed-constant conic solver is explicitly distinguished."
+  },
+  {
+    "number": 16,
+    "key": "ramanujan1914modular",
+    "reference": "Ramanujan (1914)",
+    "source_url": "https://ramanujan.sirinudi.org/Volumes/published/ram06.html",
+    "supported_scope": "Classical ellipse-perimeter approximation; not the source of pipeline novelty."
+  },
+  {
+    "number": 17,
+    "key": "lorensen1987marching",
+    "reference": "Lorensen and Cline (1987)",
+    "source_url": "https://www.cs.toronto.edu/~jacobson/seminar/lorenson-and-cline-1987.pdf",
+    "supported_scope": "Marching-cubes isosurface construction; export settings are specific to this implementation."
+  },
+  {
+    "number": 18,
+    "key": "taubin1995signal",
+    "reference": "Taubin (1995)",
+    "source_url": "https://doi.org/10.1145/218380.218473",
+    "supported_scope": "Surface fairing principle; no guarantee of anthropometric perimeter preservation is attributed to the reference."
+  },
+  {
+    "number": 19,
+    "key": "jcgm2008",
+    "reference": "JCGM 100:2008",
+    "source_url": "https://doi.org/10.59161/JCGM100-2008E",
+    "supported_scope": "Covariance propagation principles; the five-term approximation is not represented as a calibrated confidence interval."
+  },
+  {
+    "number": 20,
+    "key": "bland1986",
+    "reference": "Bland and Altman (1986)",
+    "source_url": "https://www-users.york.ac.uk/~mb55/meas/ba.htm",
+    "supported_scope": "Paired measurement agreement framework proposed for independent validation; no agreement analysis is invented for the pilot."
+  }
+]

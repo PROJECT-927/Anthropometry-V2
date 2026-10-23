@@ -1,0 +1,179 @@
+{
+  "scope": "Factorized 2D-projection conventional carve versus independently sampled dense meshgrid on tiny grids; no human or full-pipeline accuracy claim.",
+  "source_sha256": "1972bbf492accaa17c42bc43823896a31a6762b51ed65d5e7f8a009474293227",
+  "lookup_broadcast_shape": [
+    10,
+    9
+  ],
+  "half_pixel_and_oob_lookup_equal": true,
+  "cases": [
+    {
+      "case": 0,
+      "shape": [
+        25,
+        27,
+        27
+      ],
+      "spacing_mm": 0.5,
+      "occupied": 705,
+      "dense_equal": true
+    },
+    {
+      "case": 1,
+      "shape": [
+        1,
+        5,
+        4
+      ],
+      "spacing_mm": 1.0,
+      "occupied": 2,
+      "dense_equal": true
+    },
+    {
+      "case": 2,
+      "shape": [
+        3,
+        1,
+        2
+      ],
+      "spacing_mm": 1.0,
+      "occupied": 0,
+      "dense_equal": true
+    },
+    {
+      "case": 3,
+      "shape": [
+        16,
+        18,
+        20
+      ],
+      "spacing_mm": 0.5,
+      "occupied": 142,
+      "dense_equal": true
+    },
+    {
+      "case": 4,
+      "shape": [
+        4,
+        5,
+        5
+      ],
+      "spacing_mm": 2.0,
+      "occupied": 15,
+      "dense_equal": true
+    },
+    {
+      "case": 5,
+      "shape": [
+        8,
+        9,
+        10
+      ],
+      "spacing_mm": 1.0,
+      "occupied": 73,
+      "dense_equal": true
+    },
+    {
+      "case": 6,
+      "shape": [
+        16,
+        18,
+        20
+      ],
+      "spacing_mm": 0.5,
+      "occupied": 101,
+      "dense_equal": true
+    },
+    {
+      "case": 7,
+      "shape": [
+        4,
+        5,
+        5
+      ],
+      "spacing_mm": 2.0,
+      "occupied": 9,
+      "dense_equal": true
+    },
+    {
+      "case": 8,
+      "shape": [
+        16,
+        18,
+        20
+      ],
+      "spacing_mm": 0.5,
+      "occupied": 287,
+      "dense_equal": true
+    },
+    {
+      "case": 9,
+      "shape": [
+        8,
+        9,
+        10
+      ],
+      "spacing_mm": 1.0,
+      "occupied": 76,
+      "dense_equal": true
+    },
+    {
+      "case": 10,
+      "shape": [
+        8,
+        9,
+        10
+      ],
+      "spacing_mm": 1.0,
+      "occupied": 27,
+      "dense_equal": true
+    },
+    {
+      "case": 11,
+      "shape": [
+        8,
+        9,
+        10
+      ],
+      "spacing_mm": 1.0,
+      "occupied": 0,
+      "dense_equal": true
+    },
+    {
+      "case": 12,
+      "shape": [
+        16,
+        18,
+        20
+      ],
+      "spacing_mm": 0.5,
+      "occupied": 0,
+      "dense_equal": true
+    },
+    {
+      "case": 13,
+      "shape": [
+        16,
+        18,
+        20
+      ],
+      "spacing_mm": 0.5,
+      "occupied": 646,
+      "dense_equal": true
+    },
+    {
+      "case": 14,
+      "shape": [
+        16,
+        18,
+        20
+      ],
+      "spacing_mm": 0.5,
+      "occupied": 110,
+      "dense_equal": true
+    }
+  ],
+  "empty_grid_rejected": true,
+  "all_checks_passed": true,
+  "boundary_convention": "Round projected coordinates with ties-to-even, then test rounded-index bounds, as historical conventional carve."
+}

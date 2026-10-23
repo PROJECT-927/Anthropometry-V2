@@ -147,6 +147,20 @@ a crop around the subject with a 15% margin. It uses CPU/WASM inference and reta
 the mobile image-size cap. The extra pose pass can take longer on a phone.
 Browser and Python image resizing/inference are not guaranteed bit-for-bit equal.
 
+Both full-image and cropped inference canvases must have widths divisible by
+four. An unpadded 619-pixel crop from `thilakside.jpeg` reproduced a MediaPipe
+WASM abort (`image_frame.cc`, `ChannelSize() (1 vs. 4)`) even though the initial
+960-pixel-wide detection succeeded. The crop now receives right-edge padding to
+620 pixels, and landmark coordinates account for that padding and integer resize
+dimensions. If refinement throws for another reason, the browser retains valid
+full-image landmarks and recreates the failed detector before the next photo.
+
+The HTML response uses `Cache-Control: no-store`, and Flask checks template
+changes on each page load. A server started before these changes still needs one
+restart; then reload the browser page and reselect the photos. The corrected
+response has `X-Anthropometry-Frontend: aligned-pose-crop-v3`. Rebuild a Docker
+image from the updated files before replacing a deployed container.
+
 Original photos and the crop stay in the browser. The upload contains the binary
 silhouettes, mapped-back landmark coordinates, height and a preprocessing version.
 Older clients receive the binary cleanup on the server; new clients mark their

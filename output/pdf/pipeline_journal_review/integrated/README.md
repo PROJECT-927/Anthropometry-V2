@@ -1,0 +1,15 @@
+# Isolated integrated research implementation
+
+This code is separate from the application. `run_pipeline.py` processes RGB inputs with the externally supplied pinned pose model, or enters after perception with supplied masks. It returns all named section candidates without an anatomical winner. The frozen policy disables unconditional section morphology, waist deletion, and whole-volume component deletion/smoothing. Girth outputs are at declared chest/waist/hip proxy levels. Shoulder models are specified in the article but are not outputs of this integrated run.
+
+`source_manifest.json` identifies the historical source and isolated changes. `bodym_method_freeze.json` freezes code/configuration before this evaluation read target labels. `bodym_cohort_freeze.json` selects all 87 metadata subjects and the lexicographically first photo per subject. It does not assert Test-A had never been used by the project: an earlier project evaluation script exists. This is a retrospective external benchmark.
+
+`requirements-observed.txt` records the environment actually used, rather than promising a clean-install test. Run with Python 3.12.9 and the listed dependencies. Public silhouette acquisition: `python integrated/acquire_bodym.py`, then `python integrated/evaluate_bodym.py`; after downloading the published `testA/measurements.csv`, run `python review/analyze_bodym.py`. Network access is required for acquisition. The runner keeps failure attempts; metrics use nested candidate availability, not just top-level completion. Complete metrics and per-subject predictions accompany the package.
+
+The raw-RGB entry requires `--front`, `--side`, `--height-cm`, `--attempt-id`, `--mode rgb`, `--evidence-class`, `--model` and `--output`. The model SHA-256 is pinned in the driver. Human photos and the model binary are not distributed. `rgb_development_summary.json` records three development cases and remains distinct from independent scan-target evidence. Timings were collected with a simultaneous background benchmark and are illustrative; process peak working set is measured, not inferred from one Boolean array.
+
+Common-grid `profile_ablation.py` compares widest unfiltered profile, filtered profile and filtered-plus-column-cap at each level, retaining the entire raw-side Z extent. It uses a shared grid internally; its Z phase can differ from the full profile-volume grid, so these branches are reported separately. The cap uses vertical frontal contiguous runs, not torso width. Per-level activity and output differences are recorded even when zero.
+
+## BodyM attribution
+
+Source: BodyM Dataset, https://registry.opendata.aws/bodym/, accessed 22 October 2026. Project and paper: https://adversarialbodysim.github.io/. Dataset license: Creative Commons Attribution-NonCommercial 4.0 International, https://creativecommons.org/licenses/by-nc/4.0/. Original public silhouettes are not bundled in the review ZIP; acquisition scripts and source hashes are supplied. Reference measurements are scan/registered-mesh derived, not tape readings. Raw RGB is not released by BodyM; supplied-mask mode therefore does not validate MediaPipe.

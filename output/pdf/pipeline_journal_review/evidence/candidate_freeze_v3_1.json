@@ -1,0 +1,190 @@
+{
+  "freeze_utc": "2026-10-21T15:37:28.150565+00:00",
+  "plan": {
+    "version": "candidate-benchmark-v3.1",
+    "selection_policy": "report_all_no_auto_selection_no_parameter_tuning",
+    "candidate_names": [
+      "fixed_constant_no_morph",
+      "fixed_constant_uniform_no_morph",
+      "constrained_no_morph",
+      "width_depth_axis_aligned",
+      "unrounded_convex_diagnostic",
+      "historical_opening_0p9_corrected_fit"
+    ],
+    "seed": 20261024,
+    "arc_sample_count": 256,
+    "truth_boundary_samples": 32768,
+    "noise_boundary_samples": 2048,
+    "noise_model": "eight-frequency smooth normal displacement, independent fixed random phases/amplitudes, specified RMS mm; this is not a measured camera/noise model",
+    "entry_points": [
+      "direct_known_section",
+      "two_axis_projected_occupancy"
+    ],
+    "metrics": [
+      "per-candidate available/failure count",
+      "perimeter error vs continuous section and convex truth",
+      "error vs noiseless raster convex perimeter",
+      "same-sample solver comparison",
+      "continuous model disagreement",
+      "all-case raw outputs",
+      "family/grid/noise summaries"
+    ],
+    "development": {
+      "shapes": [
+        [
+          "ellipse",
+          160,
+          100,
+          2
+        ],
+        [
+          "circle",
+          100,
+          100,
+          2
+        ],
+        [
+          "superellipse",
+          140,
+          90,
+          4
+        ],
+        [
+          "box",
+          150,
+          90,
+          0
+        ],
+        [
+          "rounded_box",
+          150,
+          100,
+          25
+        ],
+        [
+          "egg",
+          140,
+          95,
+          0.12
+        ],
+        [
+          "concave",
+          130,
+          95,
+          0.16
+        ]
+      ],
+      "angles_deg": [
+        0,
+        30
+      ],
+      "spacing_mm": [
+        2,
+        4
+      ],
+      "noise_rms_mm": [
+        0,
+        1
+      ]
+    },
+    "test": {
+      "shapes": [
+        [
+          "ellipse",
+          180,
+          75,
+          2
+        ],
+        [
+          "ellipse",
+          110,
+          85,
+          2
+        ],
+        [
+          "circle",
+          75,
+          75,
+          2
+        ],
+        [
+          "superellipse",
+          160,
+          75,
+          3
+        ],
+        [
+          "superellipse",
+          130,
+          100,
+          6
+        ],
+        [
+          "box",
+          170,
+          65,
+          0
+        ],
+        [
+          "rounded_box",
+          160,
+          80,
+          18
+        ],
+        [
+          "egg",
+          155,
+          85,
+          -0.2
+        ],
+        [
+          "concave",
+          145,
+          90,
+          0.25
+        ]
+      ],
+      "angles_deg": [
+        15,
+        55,
+        80
+      ],
+      "spacing_mm": [
+        1,
+        2,
+        4
+      ],
+      "noise_rms_mm": [
+        0,
+        0.5,
+        2
+      ]
+    },
+    "failure_cases": [
+      "empty",
+      "two_components",
+      "border_contact",
+      "nonuniform_grid"
+    ],
+    "failure_expected_reasons": {
+      "empty": "empty_or_multiple_components",
+      "two_components": "empty_or_multiple_components",
+      "border_contact": "border_contact",
+      "nonuniform_grid": "nonuniform_or_unequal_grid_spacing"
+    },
+    "waist_cases": [
+      "zero",
+      "deletion",
+      "added_occupancy",
+      "disconnection",
+      "coordinate_translation_only"
+    ],
+    "physical_claim": "No human anthropometry, real acquisition, or anatomical prior validation"
+  },
+  "plan_sha256": "68d830573d9dc18138064a7b924e0ae888ffb52b75893a51b1b96e6ed32ca69d",
+  "source_sha256": {
+    "verify_candidates_v3.py": "3ccaef190b711aa38e4bc545de98684ddc5f46e1beb8fdc773c66a7c2f310a70",
+    "section_candidates_v3.py": "f21dca3207f1456ea112def5ca7642d4bfd3e1352d9295753642655a0ea3383b",
+    "corrected_conic.py": "99e035bc52846e68eb73d013dec2ce7531dfadf6b4f50f6decdd07e33535e245"
+  }
+}
