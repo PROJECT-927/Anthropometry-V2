@@ -40,7 +40,7 @@ Sumanth S. Shetty & Thilak K\\[-1pt]
 \maketitle
 
 \begin{abstract}
-This paper develops an explicit geometric pipeline for stature-calibrated anthropometry from frontal and profile images. Filtered profile intervals are coupled to frontal column thickness, and reported outputs identify their reconstruction source and measurement model. Unrounded section occupancy supports separate ellipse hypotheses without automatic selection; waist deletion is an optional, separately recorded hypothesis. Evaluation includes 598 synthetic section attempts and a retrospective external benchmark of 87 BodyM subjects, with 57 producing candidate sets under the fixed input checks. In common-grid chest ablation, column capping reduces constrained-fit mean absolute prediction error by 12.54\,mm across 57 available subjects. Profile-branch hip MAE is 49.54\,mm, compared with 113.20\,mm for its width/depth ellipse, while the simpler model performs better at chest and waist. Generated-shape tests expose projection and section-model dependence. The resulting implementation provides traceable geometric predictions and identifies where the proposed reconstruction improves a specified estimator; the external benchmark evaluates scan-target prediction from supplied silhouettes.
+This paper presents a pipeline for estimating body measurements from frontal and side photographs using the subject's height for scale. Pretrained segmentation and pose estimation produce body silhouettes and landmarks, which are aligned and mapped to physical coordinates. The pipeline constructs a conventional visual hull and a profile-guided reconstruction that filters side-view depth intervals and limits local depth using the vertical thickness of frontal silhouette regions. Cross-sections at specified chest, waist, and hip levels are measured using separate ellipse models, with each result linked to its reconstruction source and modelling assumptions. An optional curvature-based waist adjustment is reported as a separate hypothesis. The implementation specifies the geometric calculations and the conditions governing each estimate. Evaluation combines controlled geometric tests with an external benchmark of supplied silhouettes and scan-derived measurements. In a common-grid chest ablation, column capping reduces constrained-fit mean absolute prediction error by 12.54\,mm across 57 available subjects. Profile-branch hip MAE is 49.54\,mm, compared with 113.20\,mm for its width/depth ellipse, while the simpler model performs better at chest and waist. Generated shape tests expose projection and section-model dependence.
 \end{abstract}
 \noindent\textbf{Keywords:} image-based anthropometry; visual hull; profile-guided reconstruction; geometric measurement.
 
@@ -50,6 +50,37 @@ Photographic anthropometry requires correspondence between image-derived geometr
 The visual hull represents the volume consistent with observed silhouettes~\cite{laurentini1994visual}. Human-shape methods include the statistical SMPL representation~\cite{loper2015smpl}, volumetric inference in BodyNet~\cite{varol2018bodynet}, and learned reconstruction from orthographic silhouettes~\cite{ji2019}. Here, pretrained perception is followed by geometric rules in physical units. A filtered profile interval is coupled to frontal run topology and column thickness to limit replicated limb depth. An optional waist-deletion hypothesis and a half-ellipse shoulder model expose additional shape assumptions. Established component algorithms retain their attribution.
 
 Hung \emph{et al.} combine photographic breadth/depth with ellipse-based circumferences~\cite{hung2004}; Aslam \emph{et al.} use silhouette fiducials and an ellipsoid model under calibrated capture~\cite{aslam2017}. Here the proposed adaptation assigns occupancy intervals to frontal columns before section fitting. Ji \emph{et al.} learn silhouette features for a body-shape representation~\cite{ji2019}; recent compact multi-view work combines RGB/depth-assisted imagery with SMPL and exemplar optimization~\cite{chen2025compact}. These objectives differ from the present geometric tests, which establish neither comparative accuracy nor global priority.
+
+
+The primary measurement path is summarized in Figure~\ref{fig:pipeline-flow}.
+\begin{figure}[htbp]
+\centering
+\begingroup
+\setlength{\unitlength}{1mm}\linethickness{0.4pt}\small
+\begin{picture}(160,58)
+\put(0,48){\framebox(48,10){\shortstack{\textbf{Inputs}\\Frontal/profile RGB + height}}}
+\put(56,48){\framebox(48,10){\shortstack{\textbf{Perception}\\Silhouettes + pose landmarks}}}
+\put(112,48){\framebox(48,10){\shortstack{\textbf{Alignment and scale}\\Pose alignment; metric scale}}}
+\put(48,53){\vector(1,0){8}}
+\put(104,53){\vector(1,0){8}}
+\put(136,48){\line(0,-1){4}}
+\put(36,44){\line(1,0){100}}
+\put(36,44){\vector(0,-1){4}}
+\put(124,44){\vector(0,-1){4}}
+\put(0,30){\framebox(72,10){\shortstack{\textbf{Conventional visual hull}\\Intersection of both silhouette projections}}}
+\put(88,30){\framebox(72,10){\shortstack{\textbf{Profile-guided reconstruction}\\Filtered side depth + frontal column cap}}}
+\put(36,30){\line(0,-1){3}}
+\put(124,30){\line(0,-1){3}}
+\put(36,27){\line(1,0){88}}
+\put(80,27){\vector(0,-1){3}}
+\put(12,12){\framebox(136,12){\shortstack{\textbf{Common chest, waist-proxy and hip-level queries}\\Shared torso clipping; unrounded cross-sections\\Separate ellipse models and convex-occupancy diagnostic}}}
+\put(80,12){\vector(0,-1){5}}
+\put(12,0){\framebox(136,7){\textbf{Results:} value, reconstruction source, level, model and availability}}
+\end{picture}
+\endgroup
+\caption{Primary research pipeline. Both reconstruction branches are evaluated at each requested level; optional waist hypotheses and display geometry remain separate extensions.}
+\label{fig:pipeline-flow}
+\end{figure}
 
 \section{Image Preparation and Metric Alignment}
 \subsection{Acquisition, masks, and landmarks}
@@ -127,6 +158,32 @@ Converting filtered endpoints to metric coordinates gives $\zeta_-(Y)$ and $\zet
 The profile supplies a shared sagittal midpoint and depth. The frontal vertical run bounds thickness at outer columns of an approximately horizontal limb, even when it joins the torso horizontally. Endpoint interpolation can extend occupancy beyond the observed profile mask, so $O_p$ is model-conditioned. Computation uses 64-column chunks and retains dense output storage.
 
 For a straight strip of perpendicular thickness $t$ at angle $\varphi$ to the horizontal, an interior vertical intersection has length $t/|\cos\varphi|$ before finite-length effects. The cap consequently weakens toward a vertical orientation. A shared midpoint cannot recover unknown limb displacement in $Z$. Interpolated levels and departures from the intended pose must accompany the output.
+
+
+Figure~\ref{fig:profile-flow} shows how the two silhouettes enter the profile constraint.
+\begin{figure}[htbp]
+\centering
+\begingroup
+\setlength{\unitlength}{1mm}\linethickness{0.4pt}\small
+\begin{picture}(160,56)
+\put(0,46){\framebox(72,10){\shortstack{\textbf{Frontal silhouette $M_f$}\\Metric samples in $(X,Y)$}}}
+\put(88,46){\framebox(72,10){\shortstack{\textbf{Profile silhouette $M_s$}\\Widest foreground run at each row}}}
+\put(36,46){\vector(0,-1){4}}
+\put(124,46){\vector(0,-1){4}}
+\put(0,31){\framebox(72,11){\shortstack{\textbf{Contiguous vertical support}\\$T(X,Y)=h\,n_Y(X,Y)$}}}
+\put(88,31){\framebox(72,11){\shortstack{\textbf{Reject outliers; interpolate; filter}\\$D_p=\zeta_+-\zeta_-$,\quad $z_c=\tfrac12(\zeta_++\zeta_-)$}}}
+\put(36,31){\line(0,-1){4}}
+\put(124,31){\line(0,-1){4}}
+\put(36,27){\line(1,0){88}}
+\put(80,27){\vector(0,-1){4}}
+\put(14,12){\framebox(132,11){\shortstack{\textbf{Cap local depth about the profile midpoint}\\$z_\pm(X,Y)=z_c(Y)\pm\tfrac12\min\{D_p(Y),T(X,Y)\}$}}}
+\put(80,12){\vector(0,-1){4}}
+\put(14,0){\framebox(132,8){$O_p=M_f(u_f,v_f)\,\indic\{z_-\leq Z\leq z_+\}$; preserve interpolated-row flags}}
+\end{picture}
+\endgroup
+\caption{Profile-column coupling in Eq.~\eqref{eq:profile}. The depth cap acts before section extraction; conventional occupancy bypasses this constraint.}
+\label{fig:profile-flow}
+\end{figure}
 
 \subsection{Measurement levels and optional waist hypothesis}
 The frontal torso trace starts from the widest horizontal run and subsequently selects the run nearest the preceding midpoint. Separate left/right arm-separation tests use five-row margins. Missing trace values are interpolated and smoothed by a cubic 21-row fit. With mean shoulder and hip levels $Y_s,Y_h$, the waist proxy is $Y_w=Y_s+0.688(Y_h-Y_s)$, snapped to the nearest available trace row. The factor approximates $(0.818-0.620)/(0.818-0.530)$ from engineering body-height fractions. Chest is evaluated at $Y_c=Y_s+0.35(Y_w-Y_s)$; hip uses the landmark level. These prescribed levels do not search for maximum chest or hip girth.
