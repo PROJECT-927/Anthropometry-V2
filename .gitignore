@@ -1,6 +1,6 @@
 __pycache__/
 *.pyc
-
+/tmp/
 # Windows folder metadata
 desktop.ini
 
