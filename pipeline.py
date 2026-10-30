@@ -81,8 +81,8 @@ def process_view(image_path, view_name, height_cm, debug=False,
     # segmenter="grabcut" keeps the classical path available for comparison.
     if segmenter == "mediapipe":
         print(f"[{view_name}] Step 2: MediaPipe silhouette extraction...")
-        mask = extract_silhouette(
-            image, debug=debug, debug_path=f"debug_silhouette_{view_name}.png"
+        mask, silhouette_flags = extract_silhouette(
+            image, debug=debug, debug_path=f"debug_silhouette_{view_name}.png", return_info=True
         )
     elif segmenter == "landmark":
         print(f"[{view_name}] Step 2: landmark-prior + GrabCut silhouette...")
@@ -116,6 +116,7 @@ def process_view(image_path, view_name, height_cm, debug=False,
         "mask": mask,
         "normalized_mask": normalized_mask,
         "pose_info": info,
+        "quality_flags": silhouette_flags if segmenter == "mediapipe" else [],
     }
 
 
@@ -132,6 +133,10 @@ def main():
     parser.add_argument("--height", type=float, default=DEFAULT_HEIGHT_CM,
                          help=f"User height in cm (Step 1 placeholder, default {DEFAULT_HEIGHT_CM})")
     parser.add_argument("--debug", action="store_true", help="Write debug visualization images")
+    parser.add_argument("--measurements-only", action="store_true",
+                        help="Save only measurement JSON; skip masks, hull files and display rounding")
+    parser.add_argument("--output", type=Path, default=Path("measurements.json"),
+                        help="Measurement JSON output path")
     parser.add_argument("--segmenter", choices=("mediapipe", "landmark", "grabcut"),
                         default="mediapipe",
                         help="Step 2 silhouette extractor. 'mediapipe' (default) "
@@ -142,6 +147,8 @@ def main():
     parser.add_argument("--voxel-mm", type=float, default=2.0, help="Fine voxel size in mm (Step 4)")
     parser.add_argument("--coarse-voxel-mm", type=float, default=10.0, help="Coarse voxel size in mm (Step 4)")
     args = parser.parse_args()
+    if args.measurements_only and args.debug:
+        parser.error("--measurements-only cannot be combined with --debug")
 
     print(f"Step 1: height = {args.height} cm (default placeholder)")
     if args.front_mask or args.side_mask:
@@ -172,9 +179,10 @@ def main():
         print(f"ERROR: {e}", file=sys.stderr)
         sys.exit(1)
 
-    cv2.imwrite("front_normalized_mask.png", front_result["normalized_mask"] * 255)
-    cv2.imwrite("side_normalized_mask.png", side_result["normalized_mask"] * 255)
-    print("Wrote front_normalized_mask.png and side_normalized_mask.png")
+    if not args.measurements_only:
+        cv2.imwrite("front_normalized_mask.png", front_result["normalized_mask"] * 255)
+        cv2.imwrite("side_normalized_mask.png", side_result["normalized_mask"] * 255)
+        print("Wrote front_normalized_mask.png and side_normalized_mask.png")
 
     print("Step 4: Visual Hull 3D reconstruction...")
     try:
@@ -232,15 +240,16 @@ def main():
         f"side scale={hull['side_scale_mm_per_px']:.3f} mm/px"
     )
 
-    np.savez_compressed(
-        "visual_hull.npz",
-        occupied=hull["occupied"], x_mm=hull["x_mm"], y_mm=hull["y_mm"], z_mm=hull["z_mm"],
-        voxel_mm=hull["voxel_mm"],
-        front_scale_mm_per_px=hull["front_scale_mm_per_px"],
-        side_scale_mm_per_px=hull["side_scale_mm_per_px"],
-        height_cm=args.height,
-    )
-    print("Wrote visual_hull.npz")
+    if not args.measurements_only:
+        np.savez_compressed(
+            "visual_hull.npz",
+            occupied=hull["occupied"], x_mm=hull["x_mm"], y_mm=hull["y_mm"], z_mm=hull["z_mm"],
+            voxel_mm=hull["voxel_mm"],
+            front_scale_mm_per_px=hull["front_scale_mm_per_px"],
+            side_scale_mm_per_px=hull["side_scale_mm_per_px"],
+            height_cm=args.height,
+        )
+        print("Wrote visual_hull.npz")
 
     if args.debug:
         save_debug_projections(hull)
@@ -273,7 +282,7 @@ def main():
             front_result["normalized_mask"], side_result["normalized_mask"],
             height_cm=args.height, voxel_mm=args.voxel_mm,
         )
-        display_occupied = tracked_call("display:round", round_cross_sections,
+        display_occupied = None if args.measurements_only else tracked_call("display:round", round_cross_sections,
             disp["occupied"], args.voxel_mm, limb_columns=disp["limb_columns"]
         )
         display_axes = (disp["x_mm"], disp["y_mm"], disp["z_mm"])
@@ -289,11 +298,12 @@ def main():
             f"{disp['depth_capped_cols'] / max(disp['front_cols_total'], 1):.1%} of "
             f"columns depth-capped to their own width)"
         )
-        print(
-            f"  -> cross-sections rounded: "
-            f"{disp['occupied'].sum() * vox_l:.1f}L -> "
-            f"{display_occupied.sum() * vox_l:.1f}L"
-        )
+        if not args.measurements_only:
+            print(
+                f"  -> cross-sections rounded: "
+                f"{disp['occupied'].sum() * vox_l:.1f}L -> "
+                f"{display_occupied.sum() * vox_l:.1f}L"
+            )
     except GridMemoryError as e:
         print(f"ERROR: {e}", file=sys.stderr)
         sys.exit(1)
@@ -303,15 +313,16 @@ def main():
         display_axes = (hull["x_mm"], hull["y_mm"], hull["z_mm"])
         chest_hull = None
 
-    np.savez_compressed(
-        "visual_hull_corrected.npz",
-        occupied=display_occupied, x_mm=display_axes[0], y_mm=display_axes[1], z_mm=display_axes[2],
-        voxel_mm=hull["voxel_mm"], waist_y_mm=correction["waist_y_mm"],
-        front_scale_mm_per_px=hull["front_scale_mm_per_px"],
-        side_scale_mm_per_px=hull["side_scale_mm_per_px"],
-        height_cm=args.height,
-    )
-    print("Wrote visual_hull_corrected.npz")
+    if not args.measurements_only:
+        np.savez_compressed(
+            "visual_hull_corrected.npz",
+            occupied=display_occupied, x_mm=display_axes[0], y_mm=display_axes[1], z_mm=display_axes[2],
+            voxel_mm=hull["voxel_mm"], waist_y_mm=correction["waist_y_mm"],
+            front_scale_mm_per_px=hull["front_scale_mm_per_px"],
+            side_scale_mm_per_px=hull["side_scale_mm_per_px"],
+            height_cm=args.height,
+        )
+        print("Wrote visual_hull_corrected.npz")
     del display_occupied, display_axes
 
     if args.debug:
@@ -372,7 +383,7 @@ def main():
         front_pixel_height, side_pixel_height,
     )
 
-    print("\nFinal measurements (95% confidence, per Step 7's error budget):")
+    print("\nFinal measurements (geometric error budget; excludes unobserved shape and capture bias):")
     for key in ("chest", "waist", "hip", "shoulder_width", "inseam"):
         u = uncertainties[key]
         label = key.replace("_", " ")
@@ -400,6 +411,8 @@ def main():
             "uncertaintyCm": u["delta_total_cm"],
             "depthCapped": bool(u.get("depth_capped")),
             "depthCapRemovedMm": m.get("depth_cap_removed_mm", 0.0),
+            "shapeModel": m.get("shape_model", "ellipse_fit"),
+            "ellipseExtentScale": m.get("ellipse_extent_scale", 1.0),
         }
 
     measurements_out = {
@@ -414,10 +427,17 @@ def main():
         "shoulderBiacromialCm": measurements["shoulder_biacromial_cm"],
         "inseamCm": measurements["inseam_cm"],
         "inseamUncertaintyCm": uncertainties["inseam"]["delta_total_cm"],
+        "uncertaintyScope": "Geometric error budget only; not a validated 95% prediction interval.",
     }
-    with open("measurements.json", "w", encoding="utf-8") as f:
+    if args.measurements_only:
+        measurements_out["qualityFlags"] = (
+            measurements["height_flags"] + measurements["depth_flags"]
+            + measurements["shoulder_flags"] + measurements["ratio_flags"]
+            + front_result.get("quality_flags", []) + side_result.get("quality_flags", [])
+        )
+    with open(args.output, "w", encoding="utf-8") as f:
         json.dump(measurements_out, f, indent=2)
-    print("Wrote measurements.json")
+    print(f"Wrote {args.output}")
 
     print("\nPipeline complete (Steps 1-7).")
 

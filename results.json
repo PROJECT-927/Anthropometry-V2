@@ -1,0 +1,1376 @@
+{
+  "generated_at_utc": "2026-10-30T14:20:37.935210+00:00",
+  "unit": "cm",
+  "source": "photoset\\body_measurements.json",
+  "excluded_subjects": [
+    "shashank",
+    "sohan",
+    "tanmay"
+  ],
+  "workers": 2,
+  "voxel_mm": 2.0,
+  "notes": [
+    "Photo-derived estimates from the existing pipeline; reference circumferences are not pipeline inputs.",
+    "Height is a supplied scale calibration, not estimated from the photos.",
+    "Inseam and reference legs_cm are different measurements and should not be compared directly.",
+    "Uncertainty values are the pipeline geometric error budget, not validated total prediction accuracy.",
+    "Reference protocol: over photographed clothes; waist at narrowest point; shoulder tape follows the back between shoulder joint endpoints.",
+    "No masks, visual hull files, viewer or STL files are exported."
+  ],
+  "subjects": [
+    {
+      "name": "Sanath",
+      "status": "success",
+      "reference_measurements": {
+        "name": "Sanath",
+        "unit": "cm",
+        "chest_cm": 92.5,
+        "waist_cm": 85.0,
+        "hip_cm": 98.0,
+        "shoulder_cm": null,
+        "height_cm": 172.0
+      },
+      "height_cm": 172.0,
+      "height_source": "body_measurements.json",
+      "photos": {
+        "front": "sanathfront.jpeg",
+        "side": "sanathside.jpeg"
+      },
+      "input_fingerprint": "c1f71d0af1e47c66b36e0f831066bcca54f763fca5193cd29a308a637091472c",
+      "elapsed_seconds": 25.08,
+      "log": "runs\\photoset_measurements_20261030_194921\\sanath.log",
+      "measurements_cm": {
+        "chest_cm": 90.56984158708617,
+        "waist_cm": 76.79671974809008,
+        "hip_cm": 94.99913663769098,
+        "shoulder_width_cm": 50.76338435138193,
+        "inseam_cm": 66.67351341488879
+      },
+      "pipeline_details": {
+        "heightCm": 172.0,
+        "chest": {
+          "yMm": 452.0,
+          "viewerYMm": 1266.0,
+          "centerMm": [
+            -10.481165609427194,
+            50.999191284038034
+          ],
+          "semiMajorMm": 149.0,
+          "semiMinorMm": 130.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 90.56984158708617,
+          "uncertaintyCm": 0.9997980535865564,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.923286770409541
+        },
+        "waist": {
+          "yMm": 658.0,
+          "viewerYMm": 1060.0,
+          "centerMm": [
+            -2.2522854055771404,
+            12.292403045488072
+          ],
+          "semiMajorMm": 124.0,
+          "semiMinorMm": 117.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 76.79671974809008,
+          "uncertaintyCm": 0.992744602314013,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.9482355745394756
+        },
+        "hip": {
+          "yMm": 870.0,
+          "viewerYMm": 848.0,
+          "centerMm": [
+            3.7477145944228596,
+            17.292403045488072
+          ],
+          "semiMajorMm": 168.0,
+          "semiMinorMm": 130.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 94.99913663769098,
+          "uncertaintyCm": 1.0010957491946226,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.8900949723223913
+        },
+        "shoulderWidthCm": 50.76338435138193,
+        "shoulderWidthUncertaintyCm": 0.33576899202658134,
+        "shoulderTipReliable": false,
+        "shoulderMethod": "arc",
+        "shoulderBiacromialCm": 33.548786578937616,
+        "inseamCm": 66.67351341488879,
+        "inseamUncertaintyCm": 0.34538480013978373,
+        "uncertaintyScope": "Geometric error budget only; not a validated 95% prediction interval.",
+        "qualityFlags": [
+          "shoulder width: the arm crosses the side photo at shoulder height; the front of the back arc's depth is bridged across it, so the arc is a shape-model estimate."
+        ]
+      },
+      "comparison_to_reference": {
+        "chest_cm": {
+          "reference_midpoint_cm": 92.5,
+          "predicted_cm": 90.56984158708617,
+          "predicted_minus_reference_midpoint_cm": -1.9301584129138263,
+          "absolute_error_cm": 1.9301584129138263,
+          "absolute_percentage_error": 2.086657743690623
+        },
+        "waist_cm": {
+          "reference_midpoint_cm": 85.0,
+          "predicted_cm": 76.79671974809008,
+          "predicted_minus_reference_midpoint_cm": -8.203280251909916,
+          "absolute_error_cm": 8.203280251909916,
+          "absolute_percentage_error": 9.650917943423432
+        },
+        "hip_cm": {
+          "reference_midpoint_cm": 98.0,
+          "predicted_cm": 94.99913663769098,
+          "predicted_minus_reference_midpoint_cm": -3.000863362309019,
+          "absolute_error_cm": 3.000863362309019,
+          "absolute_percentage_error": 3.062105471743897
+        }
+      },
+      "mean_absolute_error_cm": 4.378100675710921,
+      "mean_absolute_percentage_error": 4.933227052952651
+    },
+    {
+      "name": "Thilak",
+      "status": "success",
+      "reference_measurements": {
+        "name": "Thilak",
+        "unit": "cm",
+        "chest_cm": 89.0,
+        "waist_cm": 94.0,
+        "hip_cm": null,
+        "shoulder_cm": 48.0,
+        "height_cm": 177.0
+      },
+      "height_cm": 177.0,
+      "height_source": "body_measurements.json",
+      "photos": {
+        "front": "thilakfront.jpeg",
+        "side": "thilakside.jpeg"
+      },
+      "input_fingerprint": "b2f582f19efb05709ac5cc832f979c2f0d81c07132f6f8608a5620cf8072971d",
+      "elapsed_seconds": 28.8,
+      "log": "runs\\photoset_measurements_20261030_194921\\thilak.log",
+      "measurements_cm": {
+        "chest_cm": 88.65398021649538,
+        "waist_cm": 90.21558283198034,
+        "hip_cm": 100.5097844217983,
+        "shoulder_width_cm": 44.7065223343409,
+        "inseam_cm": 62.05154149650436
+      },
+      "pipeline_details": {
+        "heightCm": 177.0,
+        "chest": {
+          "yMm": 508.0,
+          "viewerYMm": 1260.0,
+          "centerMm": [
+            0.9180925925926431,
+            35.41679398074584
+          ],
+          "semiMajorMm": 147.0,
+          "semiMinorMm": 126.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 88.65398021649538,
+          "uncertaintyCm": 1.334502418679555,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.9245670832539091
+        },
+        "waist": {
+          "yMm": 738.0,
+          "viewerYMm": 1030.0,
+          "centerMm": [
+            -5.418092592592643,
+            21.699736480942192
+          ],
+          "semiMajorMm": 148.0,
+          "semiMinorMm": 135.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 90.21558283198034,
+          "uncertaintyCm": 1.3363619234648314,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.9412096861300878
+        },
+        "hip": {
+          "yMm": 970.0,
+          "viewerYMm": 798.0,
+          "centerMm": [
+            1.581907407407357,
+            17.699736480942192
+          ],
+          "semiMajorMm": 173.0,
+          "semiMinorMm": 143.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 100.5097844217983,
+          "uncertaintyCm": 1.3432071207241445,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.9113490368456533
+        },
+        "shoulderWidthCm": 44.7065223343409,
+        "shoulderWidthUncertaintyCm": 0.43029494496495546,
+        "shoulderTipReliable": false,
+        "shoulderMethod": "arc",
+        "shoulderBiacromialCm": 36.519338747608,
+        "inseamCm": 62.05154149650436,
+        "inseamUncertaintyCm": 0.4420871822144261,
+        "uncertaintyScope": "Geometric error budget only; not a validated 95% prediction interval.",
+        "qualityFlags": [
+          "waist_chest = 1.02, outside the expected [0.7, 0.9] band"
+        ]
+      },
+      "comparison_to_reference": {
+        "chest_cm": {
+          "reference_midpoint_cm": 89.0,
+          "predicted_cm": 88.65398021649538,
+          "predicted_minus_reference_midpoint_cm": -0.34601978350461593,
+          "absolute_error_cm": 0.34601978350461593,
+          "absolute_percentage_error": 0.38878627360069207
+        },
+        "waist_cm": {
+          "reference_midpoint_cm": 94.0,
+          "predicted_cm": 90.21558283198034,
+          "predicted_minus_reference_midpoint_cm": -3.784417168019658,
+          "absolute_error_cm": 3.784417168019658,
+          "absolute_percentage_error": 4.0259757106592104
+        },
+        "shoulder_cm": {
+          "reference_midpoint_cm": 48.0,
+          "predicted_cm": 44.7065223343409,
+          "predicted_minus_reference_midpoint_cm": -3.293477665659097,
+          "absolute_error_cm": 3.293477665659097,
+          "absolute_percentage_error": 6.861411803456452
+        }
+      },
+      "mean_absolute_error_cm": 2.4746382057277905,
+      "mean_absolute_percentage_error": 3.7587245959054516
+    },
+    {
+      "name": "Sumanth",
+      "status": "success",
+      "reference_measurements": {
+        "name": "Sumanth",
+        "unit": "cm",
+        "chest_cm": 93.98,
+        "waist_cm": 85.09,
+        "hip_cm": {
+          "min": 97.79,
+          "max": 99.06
+        },
+        "shoulder_cm": {
+          "min": 46.99,
+          "max": 48.26
+        },
+        "height_cm": 173.0
+      },
+      "height_cm": 173.0,
+      "height_source": "body_measurements.json",
+      "photos": {
+        "front": "sumanthfront.png",
+        "side": "sumanthside.png"
+      },
+      "input_fingerprint": "a52e545f20251405c42361fa64d9badd7a9ab52c743df2c390b526fba613b2b0",
+      "elapsed_seconds": 21.92,
+      "log": "runs\\photoset_measurements_20261030_194921\\sumanth.log",
+      "measurements_cm": {
+        "chest_cm": 85.8595642852895,
+        "waist_cm": 79.83383958298808,
+        "hip_cm": 93.39724413633887,
+        "shoulder_width_cm": 48.810271176973636,
+        "inseam_cm": 71.8060424816236
+      },
+      "pipeline_details": {
+        "heightCm": 173.0,
+        "chest": {
+          "yMm": 422.0,
+          "viewerYMm": 1306.0,
+          "centerMm": [
+            3.8956415145992196,
+            28.37748721117518
+          ],
+          "semiMajorMm": 146.0,
+          "semiMinorMm": 118.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 85.8595642852895,
+          "uncertaintyCm": 1.0919308458580346,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.9039687577126296
+        },
+        "waist": {
+          "yMm": 650.0,
+          "viewerYMm": 1078.0,
+          "centerMm": [
+            -7.188742578514166,
+            6.319326980923279
+          ],
+          "semiMajorMm": 136.0,
+          "semiMinorMm": 114.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 79.83383958298808,
+          "uncertaintyCm": 1.0889803575101475,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.9121186172807195
+        },
+        "hip": {
+          "yMm": 814.0,
+          "viewerYMm": 914.0,
+          "centerMm": [
+            -9.188742578514166,
+            12.319326980923279
+          ],
+          "semiMajorMm": 170.0,
+          "semiMinorMm": 122.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 93.39724413633887,
+          "uncertaintyCm": 1.0946621950315452,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.8737182422900448
+        },
+        "shoulderWidthCm": 48.810271176973636,
+        "shoulderWidthUncertaintyCm": 0.3698501213702065,
+        "shoulderTipReliable": false,
+        "shoulderMethod": "arc",
+        "shoulderBiacromialCm": 30.39329832393627,
+        "inseamCm": 71.8060424816236,
+        "inseamUncertaintyCm": 0.3853975937947204,
+        "uncertaintyScope": "Geometric error budget only; not a validated 95% prediction interval.",
+        "qualityFlags": [
+          "chest: the side view has no usable chest-front edge at y=422mm -- the arm crosses the silhouette there, so that edge is bridged between the clean rows above and below and the depth is inferred rather than observed. Retake the side photo with the arms hanging straight down at the sides for a measured depth rather than a reconstructed one.",
+          "waist_chest = 0.93, outside the expected [0.7, 0.9] band"
+        ]
+      },
+      "comparison_to_reference": {
+        "chest_cm": {
+          "reference_midpoint_cm": 93.98,
+          "predicted_cm": 85.8595642852895,
+          "predicted_minus_reference_midpoint_cm": -8.12043571471051,
+          "absolute_error_cm": 8.12043571471051,
+          "absolute_percentage_error": 8.640599824122695
+        },
+        "waist_cm": {
+          "reference_midpoint_cm": 85.09,
+          "predicted_cm": 79.83383958298808,
+          "predicted_minus_reference_midpoint_cm": -5.256160417011927,
+          "absolute_error_cm": 5.256160417011927,
+          "absolute_percentage_error": 6.177177596676374
+        },
+        "hip_cm": {
+          "reference_midpoint_cm": 98.42500000000001,
+          "predicted_cm": 93.39724413633887,
+          "predicted_minus_reference_midpoint_cm": -5.027755863661142,
+          "absolute_error_cm": 5.027755863661142,
+          "absolute_percentage_error": 5.108210173900067
+        },
+        "shoulder_cm": {
+          "reference_midpoint_cm": 47.625,
+          "predicted_cm": 48.810271176973636,
+          "predicted_minus_reference_midpoint_cm": 1.185271176973636,
+          "absolute_error_cm": 1.185271176973636,
+          "absolute_percentage_error": 2.4887583768475294
+        }
+      },
+      "mean_absolute_error_cm": 4.897405793089304,
+      "mean_absolute_percentage_error": 5.603686492886666
+    },
+    {
+      "name": "Vasishta",
+      "status": "success",
+      "reference_measurements": {
+        "name": "Vasishta",
+        "unit": "cm",
+        "height_cm": 175.2,
+        "chest_cm": 102.0,
+        "waist_cm": 92.0,
+        "hip_cm": 105.0,
+        "shoulder_cm": 45.0,
+        "legs_cm": 93.0
+      },
+      "height_cm": 175.2,
+      "height_source": "body_measurements.json",
+      "photos": {
+        "front": "vasishtafront.jpeg",
+        "side": "vasishtaside.jpeg"
+      },
+      "input_fingerprint": "13ea78829a067243916277d077cac916adfec4f75e6961a3551d728e73f640a3",
+      "elapsed_seconds": 11.84,
+      "log": "runs\\photoset_measurements_20261030_194921\\vasishta.log",
+      "measurements_cm": {
+        "chest_cm": 95.3293829359213,
+        "waist_cm": 87.86065556630504,
+        "hip_cm": 103.4127444425192,
+        "shoulder_width_cm": 47.46125922809786,
+        "inseam_cm": 70.09541959165024
+      },
+      "pipeline_details": {
+        "heightCm": 175.2,
+        "chest": {
+          "yMm": 538.0,
+          "viewerYMm": 1220.0,
+          "centerMm": [
+            6.558829419536323,
+            -13.995341627222444
+          ],
+          "semiMajorMm": 163.0,
+          "semiMinorMm": 130.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 95.3293829359213,
+          "uncertaintyCm": 0.36616523159369546,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.9076642574715107
+        },
+        "waist": {
+          "yMm": 746.0,
+          "viewerYMm": 1012.0,
+          "centerMm": [
+            -1.5068543675613455,
+            -1.9315079775087725
+          ],
+          "semiMajorMm": 157.0,
+          "semiMinorMm": 117.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 87.86065556630504,
+          "uncertaintyCm": 0.44415649927600026,
+          "depthCapped": false,
+          "depthCapRemovedMm": 1.7564577177981562,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.88353620455704
+        },
+        "hip": {
+          "yMm": 866.0,
+          "viewerYMm": 892.0,
+          "centerMm": [
+            -1.5068543675613455,
+            16.068492022491228
+          ],
+          "semiMajorMm": 185.0,
+          "semiMinorMm": 139.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 103.4127444425192,
+          "uncertaintyCm": 4.865405026476673,
+          "depthCapped": true,
+          "depthCapRemovedMm": 33.43407638680179,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.8906255244294495
+        },
+        "shoulderWidthCm": 47.46125922809786,
+        "shoulderWidthUncertaintyCm": 0.13342029478440842,
+        "shoulderTipReliable": false,
+        "shoulderMethod": "arc",
+        "shoulderBiacromialCm": 32.702756680311715,
+        "inseamCm": 70.09541959165024,
+        "inseamUncertaintyCm": 0.138703112871017,
+        "uncertaintyScope": "Geometric error budget only; not a validated 95% prediction interval.",
+        "qualityFlags": [
+          "chest: the arms touch the torso at the chest line in the front photo, so the width is read 38mm lower (y=538mm), where the torso is clear; depth is still read at the chest line. Retake the front photo with the arms held clear of the torso up to the armpits for a width at the chest line itself.",
+          "hip: side-view depth was 11% larger than a plausible torso proportion (likely the arm/hand in profile, not the torso -- see MAX_DEPTH_TO_WIDTH_RATIO), so 33mm of depth was removed and that axis is now an assumed proportion rather than a measured one. Step 7 widens this measurement's confidence interval accordingly. Retake the side photo with arms held clear of the torso for a reading that doesn't rest on an assumption.",
+          "waist_chest = 0.92, outside the expected [0.7, 0.9] band"
+        ]
+      },
+      "comparison_to_reference": {
+        "chest_cm": {
+          "reference_midpoint_cm": 102.0,
+          "predicted_cm": 95.3293829359213,
+          "predicted_minus_reference_midpoint_cm": -6.670617064078698,
+          "absolute_error_cm": 6.670617064078698,
+          "absolute_percentage_error": 6.539820651057547
+        },
+        "waist_cm": {
+          "reference_midpoint_cm": 92.0,
+          "predicted_cm": 87.86065556630504,
+          "predicted_minus_reference_midpoint_cm": -4.1393444336949585,
+          "absolute_error_cm": 4.1393444336949585,
+          "absolute_percentage_error": 4.4992874279293025
+        },
+        "hip_cm": {
+          "reference_midpoint_cm": 105.0,
+          "predicted_cm": 103.4127444425192,
+          "predicted_minus_reference_midpoint_cm": -1.5872555574808018,
+          "absolute_error_cm": 1.5872555574808018,
+          "absolute_percentage_error": 1.5116719595055255
+        },
+        "shoulder_cm": {
+          "reference_midpoint_cm": 45.0,
+          "predicted_cm": 47.46125922809786,
+          "predicted_minus_reference_midpoint_cm": 2.461259228097859,
+          "absolute_error_cm": 2.461259228097859,
+          "absolute_percentage_error": 5.469464951328575
+        }
+      },
+      "mean_absolute_error_cm": 3.7146190708380793,
+      "mean_absolute_percentage_error": 4.505061247455238
+    },
+    {
+      "name": "Srujan",
+      "status": "success",
+      "reference_measurements": {
+        "name": "Srujan",
+        "unit": "cm",
+        "height_cm": 164,
+        "chest_cm": {
+          "min": 94.0,
+          "max": 95.0
+        },
+        "waist_cm": {
+          "min": 75.0,
+          "max": 76.0
+        },
+        "hip_cm": 94.0,
+        "shoulder_cm": 50.0,
+        "legs_cm": 89.0
+      },
+      "height_cm": 164,
+      "height_source": "body_measurements.json",
+      "photos": {
+        "front": "srujanfront.jpeg",
+        "side": "srujanside.jpeg"
+      },
+      "input_fingerprint": "4d08133263d4332f98743f079d92f1ac2265fd6983095cf8374e64a21c9226d8",
+      "elapsed_seconds": 15.33,
+      "log": "runs\\photoset_measurements_20261030_194921\\srujan.log",
+      "measurements_cm": {
+        "chest_cm": 94.48046168054096,
+        "waist_cm": 77.45945543749428,
+        "hip_cm": 94.6554707485049,
+        "shoulder_width_cm": 46.61471745428337,
+        "inseam_cm": 63.84466181499706
+      },
+      "pipeline_details": {
+        "heightCm": 164.0,
+        "chest": {
+          "yMm": 550.0,
+          "viewerYMm": 1088.0,
+          "centerMm": [
+            6.737868709340319,
+            -8.905924909684643
+          ],
+          "semiMajorMm": 156.0,
+          "semiMinorMm": 135.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 94.48046168054096,
+          "uncertaintyCm": 0.3481265015850447,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.8943253225707701
+        },
+        "waist": {
+          "yMm": 694.0,
+          "viewerYMm": 944.0,
+          "centerMm": [
+            -3.060693425607724,
+            3.3250073115683563
+          ],
+          "semiMajorMm": 136.0,
+          "semiMinorMm": 106.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 77.45945543749428,
+          "uncertaintyCm": 0.3473139782547455,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.8958478324076202
+        },
+        "hip": {
+          "yMm": 842.0,
+          "viewerYMm": 796.0,
+          "centerMm": [
+            -3.060693425607724,
+            -2.6749926884316437
+          ],
+          "semiMajorMm": 172.0,
+          "semiMinorMm": 124.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 94.6554707485049,
+          "uncertaintyCm": 0.34730884276512825,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.874940347597467
+        },
+        "shoulderWidthCm": 46.61471745428337,
+        "shoulderWidthUncertaintyCm": 0.11402172718707335,
+        "shoulderTipReliable": false,
+        "shoulderMethod": "arc",
+        "shoulderBiacromialCm": 31.247450602280196,
+        "inseamCm": 63.84466181499706,
+        "inseamUncertaintyCm": 0.11769518367338179,
+        "uncertaintyScope": "Geometric error budget only; not a validated 95% prediction interval.",
+        "qualityFlags": [
+          "chest: the arms touch the torso at the chest line in the front photo, so the width is read 64mm lower (y=550mm), where the torso is clear; depth is still read at the chest line. Retake the front photo with the arms held clear of the torso up to the armpits for a width at the chest line itself.",
+          "chest: the side view has no usable chest-front edge at y=486mm -- the arm crosses the silhouette there, so that edge is bridged between the clean rows above and below and the depth is inferred rather than observed. Retake the side photo with the arms hanging straight down at the sides for a measured depth rather than a reconstructed one."
+        ]
+      },
+      "comparison_to_reference": {
+        "chest_cm": {
+          "reference_midpoint_cm": 94.5,
+          "predicted_cm": 94.48046168054096,
+          "predicted_minus_reference_midpoint_cm": -0.01953831945904483,
+          "absolute_error_cm": 0.01953831945904483,
+          "absolute_percentage_error": 0.020675470327031563
+        },
+        "waist_cm": {
+          "reference_midpoint_cm": 75.5,
+          "predicted_cm": 77.45945543749428,
+          "predicted_minus_reference_midpoint_cm": 1.9594554374942845,
+          "absolute_error_cm": 1.9594554374942845,
+          "absolute_percentage_error": 2.5953052152242178
+        },
+        "hip_cm": {
+          "reference_midpoint_cm": 94.0,
+          "predicted_cm": 94.6554707485049,
+          "predicted_minus_reference_midpoint_cm": 0.6554707485048965,
+          "absolute_error_cm": 0.6554707485048965,
+          "absolute_percentage_error": 0.6973093069201026
+        },
+        "shoulder_cm": {
+          "reference_midpoint_cm": 50.0,
+          "predicted_cm": 46.61471745428337,
+          "predicted_minus_reference_midpoint_cm": -3.3852825457166276,
+          "absolute_error_cm": 3.3852825457166276,
+          "absolute_percentage_error": 6.770565091433254
+        }
+      },
+      "mean_absolute_error_cm": 1.5049367627937134,
+      "mean_absolute_percentage_error": 2.5209637709761514
+    },
+    {
+      "name": "Madhu",
+      "status": "success",
+      "reference_measurements": {
+        "name": "Madhu",
+        "unit": "cm",
+        "height_cm": 190,
+        "chest_cm": 85.0,
+        "waist_cm": 73.0,
+        "hip_cm": 96.0,
+        "shoulder_cm": 45.0,
+        "legs_cm": 97.0
+      },
+      "height_cm": 190,
+      "height_source": "body_measurements.json",
+      "photos": {
+        "front": "madhufront.jpeg",
+        "side": "madhuside.jpeg"
+      },
+      "input_fingerprint": "bf6706ac4143b72cb5eb58eb07d5a512b1e7c72e1e66395f9c72a60d70d150ca",
+      "elapsed_seconds": 17.47,
+      "log": "runs\\photoset_measurements_20261030_194921\\madhu.log",
+      "measurements_cm": {
+        "chest_cm": 95.03208535849747,
+        "waist_cm": 85.272,
+        "hip_cm": 99.28746181809933,
+        "shoulder_width_cm": 49.10929510955102,
+        "inseam_cm": 77.24210881053368
+      },
+      "pipeline_details": {
+        "heightCm": 190.0,
+        "chest": {
+          "yMm": 590.0,
+          "viewerYMm": 1308.0,
+          "centerMm": [
+            10.021739453831515,
+            -4.203974087418828
+          ],
+          "semiMajorMm": 169.0,
+          "semiMinorMm": 122.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 95.03208535849747,
+          "uncertaintyCm": 1.1854282063395634,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.8800548203968347
+        },
+        "waist": {
+          "yMm": 808.0,
+          "viewerYMm": 1090.0,
+          "centerMm": [
+            -3.107801193775458,
+            26.13605743127755
+          ],
+          "semiMajorMm": 152.0,
+          "semiMinorMm": 114.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 85.272,
+          "uncertaintyCm": 4.185852081878446,
+          "depthCapped": true,
+          "depthCapRemovedMm": 27.690324318538387,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.8807119430430018
+        },
+        "hip": {
+          "yMm": 920.0,
+          "viewerYMm": 978.0,
+          "centerMm": [
+            -1.1078011937754582,
+            31.13605743127755
+          ],
+          "semiMajorMm": 178.0,
+          "semiMinorMm": 133.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 99.28746181809933,
+          "uncertaintyCm": 2.8542684331314288,
+          "depthCapped": true,
+          "depthCapRemovedMm": 17.913322231719633,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.885209653911307
+        },
+        "shoulderWidthCm": 49.10929510955102,
+        "shoulderWidthUncertaintyCm": 0.3894260733002709,
+        "shoulderTipReliable": false,
+        "shoulderMethod": "arc",
+        "shoulderBiacromialCm": 33.35042973279772,
+        "inseamCm": 77.24210881053368,
+        "inseamUncertaintyCm": 0.40700142794965427,
+        "uncertaintyScope": "Geometric error budget only; not a validated 95% prediction interval.",
+        "qualityFlags": [
+          "chest: the arms touch the torso at the chest line in the front photo, so the width is read 48mm lower (y=590mm), where the torso is clear; depth is still read at the chest line. Retake the front photo with the arms held clear of the torso up to the armpits for a width at the chest line itself.",
+          "waist: side-view depth was 11% larger than a plausible torso proportion (likely the arm/hand in profile, not the torso -- see MAX_DEPTH_TO_WIDTH_RATIO), so 28mm of depth was removed and that axis is now an assumed proportion rather than a measured one. Step 7 widens this measurement's confidence interval accordingly. Retake the side photo with arms held clear of the torso for a reading that doesn't rest on an assumption.",
+          "hip: side-view depth was 6% larger than a plausible torso proportion (likely the arm/hand in profile, not the torso -- see MAX_DEPTH_TO_WIDTH_RATIO), so 18mm of depth was removed and that axis is now an assumed proportion rather than a measured one. Step 7 widens this measurement's confidence interval accordingly. Retake the side photo with arms held clear of the torso for a reading that doesn't rest on an assumption.",
+          "silhouette: pose-guided image refinement recovered missing lower legs/feet before height calibration; inspect capture quality."
+        ]
+      },
+      "comparison_to_reference": {
+        "chest_cm": {
+          "reference_midpoint_cm": 85.0,
+          "predicted_cm": 95.03208535849747,
+          "predicted_minus_reference_midpoint_cm": 10.032085358497469,
+          "absolute_error_cm": 10.032085358497469,
+          "absolute_percentage_error": 11.802453362938198
+        },
+        "waist_cm": {
+          "reference_midpoint_cm": 73.0,
+          "predicted_cm": 85.272,
+          "predicted_minus_reference_midpoint_cm": 12.272000000000006,
+          "absolute_error_cm": 12.272000000000006,
+          "absolute_percentage_error": 16.810958904109597
+        },
+        "hip_cm": {
+          "reference_midpoint_cm": 96.0,
+          "predicted_cm": 99.28746181809933,
+          "predicted_minus_reference_midpoint_cm": 3.287461818099331,
+          "absolute_error_cm": 3.287461818099331,
+          "absolute_percentage_error": 3.42443939385347
+        },
+        "shoulder_cm": {
+          "reference_midpoint_cm": 45.0,
+          "predicted_cm": 49.10929510955102,
+          "predicted_minus_reference_midpoint_cm": 4.10929510955102,
+          "absolute_error_cm": 4.10929510955102,
+          "absolute_percentage_error": 9.13176691011338
+        }
+      },
+      "mean_absolute_error_cm": 7.425210571536956,
+      "mean_absolute_percentage_error": 10.292404642753661
+    },
+    {
+      "name": "Ayush",
+      "status": "success",
+      "reference_measurements": {
+        "name": "Ayush",
+        "unit": "cm",
+        "height_cm": 172,
+        "chest_cm": 88,
+        "waist_cm": 82,
+        "hip_cm": 96,
+        "shoulder_cm": 43,
+        "legs_cm": 85
+      },
+      "height_cm": 172,
+      "height_source": "body_measurements.json",
+      "photos": {
+        "front": "ayushfront.jpeg",
+        "side": "ayushside.jpeg"
+      },
+      "input_fingerprint": "3c7a7a79358f843ff0e98f1e9bb0039c69db8f396525e63c4303179fc21d8c79",
+      "elapsed_seconds": 12.05,
+      "log": "runs\\photoset_measurements_20261030_194921\\ayush.log",
+      "measurements_cm": {
+        "chest_cm": 90.35545353118606,
+        "waist_cm": 82.6838716605172,
+        "hip_cm": 97.05306416197429,
+        "shoulder_width_cm": 42.98427105643098,
+        "inseam_cm": 68.49151401861015
+      },
+      "pipeline_details": {
+        "heightCm": 172.0,
+        "chest": {
+          "yMm": 548.0,
+          "viewerYMm": 1170.0,
+          "centerMm": [
+            7.859692888163181,
+            8.08017397524577
+          ],
+          "semiMajorMm": 159.0,
+          "semiMinorMm": 118.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 90.35545353118606,
+          "uncertaintyCm": 1.2451955327154187,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.8926737666873614
+        },
+        "waist": {
+          "yMm": 668.0,
+          "viewerYMm": 1050.0,
+          "centerMm": [
+            -2.021618489913749,
+            -11.962103879026955
+          ],
+          "semiMajorMm": 147.0,
+          "semiMinorMm": 111.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 82.6838716605172,
+          "uncertaintyCm": 1.4679217923531245,
+          "depthCapped": true,
+          "depthCapRemovedMm": 5.404097955571132,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.8833627673358526
+        },
+        "hip": {
+          "yMm": 858.0,
+          "viewerYMm": 860.0,
+          "centerMm": [
+            -11.021618489913749,
+            -14.962103879026955
+          ],
+          "semiMajorMm": 174.0,
+          "semiMinorMm": 130.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 97.05306416197429,
+          "uncertaintyCm": 2.189465652024982,
+          "depthCapped": true,
+          "depthCapRemovedMm": 12.40729214117573,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.8801561142141408
+        },
+        "shoulderWidthCm": 42.98427105643098,
+        "shoulderWidthUncertaintyCm": 0.41147517082697593,
+        "shoulderTipReliable": false,
+        "shoulderMethod": "arc",
+        "shoulderBiacromialCm": 30.256532209044593,
+        "inseamCm": 68.49151401861015,
+        "inseamUncertaintyCm": 0.4296841631315053,
+        "uncertaintyScope": "Geometric error budget only; not a validated 95% prediction interval.",
+        "qualityFlags": [
+          "chest: the arms touch the torso at the chest line in the front photo, so the width is read 68mm lower (y=548mm), where the torso is clear; depth is still read at the chest line. Retake the front photo with the arms held clear of the torso up to the armpits for a width at the chest line itself.",
+          "waist: side-view depth was 2% larger than a plausible torso proportion (likely the arm/hand in profile, not the torso -- see MAX_DEPTH_TO_WIDTH_RATIO), so 5mm of depth was removed and that axis is now an assumed proportion rather than a measured one. Step 7 widens this measurement's confidence interval accordingly. Retake the side photo with arms held clear of the torso for a reading that doesn't rest on an assumption.",
+          "hip: side-view depth was 5% larger than a plausible torso proportion (likely the arm/hand in profile, not the torso -- see MAX_DEPTH_TO_WIDTH_RATIO), so 12mm of depth was removed and that axis is now an assumed proportion rather than a measured one. Step 7 widens this measurement's confidence interval accordingly. Retake the side photo with arms held clear of the torso for a reading that doesn't rest on an assumption.",
+          "waist_chest = 0.92, outside the expected [0.7, 0.9] band"
+        ]
+      },
+      "comparison_to_reference": {
+        "chest_cm": {
+          "reference_midpoint_cm": 88,
+          "predicted_cm": 90.35545353118606,
+          "predicted_minus_reference_midpoint_cm": 2.3554535311860576,
+          "absolute_error_cm": 2.3554535311860576,
+          "absolute_percentage_error": 2.6766517399841563
+        },
+        "waist_cm": {
+          "reference_midpoint_cm": 82,
+          "predicted_cm": 82.6838716605172,
+          "predicted_minus_reference_midpoint_cm": 0.6838716605171982,
+          "absolute_error_cm": 0.6838716605171982,
+          "absolute_percentage_error": 0.8339898298990222
+        },
+        "hip_cm": {
+          "reference_midpoint_cm": 96,
+          "predicted_cm": 97.05306416197429,
+          "predicted_minus_reference_midpoint_cm": 1.0530641619742909,
+          "absolute_error_cm": 1.0530641619742909,
+          "absolute_percentage_error": 1.0969418353898863
+        },
+        "shoulder_cm": {
+          "reference_midpoint_cm": 43,
+          "predicted_cm": 42.98427105643098,
+          "predicted_minus_reference_midpoint_cm": -0.0157289435690231,
+          "absolute_error_cm": 0.0157289435690231,
+          "absolute_percentage_error": 0.03657893853261186
+        }
+      },
+      "mean_absolute_error_cm": 1.0270295743116424,
+      "mean_absolute_percentage_error": 1.1610405859514192
+    },
+    {
+      "name": "Laky",
+      "status": "success",
+      "reference_measurements": {
+        "name": "Laky",
+        "unit": "cm",
+        "height_cm": 173,
+        "chest_cm": 87,
+        "waist_cm": 76,
+        "hip_cm": 91,
+        "shoulder_cm": 43,
+        "legs_cm": 87
+      },
+      "preprocessing": {
+        "side_crop_xyxy_px": [
+          240,
+          128,
+          720,
+          1216
+        ],
+        "original_side_image_size_px": [
+          960,
+          1280
+        ],
+        "reason": "Retry with full-body crop after original side-view pose detection failure."
+      },
+      "height_cm": 173,
+      "height_source": "body_measurements.json",
+      "photos": {
+        "front": "lakyfront.jpeg",
+        "side": "lakyside.jpeg"
+      },
+      "input_fingerprint": "d52be35c7bf3c8da5106eb7837d79c30246283db227c092eff9d174214d09c27",
+      "elapsed_seconds": 11.41,
+      "log": "runs\\photoset_measurements_20261030_194921\\laky.log",
+      "measurements_cm": {
+        "chest_cm": 88.1559709422476,
+        "waist_cm": 80.784,
+        "hip_cm": 88.20739113460094,
+        "shoulder_width_cm": 46.00822987939371,
+        "inseam_cm": 69.8003128157913
+      },
+      "pipeline_details": {
+        "heightCm": 173.0,
+        "chest": {
+          "yMm": 566.0,
+          "viewerYMm": 1162.0,
+          "centerMm": [
+            -11.080634748887292,
+            8.760381434911778
+          ],
+          "semiMajorMm": 161.0,
+          "semiMinorMm": 108.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 88.1559709422476,
+          "uncertaintyCm": 1.2767206451593756,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.867598047546317
+        },
+        "waist": {
+          "yMm": 670.0,
+          "viewerYMm": 1058.0,
+          "centerMm": [
+            4.75092175431098,
+            -0.022250072631237572
+          ],
+          "semiMajorMm": 144.0,
+          "semiMinorMm": 108.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 80.784,
+          "uncertaintyCm": 2.633265860596917,
+          "depthCapped": true,
+          "depthCapRemovedMm": 15.88849147855305,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.8870510759802994
+        },
+        "hip": {
+          "yMm": 862.0,
+          "viewerYMm": 866.0,
+          "centerMm": [
+            0.7509217543109798,
+            2.9777499273687624
+          ],
+          "semiMajorMm": 170.0,
+          "semiMinorMm": 103.0,
+          "rotationDeg": 0.0,
+          "circumferenceCm": 88.20739113460094,
+          "uncertaintyCm": 1.273520364232172,
+          "depthCapped": false,
+          "depthCapRemovedMm": 0.0,
+          "shapeModel": "faust_q_section",
+          "ellipseExtentScale": 0.8230753967979334
+        },
+        "shoulderWidthCm": 46.00822987939371,
+        "shoulderWidthUncertaintyCm": 0.4048449138838799,
+        "shoulderTipReliable": false,
+        "shoulderMethod": "arc",
+        "shoulderBiacromialCm": 32.19955947238803,
+        "inseamCm": 69.8003128157913,
+        "inseamUncertaintyCm": 0.42189055453771224,
+        "uncertaintyScope": "Geometric error budget only; not a validated 95% prediction interval.",
+        "qualityFlags": [
+          "chest: the arms touch the torso at the chest line in the front photo, so the width is read 84mm lower (y=566mm), where the torso is clear; depth is still read at the chest line. Retake the front photo with the arms held clear of the torso up to the armpits for a width at the chest line itself.",
+          "waist: side-view depth was 7% larger than a plausible torso proportion (likely the arm/hand in profile, not the torso -- see MAX_DEPTH_TO_WIDTH_RATIO), so 16mm of depth was removed and that axis is now an assumed proportion rather than a measured one. Step 7 widens this measurement's confidence interval accordingly. Retake the side photo with arms held clear of the torso for a reading that doesn't rest on an assumption.",
+          "waist_chest = 0.92, outside the expected [0.7, 0.9] band"
+        ]
+      },
+      "comparison_to_reference": {
+        "chest_cm": {
+          "reference_midpoint_cm": 87,
+          "predicted_cm": 88.1559709422476,
+          "predicted_minus_reference_midpoint_cm": 1.155970942247606,
+          "absolute_error_cm": 1.155970942247606,
+          "absolute_percentage_error": 1.3287022324685127
+        },
+        "waist_cm": {
+          "reference_midpoint_cm": 76,
+          "predicted_cm": 80.784,
+          "predicted_minus_reference_midpoint_cm": 4.784000000000006,
+          "absolute_error_cm": 4.784000000000006,
+          "absolute_percentage_error": 6.294736842105271
+        },
+        "hip_cm": {
+          "reference_midpoint_cm": 91,
+          "predicted_cm": 88.20739113460094,
+          "predicted_minus_reference_midpoint_cm": -2.7926088653990604,
+          "absolute_error_cm": 2.7926088653990604,
+          "absolute_percentage_error": 3.0688009509879786
+        },
+        "shoulder_cm": {
+          "reference_midpoint_cm": 43,
+          "predicted_cm": 46.00822987939371,
+          "predicted_minus_reference_midpoint_cm": 3.00822987939371,
+          "absolute_error_cm": 3.00822987939371,
+          "absolute_percentage_error": 6.995883440450488
+        }
+      },
+      "mean_absolute_error_cm": 2.9352024217600956,
+      "mean_absolute_percentage_error": 4.4220308665030625
+    }
+  ],
+  "summary": {
+    "success": 8
+  },
+  "error_analysis": {
+    "definition": "Mean absolute error, using reference range midpoints and skipping null references. Height is supplied; legs_cm is not comparable to inseam. Shoulder comparisons retain differing pipeline shoulder methods.",
+    "measurement_count": 30,
+    "total_absolute_error_cm": 106.5758334216353,
+    "mean_absolute_error_cm": 3.5525277807211766,
+    "mean_absolute_percentage_error": 4.66988684575597,
+    "within_5_percent_count": 17,
+    "within_3_percent_count": 12,
+    "by_measurement": [
+      {
+        "measurement": "waist_cm",
+        "count": 8,
+        "total_absolute_error_cm": 41.082529368647954,
+        "mean_absolute_error_cm": 5.135316171080994,
+        "mean_absolute_percentage_error": 6.361043683753303,
+        "contribution_percent": 38.54769702444386
+      },
+      {
+        "measurement": "chest_cm",
+        "count": 8,
+        "total_absolute_error_cm": 30.630279126597827,
+        "mean_absolute_error_cm": 3.8287848908247284,
+        "mean_absolute_percentage_error": 4.185543412273682,
+        "contribution_percent": 28.740360870947473
+      },
+      {
+        "measurement": "shoulder_cm",
+        "count": 7,
+        "total_absolute_error_cm": 17.458544548960973,
+        "mean_absolute_error_cm": 2.4940777927087106,
+        "mean_absolute_percentage_error": 5.393489930308898,
+        "contribution_percent": 16.38133523187333
+      },
+      {
+        "measurement": "hip_cm",
+        "count": 7,
+        "total_absolute_error_cm": 17.40448037742854,
+        "mean_absolute_error_cm": 2.4863543396326486,
+        "mean_absolute_percentage_error": 2.567068441757275,
+        "contribution_percent": 16.33060687273534
+      }
+    ],
+    "largest_individual_errors": [
+      {
+        "name": "Madhu",
+        "measurement": "waist_cm",
+        "reference_midpoint_cm": 73.0,
+        "predicted_cm": 85.272,
+        "predicted_minus_reference_midpoint_cm": 12.272000000000006,
+        "absolute_error_cm": 12.272000000000006,
+        "absolute_percentage_error": 16.810958904109597
+      },
+      {
+        "name": "Madhu",
+        "measurement": "chest_cm",
+        "reference_midpoint_cm": 85.0,
+        "predicted_cm": 95.03208535849747,
+        "predicted_minus_reference_midpoint_cm": 10.032085358497469,
+        "absolute_error_cm": 10.032085358497469,
+        "absolute_percentage_error": 11.802453362938198
+      },
+      {
+        "name": "Sanath",
+        "measurement": "waist_cm",
+        "reference_midpoint_cm": 85.0,
+        "predicted_cm": 76.79671974809008,
+        "predicted_minus_reference_midpoint_cm": -8.203280251909916,
+        "absolute_error_cm": 8.203280251909916,
+        "absolute_percentage_error": 9.650917943423432
+      },
+      {
+        "name": "Sumanth",
+        "measurement": "chest_cm",
+        "reference_midpoint_cm": 93.98,
+        "predicted_cm": 85.8595642852895,
+        "predicted_minus_reference_midpoint_cm": -8.12043571471051,
+        "absolute_error_cm": 8.12043571471051,
+        "absolute_percentage_error": 8.640599824122695
+      },
+      {
+        "name": "Vasishta",
+        "measurement": "chest_cm",
+        "reference_midpoint_cm": 102.0,
+        "predicted_cm": 95.3293829359213,
+        "predicted_minus_reference_midpoint_cm": -6.670617064078698,
+        "absolute_error_cm": 6.670617064078698,
+        "absolute_percentage_error": 6.539820651057547
+      },
+      {
+        "name": "Sumanth",
+        "measurement": "waist_cm",
+        "reference_midpoint_cm": 85.09,
+        "predicted_cm": 79.83383958298808,
+        "predicted_minus_reference_midpoint_cm": -5.256160417011927,
+        "absolute_error_cm": 5.256160417011927,
+        "absolute_percentage_error": 6.177177596676374
+      },
+      {
+        "name": "Sumanth",
+        "measurement": "hip_cm",
+        "reference_midpoint_cm": 98.42500000000001,
+        "predicted_cm": 93.39724413633887,
+        "predicted_minus_reference_midpoint_cm": -5.027755863661142,
+        "absolute_error_cm": 5.027755863661142,
+        "absolute_percentage_error": 5.108210173900067
+      },
+      {
+        "name": "Laky",
+        "measurement": "waist_cm",
+        "reference_midpoint_cm": 76,
+        "predicted_cm": 80.784,
+        "predicted_minus_reference_midpoint_cm": 4.784000000000006,
+        "absolute_error_cm": 4.784000000000006,
+        "absolute_percentage_error": 6.294736842105271
+      },
+      {
+        "name": "Vasishta",
+        "measurement": "waist_cm",
+        "reference_midpoint_cm": 92.0,
+        "predicted_cm": 87.86065556630504,
+        "predicted_minus_reference_midpoint_cm": -4.1393444336949585,
+        "absolute_error_cm": 4.1393444336949585,
+        "absolute_percentage_error": 4.4992874279293025
+      },
+      {
+        "name": "Madhu",
+        "measurement": "shoulder_cm",
+        "reference_midpoint_cm": 45.0,
+        "predicted_cm": 49.10929510955102,
+        "predicted_minus_reference_midpoint_cm": 4.10929510955102,
+        "absolute_error_cm": 4.10929510955102,
+        "absolute_percentage_error": 9.13176691011338
+      },
+      {
+        "name": "Thilak",
+        "measurement": "waist_cm",
+        "reference_midpoint_cm": 94.0,
+        "predicted_cm": 90.21558283198034,
+        "predicted_minus_reference_midpoint_cm": -3.784417168019658,
+        "absolute_error_cm": 3.784417168019658,
+        "absolute_percentage_error": 4.0259757106592104
+      },
+      {
+        "name": "Srujan",
+        "measurement": "shoulder_cm",
+        "reference_midpoint_cm": 50.0,
+        "predicted_cm": 46.61471745428337,
+        "predicted_minus_reference_midpoint_cm": -3.3852825457166276,
+        "absolute_error_cm": 3.3852825457166276,
+        "absolute_percentage_error": 6.770565091433254
+      },
+      {
+        "name": "Thilak",
+        "measurement": "shoulder_cm",
+        "reference_midpoint_cm": 48.0,
+        "predicted_cm": 44.7065223343409,
+        "predicted_minus_reference_midpoint_cm": -3.293477665659097,
+        "absolute_error_cm": 3.293477665659097,
+        "absolute_percentage_error": 6.861411803456452
+      },
+      {
+        "name": "Madhu",
+        "measurement": "hip_cm",
+        "reference_midpoint_cm": 96.0,
+        "predicted_cm": 99.28746181809933,
+        "predicted_minus_reference_midpoint_cm": 3.287461818099331,
+        "absolute_error_cm": 3.287461818099331,
+        "absolute_percentage_error": 3.42443939385347
+      },
+      {
+        "name": "Laky",
+        "measurement": "shoulder_cm",
+        "reference_midpoint_cm": 43,
+        "predicted_cm": 46.00822987939371,
+        "predicted_minus_reference_midpoint_cm": 3.00822987939371,
+        "absolute_error_cm": 3.00822987939371,
+        "absolute_percentage_error": 6.995883440450488
+      },
+      {
+        "name": "Sanath",
+        "measurement": "hip_cm",
+        "reference_midpoint_cm": 98.0,
+        "predicted_cm": 94.99913663769098,
+        "predicted_minus_reference_midpoint_cm": -3.000863362309019,
+        "absolute_error_cm": 3.000863362309019,
+        "absolute_percentage_error": 3.062105471743897
+      },
+      {
+        "name": "Laky",
+        "measurement": "hip_cm",
+        "reference_midpoint_cm": 91,
+        "predicted_cm": 88.20739113460094,
+        "predicted_minus_reference_midpoint_cm": -2.7926088653990604,
+        "absolute_error_cm": 2.7926088653990604,
+        "absolute_percentage_error": 3.0688009509879786
+      },
+      {
+        "name": "Vasishta",
+        "measurement": "shoulder_cm",
+        "reference_midpoint_cm": 45.0,
+        "predicted_cm": 47.46125922809786,
+        "predicted_minus_reference_midpoint_cm": 2.461259228097859,
+        "absolute_error_cm": 2.461259228097859,
+        "absolute_percentage_error": 5.469464951328575
+      },
+      {
+        "name": "Ayush",
+        "measurement": "chest_cm",
+        "reference_midpoint_cm": 88,
+        "predicted_cm": 90.35545353118606,
+        "predicted_minus_reference_midpoint_cm": 2.3554535311860576,
+        "absolute_error_cm": 2.3554535311860576,
+        "absolute_percentage_error": 2.6766517399841563
+      },
+      {
+        "name": "Srujan",
+        "measurement": "waist_cm",
+        "reference_midpoint_cm": 75.5,
+        "predicted_cm": 77.45945543749428,
+        "predicted_minus_reference_midpoint_cm": 1.9594554374942845,
+        "absolute_error_cm": 1.9594554374942845,
+        "absolute_percentage_error": 2.5953052152242178
+      },
+      {
+        "name": "Sanath",
+        "measurement": "chest_cm",
+        "reference_midpoint_cm": 92.5,
+        "predicted_cm": 90.56984158708617,
+        "predicted_minus_reference_midpoint_cm": -1.9301584129138263,
+        "absolute_error_cm": 1.9301584129138263,
+        "absolute_percentage_error": 2.086657743690623
+      },
+      {
+        "name": "Vasishta",
+        "measurement": "hip_cm",
+        "reference_midpoint_cm": 105.0,
+        "predicted_cm": 103.4127444425192,
+        "predicted_minus_reference_midpoint_cm": -1.5872555574808018,
+        "absolute_error_cm": 1.5872555574808018,
+        "absolute_percentage_error": 1.5116719595055255
+      },
+      {
+        "name": "Sumanth",
+        "measurement": "shoulder_cm",
+        "reference_midpoint_cm": 47.625,
+        "predicted_cm": 48.810271176973636,
+        "predicted_minus_reference_midpoint_cm": 1.185271176973636,
+        "absolute_error_cm": 1.185271176973636,
+        "absolute_percentage_error": 2.4887583768475294
+      },
+      {
+        "name": "Laky",
+        "measurement": "chest_cm",
+        "reference_midpoint_cm": 87,
+        "predicted_cm": 88.1559709422476,
+        "predicted_minus_reference_midpoint_cm": 1.155970942247606,
+        "absolute_error_cm": 1.155970942247606,
+        "absolute_percentage_error": 1.3287022324685127
+      },
+      {
+        "name": "Ayush",
+        "measurement": "hip_cm",
+        "reference_midpoint_cm": 96,
+        "predicted_cm": 97.05306416197429,
+        "predicted_minus_reference_midpoint_cm": 1.0530641619742909,
+        "absolute_error_cm": 1.0530641619742909,
+        "absolute_percentage_error": 1.0969418353898863
+      },
+      {
+        "name": "Ayush",
+        "measurement": "waist_cm",
+        "reference_midpoint_cm": 82,
+        "predicted_cm": 82.6838716605172,
+        "predicted_minus_reference_midpoint_cm": 0.6838716605171982,
+        "absolute_error_cm": 0.6838716605171982,
+        "absolute_percentage_error": 0.8339898298990222
+      },
+      {
+        "name": "Srujan",
+        "measurement": "hip_cm",
+        "reference_midpoint_cm": 94.0,
+        "predicted_cm": 94.6554707485049,
+        "predicted_minus_reference_midpoint_cm": 0.6554707485048965,
+        "absolute_error_cm": 0.6554707485048965,
+        "absolute_percentage_error": 0.6973093069201026
+      },
+      {
+        "name": "Thilak",
+        "measurement": "chest_cm",
+        "reference_midpoint_cm": 89.0,
+        "predicted_cm": 88.65398021649538,
+        "predicted_minus_reference_midpoint_cm": -0.34601978350461593,
+        "absolute_error_cm": 0.34601978350461593,
+        "absolute_percentage_error": 0.38878627360069207
+      },
+      {
+        "name": "Srujan",
+        "measurement": "chest_cm",
+        "reference_midpoint_cm": 94.5,
+        "predicted_cm": 94.48046168054096,
+        "predicted_minus_reference_midpoint_cm": -0.01953831945904483,
+        "absolute_error_cm": 0.01953831945904483,
+        "absolute_percentage_error": 0.020675470327031563
+      },
+      {
+        "name": "Ayush",
+        "measurement": "shoulder_cm",
+        "reference_midpoint_cm": 43,
+        "predicted_cm": 42.98427105643098,
+        "predicted_minus_reference_midpoint_cm": -0.0157289435690231,
+        "absolute_error_cm": 0.0157289435690231,
+        "absolute_percentage_error": 0.03657893853261186
+      }
+    ]
+  }
+}

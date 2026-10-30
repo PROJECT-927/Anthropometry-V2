@@ -79,6 +79,16 @@ CENTRE_OUTLIER_MIN_PX = 40.0
 # Rows added either side of a rejected band so interpolation endpoints
 # are clean rather than merely below threshold.
 REJECT_DILATION_ROWS = 51
+# Inside a rejected band, a measured edge within this fraction of the body's
+# median depth of the neck-to-belly interpolation is still the body's own
+# edge and is kept. An arm contaminates one edge, not the torso: with the arm
+# held forward in profile, the back edge stays clean while interpolating it
+# shaved up to 4.8cm off the scapulae, and the chest front below the arm is
+# clean while the interpolated line ran 2-5cm inside it. Arm-contaminated
+# edges sat 9-65cm outside the line, or jumped inward where the widest run
+# was the detached arm itself; the body's own edges sat 0-5cm out (0.25 of
+# a ~20cm median depth), on the eight capture subjects.
+EDGE_ACCEPT_DEPTH_FRACTION = 0.25
 
 # Median-filter width applied to each edge before smoothing. The global
 # outlier test above catches gross contamination (the arm band, 3-4x the
@@ -206,7 +216,7 @@ def _column_run_lengths(occ_f):
     return sizes[labels]
 
 
-def body_depth_profile(side_mask):
+def body_depth_profile(side_mask, scale_mm_per_px=None):
     """
     One depth interval per image row of the side mask: the body core,
     with limb contamination rejected and interpolated over.
@@ -251,25 +261,39 @@ def body_depth_profile(side_mask):
         | (np.abs(centre - med_centre) > max(CENTRE_OUTLIER_MADS * mad_centre,
                                               CENTRE_OUTLIER_MIN_PX))
     )
-    bad = ndimage.binary_dilation(bad, np.ones(REJECT_DILATION_ROWS))
+    def physical_window(value):
+        size = value if scale_mm_per_px is None else max(3, int(round(value / scale_mm_per_px)))
+        return size if size % 2 else size+1
+
+    bad = ndimage.binary_dilation(bad, np.ones(physical_window(REJECT_DILATION_ROWS)))
 
     good = ~bad
     if not good.any():
         raise ValueError("Every row of the side mask was rejected as contaminated.")
 
     idx = np.arange(len(rows))
-    lo_f = np.interp(idx, idx[good], lo[good])
-    hi_f = np.interp(idx, idx[good], hi[good])
+    lo_i = np.interp(idx, idx[good], lo[good])
+    hi_i = np.interp(idx, idx[good], hi[good])
+    # Keep each edge of a rejected row where it is still the body's edge
+    # (see EDGE_ACCEPT_DEPTH_FRACTION); only the contaminated edge is replaced.
+    tol = EDGE_ACCEPT_DEPTH_FRACTION * med_depth
+    with np.errstate(invalid="ignore"):
+        keep_lo = bad & (np.abs(lo - lo_i) <= tol)
+        keep_hi = bad & (np.abs(hi - hi_i) <= tol)
+    lo_f = np.where(keep_lo, lo, lo_i)
+    hi_f = np.where(keep_hi, hi, hi_i)
+    # A row is measured only if neither of its edges was interpolated.
+    bad = bad & ~(keep_lo & keep_hi)
 
     # Each edge is filtered independently: the contamination is
     # frequently one-sided (on the sample photo the trailing edge runs
     # perfectly smooth from 583 to 458 while the forward edge carries
     # the whole ankle excursion), so filtering the pair jointly would
     # disturb a clean edge to fix a dirty one.
-    lo_f = ndimage.median_filter(lo_f, size=EDGE_MEDIAN_ROWS, mode="nearest")
-    hi_f = ndimage.median_filter(hi_f, size=EDGE_MEDIAN_ROWS, mode="nearest")
+    lo_f = ndimage.median_filter(lo_f, size=physical_window(EDGE_MEDIAN_ROWS), mode="nearest")
+    hi_f = ndimage.median_filter(hi_f, size=physical_window(EDGE_MEDIAN_ROWS), mode="nearest")
 
-    return rows, _smooth(lo_f), _smooth(hi_f), bad
+    return rows, _smooth(lo_f, window=physical_window(61)), _smooth(hi_f, window=physical_window(61)), bad
 
 
 def _open_disk(mask, radius_px):

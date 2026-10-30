@@ -212,6 +212,31 @@ def ramanujan_perimeter(semi_major_mm, semi_minor_mm):
     return float(np.pi * (3 * (a + b) - np.sqrt((3 * a + b) * (a + 3 * b))))
 
 
+# Any convex section of width W and depth D has a perimeter between
+# 2*sqrt(W^2 + D^2) and 2*(W + D). Where a human trunk section sits in that
+# interval, q in P = lower + q*(upper - lower), was measured on 764 raw
+# MPI-FAUST cross-sections (paper, "Population q") -- independent scans, NOT
+# fitted to any capture subject. An ellipse inscribed in W x D sits at
+# q ~= 0.262 for every human aspect ratio, below all three sites: real trunks
+# are squarer than an ellipse. Reporting the inscribed ellipse's perimeter
+# under-read every subject's chest by ~3cm and waist/hip by ~1cm before any
+# capture error was added on top.
+SECTION_PERIMETER_Q = {"chest": 0.353, "waist": 0.305, "hip": 0.293}
+
+
+def section_perimeter_mm(width_mm, depth_mm, label):
+    """Trunk girth from observed width and depth via the FAUST population q.
+
+    Labels without a measured q fall back to the inscribed ellipse.
+    """
+    q = SECTION_PERIMETER_Q.get(label)
+    if q is None:
+        return ramanujan_perimeter(max(width_mm, depth_mm) / 2, min(width_mm, depth_mm) / 2)
+    lower = 2.0 * np.hypot(width_mm, depth_mm)
+    upper = 2.0 * (width_mm + depth_mm)
+    return float(lower + q * (upper - lower))
+
+
 # ---------------------------------------------------------------------------
 # Cross-section -> boundary points
 # ---------------------------------------------------------------------------
@@ -352,7 +377,36 @@ def measure_circumference(hull, y_mm, torso_x_bounds_mm=None, torso_z_bounds_mm=
         )
 
     ellipse = fit_ellipse(hull_pts)
-    circumference_mm = ramanujan_perimeter(ellipse["semi_major_mm"], ellipse["semi_minor_mm"])
+    # An unconstrained least-squares fit to a rounded rectangle can extend
+    # outside BOTH observed silhouettes. Keep its projected radii inside the
+    # measured section instead of reporting dimensions absent from the photos.
+    pts = np.asarray(points)
+    cx, cz = ellipse["center"]
+    available_x = (pts[:, 0].max() - pts[:, 0].min()) / 2
+    available_z = (pts[:, 1].max() - pts[:, 1].min()) / 2
+    angle = np.radians(ellipse["rotation_deg"])
+    a, b = ellipse["semi_major_mm"], ellipse["semi_minor_mm"]
+    extent_x = np.hypot(a * np.cos(angle), b * np.sin(angle))
+    extent_z = np.hypot(a * np.sin(angle), b * np.cos(angle))
+    extent_scale = min(1.0, available_x / extent_x, available_z / extent_z)
+    if extent_scale <= 0:
+        raise MeasurementError("Ellipse center is outside its observed cross-section.")
+    # Constrain each observed axis independently: shrinking both by the worst
+    # violation discards valid depth when only the fitted width overshoots.
+    bounded_x = min(extent_x, available_x)
+    bounded_z = min(extent_z, available_z)
+    ellipse["center"] = tuple((pts.min(axis=0)+pts.max(axis=0))/2)
+    ellipse["semi_major_mm"] = float(max(bounded_x, bounded_z))
+    ellipse["semi_minor_mm"] = float(min(bounded_x, bounded_z))
+    ellipse["rotation_deg"] = 0.0 if bounded_x >= bounded_z else 90.0
+    # Algebraic coefficient covariance describes the unconstrained fit, not
+    # these extent-constrained axes. Boundary/scale uncertainty still applies;
+    # unobserved cross-section shape is explicitly outside that error budget.
+    ellipse["coeffs"] = None
+    ellipse["coeff_cov"] = None
+    # The ellipse still locates and draws the section; its inscribed
+    # perimeter is not the girth (see SECTION_PERIMETER_Q).
+    circumference_mm = section_perimeter_mm(2 * bounded_x, 2 * bounded_z, label)
 
     return {
         "label": label,
@@ -370,6 +424,8 @@ def measure_circumference(hull, y_mm, torso_x_bounds_mm=None, torso_z_bounds_mm=
         "boundary_point_count": len(points),
         "hull_points_mm": hull_pts,
         "boundary_points_mm": points,
+        "ellipse_extent_scale": float(extent_scale),
+        "shape_model": "faust_q_section" if label in SECTION_PERIMETER_Q else "extent_constrained_ellipse",
     }
 
 
@@ -384,36 +440,23 @@ CHEST_HEIGHT_FRACTION = 0.35
 
 
 def find_chest_height(front_mask, shoulder_y_mm, waist_y_mm, top_row, scale_mm_per_px, center_x_px):
-    """
-    Chest/bust height, as a fraction of the shoulder-to-waist span --
-    not a widest-point search, on purpose.
+    """Choose a proportional chest row below visible arm/sleeve fusion.
 
-    A "widest row of the front silhouette" search was the first
-    approach here, and it fails outright on photos where the arms hang
-    close against the torso all the way down past chest height (this
-    project's own sample photos included) -- confirmed by testing both
-    ways of running it:
-      - restricted to the arm-separated region (the same trim
-        trace_torso_boundary uses for waist): the search band collapses
-        to almost nothing, so argmax just returns its first surviving
-        row -- an artifact of where the trim happens to end, not a
-        located chest.
-      - run over the full, untrimmed shoulder-to-waist band: the
-        maximum lands squarely on the elbow/forearm bulge (confirmed
-        against the sample photos: width ~613mm at the elbow vs a
-        genuine torso width in the 380-420mm range), not the ribcage.
-
-    Both failures have the same root cause the side-view depth cap
-    documents for a different view: a single photo with arms at the
-    sides doesn't give the front silhouette enough information to
-    separate "torso" from "arm" in the chest-height region, so no
-    search over that silhouette -- windowed or not -- can be trusted to
-    find chest height there. A proportional estimate, clearly not
-    claimed to be a precise detection, is the honest fallback -- same
-    principle as MAX_DEPTH_TO_WIDTH_RATIO's cap, applied to a location
-    instead of a distance.
+    The whole shoulder-to-waist trace identifies where the torso separates
+    from the arms. A contaminated proposed row moves down to the clean region,
+    with 10mm clearance for local width sampling. This can sample lower than
+    the fullest chest, so the output carries a location-quality warning.
     """
-    return shoulder_y_mm + CHEST_HEIGHT_FRACTION * (waist_y_mm - shoulder_y_mm)
+    proposed = shoulder_y_mm + CHEST_HEIGHT_FRACTION * (waist_y_mm - shoulder_y_mm)
+    # A small band can be fused to sleeves throughout and mistake their outer
+    # edges for the chest. Trace the full upper torso to find arm separation.
+    trace = trace_torso_boundary(
+        front_mask, shoulder_y_mm, waist_y_mm, top_row, scale_mm_per_px, center_x_px
+    )
+    clean_start = float(trace["y_mm"][0]) + 10.0
+    if clean_start >= waist_y_mm:
+        raise MeasurementError("No arm-separated chest rows above the waist; retake with arms clear.")
+    return max(proposed, clean_start)
 
 
 def measure_shoulder_width(landmarks_normalized, scale_mm_per_px):
@@ -520,7 +563,8 @@ SHOULDER_MAX_DEPTH_TO_WIDTH = 0.60
 
 def measure_shoulder_arc(front_mask, side_mask, height_cm,
                          front_top_row, front_scale_mm_per_px, front_center_x_px,
-                         side_top_row, side_scale_mm_per_px, side_center_x_px):
+                         side_top_row, side_scale_mm_per_px, side_center_x_px,
+                         front_landmarks=None, side_landmarks=None):
     """Tailor's shoulder width: the arc across the back, acromion to acromion.
 
     A tailor's tape follows the curved surface of the upper back, so the
@@ -541,14 +585,30 @@ def measure_shoulder_arc(front_mask, side_mask, height_cm,
     Returns (arc_mm, flags). arc_mm is None when the slice fails the
     plausibility guard, in which case the caller should fall back.
     """
+    if front_landmarks and side_landmarks:
+        names = ("left", "right")
+        available = all(n+"_"+part in front_landmarks for n in names for part in ("shoulder", "elbow"))
+        if available:
+            arms = [np.asarray(front_landmarks[n+"_elbow"])-front_landmarks[n+"_shoulder"] for n in names]
+            # Raised horizontal arms leave the upper torso slice usable. With
+            # lowered arms, trace the surface above each shoulder joint instead
+            # of sampling a fixed head-height fraction through neck or sleeves.
+            horizontal = all(abs(v[1]) <= 0.5*np.linalg.norm(v) for v in arms)
+            if not horizontal:
+                return measure_shoulder_surface_arc(
+                    front_mask, side_mask, front_landmarks, side_landmarks,
+                    front_scale_mm_per_px, side_scale_mm_per_px,
+                )
     y_mm = (1.0 - SHOULDER_HEIGHT_FRACTION) * height_cm * 10.0
 
     try:
         left, right = _torso_bounds_at(
-            front_mask, y_mm, front_top_row, front_scale_mm_per_px, front_center_x_px
+            front_mask, y_mm, front_top_row, front_scale_mm_per_px, front_center_x_px,
+            band_mm=40.0, percentile=15.0,
         )
         back, front = _torso_bounds_at(
-            side_mask, y_mm, side_top_row, side_scale_mm_per_px, side_center_x_px
+            side_mask, y_mm, side_top_row, side_scale_mm_per_px, side_center_x_px,
+            band_mm=40.0, percentile=15.0,
         )
     except Exception as exc:
         return None, [f"shoulder width: torso trace failed at shoulder height ({exc})."]
@@ -559,7 +619,29 @@ def measure_shoulder_arc(front_mask, side_mask, height_cm,
     if width_mm <= 0 or depth_mm <= 0:
         return None, ["shoulder width: degenerate torso slice at shoulder height."]
 
+    flags = []
     ratio = depth_mm / width_mm
+    if ratio > SHOULDER_MAX_DEPTH_TO_WIDTH:
+        # With the arms held forward in the side photo, the trace at shoulder
+        # height follows the arm. The arm-rejected body profile keeps the
+        # clean back edge and bridges only the contaminated front edge -- the
+        # depth the lowered-arm path already uses. Falling straight back to
+        # the joint-to-joint chord instead read ~25-35% short of the tape.
+        from profile_carve import body_depth_profile
+        try:
+            rows, lo, hi, bad = body_depth_profile(side_mask, scale_mm_per_px=side_scale_mm_per_px)
+        except ValueError:
+            rows = None
+        side_row = side_top_row + y_mm / side_scale_mm_per_px
+        if rows is not None and rows[0] <= side_row <= rows[-1]:
+            profile_depth_mm = float(np.interp(side_row, rows, hi - lo) * side_scale_mm_per_px)
+            if 0 < profile_depth_mm <= SHOULDER_MAX_DEPTH_TO_WIDTH * width_mm:
+                depth_mm = profile_depth_mm
+                ratio = depth_mm / width_mm
+                if bad[int(np.argmin(np.abs(rows - side_row)))]:
+                    flags.append("shoulder width: the arm crosses the side photo at shoulder height; "
+                                 "the front of the back arc's depth is bridged across it, so the arc "
+                                 "is a shape-model estimate.")
     if ratio > SHOULDER_MAX_DEPTH_TO_WIDTH:
         return None, [
             f"shoulder width: torso slice at shoulder height is {ratio:.2f} as deep "
@@ -571,7 +653,60 @@ def measure_shoulder_arc(front_mask, side_mask, height_cm,
             f"clear of the torso at shoulder height."
         ]
 
-    return float(ramanujan_perimeter(width_mm / 2.0, depth_mm / 2.0) / 2.0), []
+    return float(ramanujan_perimeter(width_mm / 2.0, depth_mm / 2.0) / 2.0), flags
+
+
+def shoulder_surface_endpoints(mask, landmarks, scale_mm_per_px):
+    """Intersect outward upper-arm normals with the visible shoulder surface."""
+    endpoints = []
+    torso_center_x = np.mean([landmarks[n+"_shoulder"][0] for n in ("left", "right")])
+    for name in ("left", "right"):
+        start = np.asarray(landmarks[name+"_shoulder"], dtype=float)
+        arm = np.asarray(landmarks[name+"_elbow"], dtype=float)-start
+        if np.linalg.norm(arm) < 1:
+            raise MeasurementError("Shoulder and elbow landmarks coincide.")
+        normal = np.array([arm[1], -arm[0]]) / np.linalg.norm(arm)
+        # Outward is unambiguous even for a vertical arm, whose two normals
+        # both have zero Y. Choosing by Y alone can trace across the torso.
+        if normal[0]*(start[0]-torso_center_x) < 0:
+            normal = -normal
+        endpoint = None
+        for distance in np.arange(0, 150.0 / scale_mm_per_px, 0.5):
+            point = start + distance*normal
+            x, y = np.rint(point).astype(int)
+            if not (0 <= y < mask.shape[0] and 0 <= x < mask.shape[1]) or not mask[y, x]:
+                break
+            endpoint = point
+        if endpoint is None:
+            raise MeasurementError("A shoulder landmark lies outside the silhouette.")
+        endpoints.append(endpoint)
+    return np.asarray(endpoints)
+
+
+def measure_shoulder_surface_arc(front_mask, side_mask, front_landmarks, side_landmarks,
+                                  front_scale_mm_per_px, side_scale_mm_per_px):
+    """Back-arc estimate with pose-located surface endpoints and torso-only depth."""
+    from profile_carve import body_depth_profile
+    try:
+        endpoints = shoulder_surface_endpoints(front_mask, front_landmarks, front_scale_mm_per_px)
+        width = float(np.linalg.norm(endpoints[1]-endpoints[0])*front_scale_mm_per_px)
+        front_joint_row = np.mean([front_landmarks[n+"_shoulder"][1] for n in ("left", "right")])
+        side_joint_row = np.mean([side_landmarks[n+"_shoulder"][1] for n in ("left", "right")])
+        # Align the views at their own detected shoulders, rather than assuming
+        # equal distances from segmented head/foot endpoints in both photos.
+        side_row = side_joint_row + (endpoints[:, 1].mean()-front_joint_row)*front_scale_mm_per_px/side_scale_mm_per_px
+        rows, lo, hi, bad = body_depth_profile(side_mask, scale_mm_per_px=side_scale_mm_per_px)
+        if not rows[0] <= side_row <= rows[-1]:
+            raise MeasurementError("Shoulder height is outside the side silhouette.")
+        depth = float(np.interp(side_row, rows, hi-lo)*side_scale_mm_per_px)
+        if width <= 0 or depth <= 0 or depth > width:
+            raise MeasurementError("Shoulder cross-section is degenerate or contaminated by an arm.")
+        flags = []
+        if bad[int(np.argmin(abs(rows-side_row)))]:
+            flags.append("shoulder width: side depth is interpolated across arm occlusion; back arc is a shape-model estimate.")
+        return float(ramanujan_perimeter(width/2, depth/2)/2), flags
+    except (MeasurementError, ValueError) as exc:
+        return None, [f"shoulder width: surface-arc estimate unavailable ({exc})."]
 
 
 def measure_inseam(hip_y_mm, ankle_y_mm):
@@ -579,24 +714,13 @@ def measure_inseam(hip_y_mm, ankle_y_mm):
     return float(ankle_y_mm - hip_y_mm)
 
 
-def _torso_bounds_at(mask, y_mm, top_row, scale_mm_per_px, center_x_px, band_mm=40.0, percentile=15.0, view_name=None):
-    """
-    Torso half-widths at a specific height, from either the front mask
-    (giving X bounds) or the side mask (giving Z bounds) -- built on the
-    same continuity-tracked, arm-trimmed tracing Step 5 uses.
+def _torso_bounds_at(mask, y_mm, top_row, scale_mm_per_px, center_x_px, band_mm=10.0, percentile=50.0, view_name=None):
+    """Local torso bounds from the central silhouette run.
 
-    In profile (the side mask), a hand resting near the hip/waist sits
-    *in front of* the torso rather than beside it, so it never creates a
-    silhouette gap the run-splitting in trace_torso_boundary can catch
-    (confirmed against the sample photos: exactly one run at the waist
-    row, with a visible hand-shaped bulge). What does distinguish it is
-    shape: the torso taper is smooth over tens of mm, while a hand is a
-    narrow spike. Taking a low percentile of the half-width over a
-    modest band (rather than reading the single nearest row) rejects
-    that kind of localized spike without needing to explicitly detect
-    and model the hand -- a genuinely smoothly-tapering torso barely
-    changes value under this, while a spike gets excluded because most
-    of the band sits below it.
+    Use a narrow physical band and its median by default. A broad low-percentile
+    band under-reads smoothly varying anatomy; expanding that result by 15%
+    then includes arms and clothing that were outside the requested section.
+    Explicit band/percentile overrides remain available for shoulder tracing.
     """
     y0 = max(0.0, y_mm - band_mm)
     y1 = y_mm + band_mm
@@ -691,6 +815,30 @@ def _cap_depth_to_width(x_bounds_mm, z_bounds_mm, max_ratio=MAX_DEPTH_TO_WIDTH_R
     return capped, float(depth - (capped[1] - capped[0]))
 
 
+def side_arm_intersects_height(landmarks, y_mm, top_row, scale_mm_per_px, band_mm=90.0):
+    """Include entire visible arm segments, not just the endpoint joint rows."""
+    if not landmarks:
+        return True  # Missing pose evidence cannot establish a clean slice.
+    segment_known = False
+    for side in ("left", "right"):
+        points = []
+        for joint in ("shoulder", "elbow", "wrist"):
+            point = landmarks.get(side+"_"+joint)
+            if point is None:
+                points.append(None)
+                continue
+            xy, visibility = (point["xy"], point.get("visibility", 1.0)) if isinstance(point, dict) else (point, 1.0)
+            points.append((xy[1]-top_row)*scale_mm_per_px if visibility >= 0.5 else None)
+        if any(p is not None and abs(p-y_mm) <= band_mm for p in points):
+            return True
+        for a, b in zip(points, points[1:]):
+            if a is not None and b is not None:
+                segment_known = True
+                if min(a, b)-band_mm <= y_mm <= max(a, b)+band_mm:
+                    return True
+    return not segment_known
+
+
 # ---------------------------------------------------------------------------
 # Top-level entry point
 # ---------------------------------------------------------------------------
@@ -698,7 +846,7 @@ def _cap_depth_to_width(x_bounds_mm, z_bounds_mm, max_ratio=MAX_DEPTH_TO_WIDTH_R
 def extract_measurements(front_mask, side_mask, hull, waist_correction, landmarks_normalized,
                           front_top_row, front_scale_mm_per_px, front_center_x_px,
                           side_top_row, side_scale_mm_per_px, side_center_x_px,
-                          height_cm=None, torso_margin=1.15, chest_hull=None,
+                          height_cm=None, torso_margin=1.0, chest_hull=None,
                           side_landmarks_normalized=None):
     """
     Full Step 6 pipeline. landmarks_normalized is Step 3's
@@ -749,41 +897,9 @@ def extract_measurements(front_mask, side_mask, hull, waist_correction, landmark
     depth_cap_fraction = {}
 
     def arm_near(y_mm, band_mm=90.0):
-        """Is an arm actually crossing the side silhouette at this height?
-
-        The depth cap exists to catch a limb projecting toward the camera in
-        profile, which inflates the measured torso depth. It decides that from
-        the depth/width RATIO alone, which is an indirect proxy -- and MEASURED
-        on the capture photos it is a false positive at the waist on all three
-        subjects: the elbows and wrists sit at 0.74-0.82 of stature while the
-        waist is at 0.56-0.62, and every side silhouette there is a single run
-        of torso. The cap was firing on genuine (if deep) body proportions and
-        replacing a measured depth with an assumed one, which is what put a
-        +/-9.0cm interval on a waist whose real error was under 4%.
-
-        The side-view landmarks answer the question directly: if no elbow or
-        wrist is within `band_mm` of the slice, no arm can be intruding, so the
-        measured depth stands.
-
-        Step 3's normalized landmarks are bare [x, y] arrays with no visibility
-        field, so every arm landmark is used. That is acceptable here because
-        in a side view both arms sit at nearly the same height, so the occluded
-        far arm does not move the answer; the visibility branch below only
-        applies if a caller passes richer landmark dicts.
-        """
-        if not side_landmarks_normalized:
-            return True                     # unknown -> keep the old behaviour
-        for name in ("left_elbow", "right_elbow", "left_wrist", "right_wrist"):
-            lm = side_landmarks_normalized.get(name)
-            if lm is None:
-                continue
-            xy, vis = (lm["xy"], lm["visibility"]) if isinstance(lm, dict) else (lm, 1.0)
-            if vis < 0.5:
-                continue
-            lm_y_mm = (xy[1] - side_top_row) * side_scale_mm_per_px
-            if abs(lm_y_mm - y_mm) <= band_mm:
-                return True
-        return False
+        return side_arm_intersects_height(
+            side_landmarks_normalized, y_mm, side_top_row, side_scale_mm_per_px, band_mm
+        )
 
     def torso_bounds(y_mm, label):
         x_lo, x_hi = _torso_bounds_at(front_mask, y_mm, front_top_row, front_scale_mm_per_px, front_center_x_px, view_name="front")
@@ -815,10 +931,31 @@ def extract_measurements(front_mask, side_mask, hull, waist_correction, landmark
         depth_cap_removed_mm["chest"] = 0.0
         depth_cap_fraction["chest"] = 0.0
         chest = measure_circumference(chest_hull, chest_y_mm, chest_x, None, label="chest")
+        # Only the front view has to drop below arms touching the torso; the
+        # side view still sees the body core at the chest line itself. Reading
+        # depth there instead of at the lowered width row keeps the chest from
+        # being sampled on the lower ribs (measured 40-65mm low on the A-pose
+        # capture subjects, where the trunk is shallower).
+        chest_line_mm = shoulder_y_mm + CHEST_HEIGHT_FRACTION * (waist_y_mm - shoulder_y_mm)
+        if chest_line_mm < chest["y_mm"]:
+            line = measure_circumference(chest_hull, chest_line_mm, chest_x, None, label="chest")
+            x_is_major = chest["rotation_deg"] == 0.0
+            width_mm = 2 * (chest["semi_major_mm"] if x_is_major else chest["semi_minor_mm"])
+            depth_mm = 2 * (line["semi_minor_mm"] if line["rotation_deg"] == 0.0 else line["semi_major_mm"])
+            chest["semi_major_mm"], chest["semi_minor_mm"] = max(width_mm, depth_mm) / 2, min(width_mm, depth_mm) / 2
+            chest["rotation_deg"] = 0.0 if width_mm >= depth_mm else 90.0
+            chest["circumference_mm"] = section_perimeter_mm(width_mm, depth_mm, "chest")
+            chest["circumference_cm"] = chest["circumference_mm"] / 10.0
+            chest["depth_y_mm"] = line["y_mm"]
     else:
         chest_x, chest_z = torso_bounds(chest_y_mm, "chest")
         chest = measure_circumference(corrected_hull, chest_y_mm, chest_x, chest_z, label="chest")
-    waist = measure_circumference(corrected_hull, waist_y_mm, waist_x, waist_z, label="waist")
+    # Waist girth reads the uncarved hull. section_perimeter_mm turns the
+    # observed width and depth into a trunk perimeter, and its population q
+    # already carries the section's concave shape; Step 5's carve pulls the
+    # sides in further (1-10mm on the capture subjects), narrowing the width
+    # below what the front photo shows and counting that concavity twice.
+    waist = measure_circumference(hull, waist_y_mm, waist_x, waist_z, label="waist")
     hip = measure_circumference(corrected_hull, hip_y_mm, hip_x, hip_z, label="hip")
 
     # Carried on the measurement itself so Step 7 can turn a capped
@@ -845,10 +982,13 @@ def extract_measurements(front_mask, side_mask, hull, waist_correction, landmark
         front_mask, side_mask, height_cm,
         front_top_row, front_scale_mm_per_px, front_center_x_px,
         side_top_row, side_scale_mm_per_px, side_center_x_px,
+        front_landmarks=landmarks_normalized, side_landmarks=side_landmarks_normalized,
     )
     if arc_mm is not None:
         shoulder_width_mm = arc_mm
         shoulder_method = "arc"
+        # A valid arc does not use the failed tip detector's biacromial fallback.
+        shoulder_flags = arc_flags
     else:
         shoulder_width_mm = fallback_width_mm
         shoulder_method = "biacromial_fallback"
@@ -884,35 +1024,26 @@ def extract_measurements(front_mask, side_mask, hull, waist_correction, landmark
     # Nothing downstream can tell those two cases apart, so say which
     # one this is rather than reporting a number that looks equally
     # confident either way.
+    chest_depth_y_mm = chest.get("depth_y_mm", chest["y_mm"])
     if chest_hull is not None and "depth_interpolated" in chest_hull:
-        j = int(np.argmin(np.abs(chest_hull["y_mm"] - chest["y_mm"])))
+        j = int(np.argmin(np.abs(chest_hull["y_mm"] - chest_depth_y_mm)))
         if bool(chest_hull["depth_interpolated"][j]):
             depth_flags.append(
-                f"chest: the side view has no usable depth at y={chest['y_mm']:.0f}mm -- the arm "
-                "crosses the silhouette there, so those rows were rejected and this depth is "
-                "interpolated from the neck above and the belly below. That interpolation runs "
-                "across the deepest part of the torso, so the chest reads low (5-6cm on the "
-                "subjects measured so far). Retake the front and side photos with the arms raised "
-                "clear of chest height for a measured depth rather than a reconstructed one."
+                f"chest: the side view has no usable chest-front edge at y={chest_depth_y_mm:.0f}mm -- "
+                "the arm crosses the silhouette there, so that edge is bridged between the clean "
+                "rows above and below and the depth is inferred rather than observed. "
+                "Retake the side photo with the arms hanging straight down at the sides "
+                "for a measured depth rather than a reconstructed one."
             )
 
-    # Stated unconditionally because it is unconditionally true:
-    # find_chest_height does not search, it always returns a fixed
-    # fraction of the shoulder-to-waist span. Deliberately claims
-    # nothing about where the arms are in *this* photo -- an earlier
-    # version of this flag asserted "arms flush against the torso
-    # through the chest-height region ... true for this photo", which
-    # was a finding about the specific photos it was written against
-    # and was simply wrong for others (on a T-pose photo the arms are
-    # nowhere near chest height, and the front silhouette there is
-    # cleanly torso-only). Where the arms genuinely do intrude, the
-    # depth-cap flags above report it from measured evidence.
-    height_flags = [
-        f"chest: height is a proportional estimate ({CHEST_HEIGHT_FRACTION:.0%} of the way from "
-        "shoulder to waist), not detected from the silhouette -- so the chest slice may sit above "
-        "or below your actual fullest chest point. The circumference itself is measured normally "
-        "at that height."
-    ]
+    height_flags = []
+    if chest_depth_y_mm < chest["y_mm"]:
+        height_flags.append(
+            f"chest: the arms touch the torso at the chest line in the front photo, so the width is "
+            f"read {chest['y_mm'] - chest_depth_y_mm:.0f}mm lower (y={chest['y_mm']:.0f}mm), where "
+            "the torso is clear; depth is still read at the chest line. Retake the front photo with "
+            "the arms held clear of the torso up to the armpits for a width at the chest line itself."
+        )
 
     return {
         "chest": chest,

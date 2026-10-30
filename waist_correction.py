@@ -653,9 +653,19 @@ def apply_waist_correction(hull, waist_y_mm, d_left_mm, d_right_mm,
 # assumption about its profile.
 WAIST_SHOULDER_HIP_FRACTION = 0.688
 
+# The tape waist is the narrowest point, but only inside the anatomical waist
+# zone around that fraction. Over the whole shoulder-hip span the argmin
+# locked onto trace dips where elbows or wrists crowd the torso outline --
+# 46-56% of the span down on four of the eight capture subjects -- and
+# under-read their waists by 5-10cm; the fixed fraction alone landed on
+# garment flares on slim subjects (+10 to +19cm). The narrowest row inside
+# this band does neither, and on a torso that widens monotonically it stays
+# within the zone instead of running off to a dip.
+WAIST_SEARCH_BAND = (0.60, 0.80)
+
 
 def correct_waist(front_mask, hull, shoulder_y_mm, hip_y_mm,
-                  waist_from_fraction=True):
+                  waist_from_fraction=False):
     """
     Full Step 5 pipeline.
 
@@ -674,11 +684,19 @@ def correct_waist(front_mask, hull, shoulder_y_mm, hip_y_mm,
     waist = find_waist(front_mask, shoulder_y_mm, hip_y_mm, top_f, scale_f, cx_f)
     y_mm = waist["y_mm"]
 
+    span = hip_y_mm - shoulder_y_mm
     if waist_from_fraction:
-        target = shoulder_y_mm + WAIST_SHOULDER_HIP_FRACTION * (hip_y_mm - shoulder_y_mm)
+        target = shoulder_y_mm + WAIST_SHOULDER_HIP_FRACTION * span
         wi = int(np.argmin(np.abs(y_mm - target)))
     else:
-        wi = waist["row_index"]
+        band_lo, band_hi = WAIST_SEARCH_BAND
+        in_band = ((y_mm >= shoulder_y_mm + band_lo * span)
+                   & (y_mm <= shoulder_y_mm + band_hi * span))
+        if in_band.any():
+            width = waist["half_width_left_mm"] + waist["half_width_right_mm"]
+            wi = int(np.argmin(np.where(in_band, width, np.inf)))
+        else:
+            wi = waist["row_index"]
 
     d_left, L_left, k_left, theta_left, area_left = correction_depth(
         y_mm, waist["half_width_left_mm"], wi

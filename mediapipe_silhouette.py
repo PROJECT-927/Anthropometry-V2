@@ -140,9 +140,65 @@ def fill_small_holes(mask, max_frac=0.02):
     return out
 
 
+def recover_missing_feet(image_bgr, mask, landmarks):
+    """Refine a truncated lower-leg mask using visible pose points and image colors.
+
+    Only runs when confident foot points extend materially below the mask. The
+    refinement is restricted to knee-to-foot corridors, so a background-colored
+    trouser leg cannot silently shorten the height calibration.
+    """
+    height, width = mask.shape
+    ys = np.flatnonzero(mask.any(axis=1))
+    if not len(ys):
+        return mask, []
+    stature_px = ys[-1]-ys[0]+1
+    limbs = []
+    for indices in ((25, 27, 29, 31), (26, 28, 30, 32)):
+        points = [landmarks[i] for i in indices]
+        if min(float(p.visibility) for p in points) < 0.5:
+            continue
+        coords = np.array([[p.x*width, p.y*height] for p in points])
+        if not (np.all(coords >= 0) and np.all(coords[:, 0] < width) and np.all(coords[:, 1] < height)):
+            continue
+        knee_x, knee_y = np.rint(coords[0]).astype(int)
+        gap = coords[2:, 1].max()-ys[-1]
+        if mask[knee_y, knee_x] and 0.02*stature_px < gap < 0.20*stature_px:
+            limbs.append(coords)
+    if not limbs:
+        return mask, []
+    corridor = np.zeros_like(mask)
+    seeds = np.zeros_like(mask)
+    radius = max(4, int(round(0.035*stature_px)))
+    for points in limbs:
+        for a, b in ((0, 1), (1, 2), (2, 3)):
+            p, q = tuple(np.rint(points[a]).astype(int)), tuple(np.rint(points[b]).astype(int))
+            cv2.line(corridor, p, q, 1, 2*radius)
+            cv2.circle(corridor, q, radius, 1, -1)
+            cv2.line(seeds, p, q, 1, max(1, radius//5))
+    cy, cx = np.where(corridor)
+    pad = radius
+    x0, x1 = max(0, cx.min()-pad), min(width, cx.max()+pad+1)
+    y0, y1 = max(0, cy.min()-pad), min(height, cy.max()+pad+1)
+    region = corridor[y0:y1, x0:x1] > 0
+    labels = np.full(region.shape, cv2.GC_BGD, np.uint8)
+    labels[region] = cv2.GC_PR_FGD
+    labels[(mask[y0:y1, x0:x1] > 0) & region] = cv2.GC_FGD
+    labels[seeds[y0:y1, x0:x1] > 0] = cv2.GC_FGD
+    cv2.setRNGSeed(0)
+    cv2.grabCut(image_bgr[y0:y1, x0:x1].copy(), labels, None,
+                np.zeros((1, 65), np.float64), np.zeros((1, 65), np.float64), 5, cv2.GC_INIT_WITH_MASK)
+    recovered = region & ((labels == cv2.GC_FGD) | (labels == cv2.GC_PR_FGD))
+    result = mask.copy()
+    result[y0:y1, x0:x1] |= recovered.astype(np.uint8)
+    result = fill_small_holes(keep_largest_component(result))
+    message = "silhouette: pose-guided image refinement recovered missing lower legs/feet before height calibration; inspect capture quality."
+    print("  ! " + message, flush=True)
+    return result, [message]
+
+
 def extract_silhouette(image_bgr, threshold=MASK_THRESHOLD,
                        dilation_px=BOUNDARY_DILATION_PX,
-                       debug=False, debug_path="debug_silhouette.png"):
+                       debug=False, debug_path="debug_silhouette.png", return_info=False):
     """Return a uint8 {0,1} silhouette of the dominant person.
 
     Raises SilhouetteError if no pose is detected or the result is too small
@@ -186,6 +242,12 @@ def extract_silhouette(image_bgr, threshold=MASK_THRESHOLD,
     mask = (probability > threshold).astype(np.uint8)
     mask = keep_largest_component(mask)
     mask = fill_small_holes(mask)
+    # Landmark coordinates refer to the padded inference width, not the input
+    # width. Convert X before using the localized image refinement.
+    from types import SimpleNamespace
+    landmarks = [SimpleNamespace(x=p.x*detect_input.shape[1]/width, y=p.y,
+                                 visibility=p.visibility) for p in result.pose_landmarks[0]]
+    mask, quality_flags = recover_missing_feet(image_bgr, mask, landmarks)
 
     if dilation_px > 0:
         r = int(dilation_px)
@@ -204,7 +266,7 @@ def extract_silhouette(image_bgr, threshold=MASK_THRESHOLD,
     if debug:
         save_debug(image_bgr, probability, mask, debug_path)
 
-    return mask
+    return (mask, quality_flags) if return_info else mask
 
 
 def save_debug(image, probability, mask, out_path):
