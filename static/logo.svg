@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="353 128 174 172" role="img" aria-label="Anthropometric">
+  <circle cx="439.5" cy="149" r="17" fill="#171615"/>
+  <path d="M389.5 285 L439.5 186 L489.5 285" fill="none" stroke="#171615" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="359" y="228" width="161" height="33" rx="7" fill="#FFD600" stroke="#171615" stroke-width="4"/>
+  <path d="M385.5 245 V260 M412.5 245 V260 M439.5 238 V260 M466.5 245 V260 M493.5 245 V260" stroke="#171615" stroke-width="4"/>
+</svg>

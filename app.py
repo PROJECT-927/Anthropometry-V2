@@ -714,6 +714,14 @@ def index():
     return response
 
 
+@app.route("/favicon.ico")
+def favicon():
+    """Browsers fetch this path on their own for pages with no icon link,
+    such as the 3D viewer opened in its own tab."""
+    return send_from_directory(app.static_folder, "favicon.ico",
+                               mimetype="image/vnd.microsoft.icon", max_age=86400)
+
+
 @app.route("/models/pose_landmarker_heavy.task")
 def pose_model():
     """Serve the same pinned MediaPipe model to the on-device browser runtime."""

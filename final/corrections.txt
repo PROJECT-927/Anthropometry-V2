@@ -1,0 +1,118 @@
+change the title from "Privacy-Preserving Two-View Anthropometry:
+Profile-Guided Reconstruction and
+Geometric Body Measurement" to "Anthropometric - An Algo Approach "
+
+In abstract section 
+Replace the paragraph "On the BodyM benchmark, column capping reduces constrained-ellipse chest error
+by 12.54mm in a paired ablation and the profile branch attains a hip MAE of 49.54mm,
+while the width/depth ellipse remains better at chest and waist. On nine volunteers in
+fitted clothing, MAEs against tape are 3.36, 3.65, 2.81 and 1.93cm for chest, waist, hip
+and shoulder. A tenth subject in a loose polo shirt is overestimated by 11.51cm at chest
+and 12.27cm at waist, showing clothing to be the dominant failure mode." with a more practical explanation of the project rather than cold hard numbers , it should be such that upon reading it the entire project must be understood , dont touch the other paragraphs 
+
+In Introduction 1.1 overview
+Human body measurements underpin garment sizing, ergonomics and clinical screen
+ing. Clothing standards define circumferences, breadths and surface paths in terms of
+anatomical landmarks [1], and girths such as waist circumference are routinely used
+as indicators of health risk [2]. The reference procedure, manual tape measurement,
+requires physical contact and a trained measurer, and its repeatability depends on land
+mark identification, tape tension and posture [3]. Three-dimensional body scanners re
+move the tape but rely on dedicated booths and on protocols for extracting dimensions
+from scans [4,5]. Neither route is convenient for a person who wants their measure
+ments at home, for example before buying clothes online " expand upon this paragraph and elaborate it to show the flow and evolution currently this is very short , incorporate a better flow from one technology to another 
+
+in 1.3 objective
+ O1: estimatechest, waist and hip girths, shoulder length and a hip-to-ankle length
+from one frontal and one profile photograph and the stature, without training any
+model on measurement labels;
+• O2: reducethedepthover-estimation that limbs cause in a conventional two-view
+visual hull;
+• O3: keep the photographs on the user’s device and minimise the data transmitted
+to the server;
+• O4: make every reported value auditable by recording its reconstruction source,
+level, section model and availability;
+• O5: evaluate the pipeline on controlled synthetic geometry, a public benchmark
+and volunteers with tape references, and characterise its failure modes, in partic
+ular loose clothing
+
+Remove O1,O2,O3,O4,O5 and only keep bullet points and capitalize every first letter 
+
+1.4 Scope
+Let If and Is be frontal and approximately orthogonal profile RGB photographs of a
+standing subject and H the stature in centimetres. On the device, a fixed pretrained per
+ception operator T maps each photograph to a binary silhouette and a set of landmarks,
+T (Iv) = (Mv,Λv), Mv ∈ {0,1}h× w, Λv ∈ [0,1]10× 3,
+(1.1)
+for v ∈ {f,s}, where each landmark stores normalised coordinates and visibility. In
+the normal application workflow the data transmitted to the server are
+Dtx = {Mf,Ms,Λf,Λs,H},
+Dept. of CSE,BMSCE
+If, Is /∈ Dtx.
+(1.2)
+Page 2
+Privacy-Preserving Two-View Anthropometry
+The task is to design a measurement function g that returns, for each site k ∈ K =
+{chest, waist, hip, shoulder,inseam}, an estimate and a provenance record,
+( ˆmk, ρk) = gk(Dtx),
+(1.3)
+where ρk lists the reconstruction branch, body level, section model, flags and availabil
+ity. Given reference measurements mi,k for subjects i = 1,...,N, the goal is to keep
+the absolute error | ˆ
+mi,k−mi,k| small under three constraints: Eq. (1.2) holds; no param
+eter of g is fitted to measurement labels; and a value that cannot be computed reliably
+is reported as unavailable with a reason rather than replaced by a default. Since two sil
+houettes alone cannot provide a complete three-dimensional representation of the body,
+the function g relies on certain assumptions about body shape, which should be clearly
+defined and capable of being evaluated.
+
+rewrite this by completely removing the mathematical formulation , and replacing it with words what the actual scope is ie in tailoring , dont include health , but elaborate on scope theoretically remove the mathematical formulation 
+
+1.8 Work Plan
+The project was organised into the seven phases of Table 1.2, each ending with a re
+viewed deliverable.
+Add a gantt chart over here based on table data
+2.4 Mapping of Objectives with Research Gap Identifi
+cation
+Table 2.2 links each gap identified in Section 2.3 to the objective that responds to it and
+to the part of the report where the response is described and evaluated.
+Table 2.2: Mapping of the identified research gaps to the project objectives.
+Research gap
+Objective Response in this project
+(i) Learned estimators depend on large
+labelled or synthetic training sets
+(ii) Two-view intersection replicates
+torso depth into limbs, and the error is
+left untreated
+(iii) Full-body photographs are
+uploaded and leave the subject’s
+control
+(iv-a) Studies report one number per
+site without stating the reconstruction
+and section model behind it
+(iv-b) The failure modes, in particular
+loose clothing, are rarely quantified
+O1
+O2
+O3
+O4
+O5
+Pretrained perception only; all
+measurement stages are geometric with
+fixed constants (Table 5.4)
+Profile-guided columnwise depth
+constraint, Eq. (5.7); evaluated in
+Sections 6.2 and 6.3
+Browser-side perception and a server
+that accepts only binary silhouettes,
+landmarks and stature (Section 5.5)
+Competing estimators E, W, H
+reported separately with a provenance
+record (Table 5.3)
+Synthetic, BodyM and volunteer
+evaluation with a documented
+loose-clothing case (Section 6.5) in this again remove numbers and O1,O2,O3,O4,O5 
+
+In the Design chapter flow is rather inconsistent and fragmented completely migrate privacy architecture to design section , any block diagram also move it to design let methodology contain no block diagrams rather be it theoretical 
+
+6.5 Negative Example: Effect of Loose Clothing 
+reformat this section to include both  Negative and positive examples 

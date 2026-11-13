@@ -3,7 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Anthropometry</title>
+<title>Anthropometric</title>
+<link rel="icon" href="/static/logo.svg" type="image/svg+xml">
+<link rel="icon" href="/static/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png" sizes="180x180">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/bodoni-moda@5/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/hanken-grotesk@5/index.css">
 <style>
@@ -31,8 +35,17 @@
   .btn, .key { border-radius: 10px; }
   .tape { border-radius: 8px; overflow: hidden; }
 
-  .bar { display: flex; justify-content: space-between; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
   .bar b { font-weight: 650; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; flex: none; color: inherit; text-decoration: none; }
+  .brand img { height: 28px; width: auto; display: block; }
+  .bar > .soft { min-width: 0; text-align: right; }
+
+  /* Sign-off on the last results stage. */
+  .signoff { display: grid; justify-items: center; gap: 2px; text-align: center; padding-top: 4px; }
+  .signoff img { height: 40px; width: auto; margin-bottom: 4px; }
+  .signoff b { font: 500 22px/1.1 var(--serif); }
+  .signoff span { font-size: 14px; }
 
   /* Stages are stacked; the page snaps to one stage at a time. */
   .frame { flex: 1; min-height: 0; container-type: size; }
@@ -136,6 +149,8 @@
   /* Tablets and desktops: two columns, content sized to the screen height. */
   @media (min-width: 800px) {
     .bar, .nav { padding-inline: 32px; }
+    .brand img { height: 32px; }
+    .bar { padding-block: 8px; }
     .fit { height: 100cqh; padding: 28px 32px; gap: 20px 48px; align-content: stretch; }
 
     .s-upload { grid-template-columns: 5fr 7fr; grid-template-rows: minmax(0, 1fr); }
@@ -154,7 +169,7 @@
     .s-model .viewer { aspect-ratio: auto; max-height: none; height: 100%; min-height: 0; }
     .s-model .acts { grid-template-columns: 1fr; align-self: center; }
 
-    .s-sil { grid-template-rows: auto minmax(0, 1fr) auto; }
+    .s-sil { grid-template-rows: auto minmax(0, 1fr) auto auto; row-gap: 14px; }
     .s-sil .sil { gap: 16px; min-height: 0; grid-template-rows: minmax(0, 1fr); }
     .s-sil .sil figure { aspect-ratio: auto; max-height: none; height: 100%; min-height: 0; }
   }
@@ -177,7 +192,7 @@
   </symbol>
 </svg>
 
-<div class="bar"><b>Anthropometry</b><span class="soft">Photos stay on this device</span></div>
+<div class="bar"><a class="brand" id="brand" href="/" aria-label="Anthropometric home"><img src="/static/logo.svg" alt="" width="33" height="32"><b>Anthropometric</b></a><span class="soft">Photos stay on this device</span></div>
 
 <div class="frame"><main id="main">
 
@@ -253,6 +268,11 @@
       <figure><figcaption>Side</figcaption><img id="dbg-side" alt="Side silhouette and pose points"></figure>
     </div>
     <p class="soft">If an outline does not match your body, retake that photo against a plain background.</p>
+    <footer class="signoff">
+      <img src="/static/logo.svg" alt="" width="41" height="40">
+      <b>Anthropometric</b>
+      <span class="soft">Measured by camera, not by tape.</span>
+    </footer>
   </div></section>
 
 </main></div>
@@ -482,6 +502,9 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
   $("back").onclick = () => show(at - 1);
   $("next").onclick = () => show(at + 1);
   $("home").onclick = () => show(0);
+  // The logo link goes to the first stage without reloading, so a finished
+  // run's results stay available below it.
+  $("brand").addEventListener("click", (e) => { e.preventDefault(); show(0); });
   document.addEventListener("keydown", (e) => {
     if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
     if (e.key === "ArrowUp") { e.preventDefault(); show(at - 1); }
@@ -808,7 +831,7 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
     let kept = "No photos are stored.";
     if (job.expires_at) {
       const when = new Date(job.expires_at);
-      kept += " Run data is deleted on " + when.toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) + ".";
+      kept += " Run data will be deleted on " + when.toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) + ".";
     }
     note.textContent = kept;
     btn.disabled = false;
