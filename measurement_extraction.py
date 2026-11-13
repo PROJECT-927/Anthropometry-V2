@@ -367,7 +367,8 @@ def slice_boundary_points_mm(hull, y_mm, torso_x_bounds_mm=None, torso_z_bounds_
     return points, actual_y
 
 
-def measure_circumference(hull, y_mm, torso_x_bounds_mm=None, torso_z_bounds_mm=None, label=""):
+def measure_circumference(hull, y_mm, torso_x_bounds_mm=None, torso_z_bounds_mm=None, label="",
+                          perimeter_model=None):
     """Full Step 6 pipeline for one horizontal slice: hull -> ellipse -> Ramanujan."""
     points, actual_y = slice_boundary_points_mm(hull, y_mm, torso_x_bounds_mm, torso_z_bounds_mm)
     hull_pts = graham_scan(points)
@@ -377,6 +378,8 @@ def measure_circumference(hull, y_mm, torso_x_bounds_mm=None, torso_z_bounds_mm=
         )
 
     ellipse = fit_ellipse(hull_pts)
+    fitted_perimeter_mm = ramanujan_perimeter(ellipse["semi_major_mm"], ellipse["semi_minor_mm"])
+    fitted_coeffs, fitted_cov = ellipse["coeffs"], ellipse["coeff_cov"]
     # An unconstrained least-squares fit to a rounded rectangle can extend
     # outside BOTH observed silhouettes. Keep its projected radii inside the
     # measured section instead of reporting dimensions absent from the photos.
@@ -407,6 +410,13 @@ def measure_circumference(hull, y_mm, torso_x_bounds_mm=None, torso_z_bounds_mm=
     # The ellipse still locates and draws the section; its inscribed
     # perimeter is not the girth (see SECTION_PERIMETER_Q).
     circumference_mm = section_perimeter_mm(2 * bounded_x, 2 * bounded_z, label)
+    if perimeter_model == "legacy_fitted_ellipse":
+        if label != "waist":
+            raise ValueError("Legacy perimeter compatibility is restricted to the waist.")
+        circumference_mm = fitted_perimeter_mm
+        ellipse["coeffs"], ellipse["coeff_cov"] = fitted_coeffs, fitted_cov
+    elif perimeter_model not in (None, "population_section"):
+        raise ValueError(f"Unknown section perimeter model: {perimeter_model}")
 
     return {
         "label": label,
@@ -425,7 +435,8 @@ def measure_circumference(hull, y_mm, torso_x_bounds_mm=None, torso_z_bounds_mm=
         "hull_points_mm": hull_pts,
         "boundary_points_mm": points,
         "ellipse_extent_scale": float(extent_scale),
-        "shape_model": "faust_q_section" if label in SECTION_PERIMETER_Q else "extent_constrained_ellipse",
+        "shape_model": ("legacy_fitted_ellipse" if perimeter_model == "legacy_fitted_ellipse"
+                        else "faust_q_section" if label in SECTION_PERIMETER_Q else "extent_constrained_ellipse"),
     }
 
 
@@ -885,9 +896,10 @@ def extract_measurements(front_mask, side_mask, hull, waist_correction, landmark
     hip_y_mm = row_y_mm("left_hip", "right_hip")
     ankle_y_mm = row_y_mm("left_ankle", "right_ankle")
     waist_y_mm = waist_correction["waist_y_mm"]
+    chest_reference_waist_y_mm = waist_correction.get("chest_reference_waist_y_mm", waist_y_mm)
 
     chest_y_mm = find_chest_height(
-        front_mask, shoulder_y_mm, waist_y_mm, front_top_row, front_scale_mm_per_px, front_center_x_px
+        front_mask, shoulder_y_mm, chest_reference_waist_y_mm, front_top_row, front_scale_mm_per_px, front_center_x_px
     )
 
     corrected_hull = dict(hull)
@@ -936,7 +948,7 @@ def extract_measurements(front_mask, side_mask, hull, waist_correction, landmark
         # depth there instead of at the lowered width row keeps the chest from
         # being sampled on the lower ribs (measured 40-65mm low on the A-pose
         # capture subjects, where the trunk is shallower).
-        chest_line_mm = shoulder_y_mm + CHEST_HEIGHT_FRACTION * (waist_y_mm - shoulder_y_mm)
+        chest_line_mm = shoulder_y_mm + CHEST_HEIGHT_FRACTION * (chest_reference_waist_y_mm - shoulder_y_mm)
         if chest_line_mm < chest["y_mm"]:
             line = measure_circumference(chest_hull, chest_line_mm, chest_x, None, label="chest")
             x_is_major = chest["rotation_deg"] == 0.0
@@ -955,7 +967,9 @@ def extract_measurements(front_mask, side_mask, hull, waist_correction, landmark
     # already carries the section's concave shape; Step 5's carve pulls the
     # sides in further (1-10mm on the capture subjects), narrowing the width
     # below what the front photo shows and counting that concavity twice.
-    waist = measure_circumference(hull, waist_y_mm, waist_x, waist_z, label="waist")
+    waist = measure_circumference(hull, waist_y_mm, waist_x, waist_z, label="waist",
+                                  perimeter_model=waist_correction.get("waist_estimator", "population_section"))
+    waist["location_method"] = waist_correction.get("waist_location_method", "unspecified")
     hip = measure_circumference(corrected_hull, hip_y_mm, hip_x, hip_z, label="hip")
 
     # Carried on the measurement itself so Step 7 can turn a capped
@@ -1037,6 +1051,16 @@ def extract_measurements(front_mask, side_mask, hull, waist_correction, landmark
             )
 
     height_flags = []
+    if waist_correction.get("waist_estimator") == "legacy_fitted_ellipse":
+        height_flags.append(
+            "waist: raised-arm capture compatibility uses the fitted-section estimate at an "
+            "anatomical waist level; the tape level is not directly identified in the photo."
+        )
+    elif waist.get("location_method") == "band_edge_estimate":
+        height_flags.append(
+            "waist: no interior minimum was found in the waist search band; the reported level "
+            "is a boundary estimate and should be checked against the tape location."
+        )
     if chest_depth_y_mm < chest["y_mm"]:
         height_flags.append(
             f"chest: the arms touch the torso at the chest line in the front photo, so the width is "

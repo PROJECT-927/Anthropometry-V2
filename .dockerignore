@@ -9,6 +9,10 @@ venv/
 .test_venv/
 runs/
 memory_profiles/
+capacity_profiles/
+capacity_fixture/
+capacity_results/
+tmp/
 photoset/
 sample/
 dataset/
@@ -24,3 +28,4 @@ measurements.json
 hull_viewer.html
 stl_preview.png
 unidata_masks.png
+others/

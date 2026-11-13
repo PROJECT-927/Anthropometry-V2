@@ -21,6 +21,9 @@ crop_bottom_left.png
 # These contain derived silhouettes, landmarks, voxel grids and measurements.
 runs/
 memory_profiles/
+capacity_profiles/
+capacity_fixture/
+capacity_results/
 
 # Local permission settings (machine-specific); launch.json (dev server
 # config) is still tracked, that's shared project infra.

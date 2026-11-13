@@ -1,2 +1,0 @@
-# Optional local RAM monitor; not needed by the deployed application.
-psutil>=5.9,<8

@@ -30,10 +30,11 @@ import threading
 import uuid
 from datetime import datetime
 
+import logging
+
 import cv2
 import numpy as np
 from flask import Flask, jsonify, render_template, request, send_from_directory, abort
-from compute_queue import ComputeQueue
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 RUNS_DIR = os.path.join(PROJECT_ROOT, "runs")
@@ -57,12 +58,25 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 _jobs = {}
 _jobs_lock = threading.Lock()
 
-# Pipeline, viewer and STL exports share this budget. Web threads can keep
-# accepting requests without starting an unbounded number of memory-heavy jobs.
-_compute_queue = ComputeQueue(
-    workers=int(os.environ.get("MAX_CONCURRENT_COMPUTE_JOBS", "1")),
-    pending=int(os.environ.get("MAX_PENDING_COMPUTE_JOBS", "8")),
-)
+
+def _start_background(function, *args, on_error=None):
+    """
+    Runs a pipeline/viewer/STL job on its own daemon thread, right away.
+
+    There is deliberately no shared queue: every user's submission starts
+    immediately, so several people can run the pipeline at the same time.
+    Each job already runs in its own runs/<id>/ directory as a separate
+    subprocess, so concurrent jobs do not touch each other's files.
+    """
+    def run():
+        try:
+            function(*args)
+        except Exception as error:
+            logging.getLogger(__name__).exception("Background job failed")
+            if on_error is not None:
+                on_error(error)
+
+    threading.Thread(target=run, daemon=True, name=f"job-{function.__name__}").start()
 
 # STL export runs on demand rather than as part of every job: marching
 # cubes over a ~9M-voxel grid plus smoothing and decimation costs about
@@ -133,7 +147,7 @@ def _new_job(job_id, height_cm):
         "id": job_id,
         "state": "queued",
         "progress": 2,
-        "step": "Waiting for server capacity",
+        "step": "Starting",
         "log": [],
         "error": None,
         "results": None,
@@ -535,16 +549,11 @@ def api_run():
     with _jobs_lock:
         _jobs[job_id] = _new_job(job_id, height_cm)
 
-    submitted = _compute_queue.submit(
+    _start_background(
         _run_pipeline, job_id, job_dir, front_path, side_path, height_cm,
         request.form.get("preprocessing") == "browser-v2",
         on_error=lambda error: _update(job_id, state="error", error=f"Pipeline failed: {error}"),
     )
-    if not submitted:
-        with _jobs_lock:
-            _jobs.pop(job_id, None)
-        shutil.rmtree(job_dir, ignore_errors=True)
-        return jsonify({"error": "The server queue is full. Please try again shortly."}), 429
 
     return jsonify({"job_id": job_id})
 
@@ -582,14 +591,10 @@ def api_job_stl(job_id):
             return jsonify(dict(_stl_jobs[job_id]))
         _stl_jobs[job_id] = {"state": "queued"}
 
-    submitted = _compute_queue.submit(
+    _start_background(
         _export_stl, job_id, job_dir,
         on_error=lambda error: _fail_stl(job_id, os.path.join(job_dir, STL_PART), str(error)),
     )
-    if not submitted:
-        with _stl_lock:
-            _stl_jobs.pop(job_id, None)
-        return jsonify({"state": "error", "error": "The server queue is full. Please retry shortly."}), 429
     return jsonify(_stl_status(job_id, job_dir))
 
 

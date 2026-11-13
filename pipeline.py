@@ -137,6 +137,8 @@ def main():
                         help="Save only measurement JSON; skip masks, hull files and display rounding")
     parser.add_argument("--output", type=Path, default=Path("measurements.json"),
                         help="Measurement JSON output path")
+    parser.add_argument("--waist-estimator", choices=("auto", "population", "legacy"), default="auto",
+                        help="auto preserves the legacy waist fit for front raised-arm captures; population uses the current section model")
     parser.add_argument("--segmenter", choices=("mediapipe", "landmark", "grabcut"),
                         default="mediapipe",
                         help="Step 2 silhouette extractor. 'mediapipe' (default) "
@@ -258,7 +260,8 @@ def main():
     print("Step 5: Curvature-based waist correction...")
     try:
         correction = tracked_call("waist:correct", correct_waist,
-            front_result["normalized_mask"], hull, shoulder_y_mm, hip_y_mm
+            front_result["normalized_mask"], hull, shoulder_y_mm, hip_y_mm,
+            landmarks_normalized=front_landmarks, waist_estimator=args.waist_estimator,
         )
     except WaistCorrectionError as e:
         print(f"ERROR: {e}", file=sys.stderr)
@@ -413,6 +416,7 @@ def main():
             "depthCapRemovedMm": m.get("depth_cap_removed_mm", 0.0),
             "shapeModel": m.get("shape_model", "ellipse_fit"),
             "ellipseExtentScale": m.get("ellipse_extent_scale", 1.0),
+            **({"locationMethod": m["location_method"]} if "location_method" in m else {}),
         }
 
     measurements_out = {
@@ -427,6 +431,7 @@ def main():
         "shoulderBiacromialCm": measurements["shoulder_biacromial_cm"],
         "inseamCm": measurements["inseam_cm"],
         "inseamUncertaintyCm": uncertainties["inseam"]["delta_total_cm"],
+        "waistEstimator": correction.get("waist_estimator", "population_section"),
         "uncertaintyScope": "Geometric error budget only; not a validated 95% prediction interval.",
     }
     if args.measurements_only:

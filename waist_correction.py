@@ -664,8 +664,24 @@ WAIST_SHOULDER_HIP_FRACTION = 0.688
 WAIST_SEARCH_BAND = (0.60, 0.80)
 
 
+def is_raised_arm_capture(landmarks):
+    """Recognize the original front T-pose protocol from both upper arms."""
+    if not landmarks:
+        return False
+    for side in ("left", "right"):
+        shoulder, elbow = landmarks.get(side+"_shoulder"), landmarks.get(side+"_elbow")
+        if shoulder is None or elbow is None:
+            return False
+        arm = np.asarray(elbow, dtype=float)-np.asarray(shoulder, dtype=float)
+        length = np.linalg.norm(arm)
+        if not np.all(np.isfinite(arm)) or length < 1 or abs(arm[1]) > 0.5*length:
+            return False
+    return True
+
+
 def correct_waist(front_mask, hull, shoulder_y_mm, hip_y_mm,
-                  waist_from_fraction=False):
+                  waist_from_fraction=False, landmarks_normalized=None,
+                  waist_estimator="auto"):
     """
     Full Step 5 pipeline.
 
@@ -684,10 +700,20 @@ def correct_waist(front_mask, hull, shoulder_y_mm, hip_y_mm,
     waist = find_waist(front_mask, shoulder_y_mm, hip_y_mm, top_f, scale_f, cx_f)
     y_mm = waist["y_mm"]
 
+    if waist_estimator not in ("auto", "population", "legacy"):
+        raise ValueError(f"Unknown waist estimator: {waist_estimator}")
+    # Preserve the established waist algorithm for the original raised-arm
+    # protocol. The newer population-section model remains the default for
+    # lowered-arm captures. This is an explicit compatibility policy, not a
+    # claim that either estimator is validated for every capture or body.
+    legacy_protocol = waist_estimator == "legacy" or (
+        waist_estimator == "auto" and is_raised_arm_capture(landmarks_normalized))
+    selected_estimator = "legacy_fitted_ellipse" if legacy_protocol else "population_section"
     span = hip_y_mm - shoulder_y_mm
-    if waist_from_fraction:
+    if waist_from_fraction or legacy_protocol:
         target = shoulder_y_mm + WAIST_SHOULDER_HIP_FRACTION * span
         wi = int(np.argmin(np.abs(y_mm - target)))
+        location_method = "anatomical_fraction"
     else:
         band_lo, band_hi = WAIST_SEARCH_BAND
         in_band = ((y_mm >= shoulder_y_mm + band_lo * span)
@@ -695,8 +721,29 @@ def correct_waist(front_mask, hull, shoulder_y_mm, hip_y_mm,
         if in_band.any():
             width = waist["half_width_left_mm"] + waist["half_width_right_mm"]
             wi = int(np.argmin(np.where(in_band, width, np.inf)))
+            band_indices = np.flatnonzero(in_band)
+            # A minimum pinned to the permitted window edge is a truncated
+            # search, not evidence of a waist valley. Do not report the first
+            # allowed torso row as a detected minimum on a monotonic profile.
+            at_boundary = min(abs(y_mm[wi]-y_mm[band_indices[0]]),
+                              abs(y_mm[wi]-y_mm[band_indices[-1]])) <= max(3., 1.5*scale_f)
+            location_method = "band_edge_estimate" if at_boundary else "narrowest_in_band"
         else:
             wi = waist["row_index"]
+            location_method = "front_profile_fallback"
+
+    # Waist compatibility must not silently move the chest's existing
+    # shoulder-to-waist reference line. Preserve the population-path reference
+    # for chest placement; only the waist measurement uses the legacy anchor.
+    chest_reference_y_mm = float(y_mm[wi])
+    if legacy_protocol:
+        in_band = ((y_mm >= shoulder_y_mm + WAIST_SEARCH_BAND[0]*span)
+                   & (y_mm <= shoulder_y_mm + WAIST_SEARCH_BAND[1]*span))
+        if in_band.any():
+            width = waist["half_width_left_mm"] + waist["half_width_right_mm"]
+            chest_reference_y_mm = float(y_mm[int(np.argmin(np.where(in_band, width, np.inf)))])
+    waist["profile_minimum_row_index"] = waist["row_index"]
+    waist["row_index"] = wi
 
     d_left, L_left, k_left, theta_left, area_left = correction_depth(
         y_mm, waist["half_width_left_mm"], wi
@@ -730,6 +777,9 @@ def correct_waist(front_mask, hull, shoulder_y_mm, hip_y_mm,
         "area_before_mm2": area_before,
         "area_after_mm2": area_after,
         "waist_trace": waist,
+        "waist_location_method": location_method,
+        "waist_estimator": selected_estimator,
+        "chest_reference_waist_y_mm": chest_reference_y_mm,
     }
 
 
