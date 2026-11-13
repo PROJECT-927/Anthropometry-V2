@@ -2,283 +2,269 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Anthropometry — Body Measurement from Two Photos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Anthropometry</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/bodoni-moda@5/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/hanken-grotesk@5/index.css">
 <style>
   :root {
-    --bg: #0f1216;
-    --panel: #171c22;
-    --panel-2: #1e242c;
-    --line: #2a323c;
-    --text: #e6ebf0;
-    --muted: #8f9bab;
-    --accent: #4db6ac;
-    --accent-dim: #2f6f68;
-    --warn: #e0a955;
-    --err: #e06c62;
-    --ok: #6fcf97;
+    --paper: #f4f3ef; --panel: #e9e7e1; --ink: #171614; --soft: #6f6c66; --line: #cfccc4;
+    --tape: #ffd400; --rust: #b8401a;
+    --serif: "Bodoni Moda Variable", "Bodoni MT", Didot, Georgia, serif;
+    --sans: "Hanken Grotesk Variable", "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace;
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; }
   body {
-    margin: 0; background: var(--bg); color: var(--text);
-    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--paper); color: var(--ink); font: 400 16px/1.45 var(--sans);
+    display: flex; flex-direction: column; overflow: hidden; height: 100dvh;
+    -webkit-tap-highlight-color: transparent;
   }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 20px 80px; }
-  header h1 { margin: 0 0 6px; font-size: 24px; font-weight: 650; letter-spacing: -0.01em; }
-  header p { margin: 0 0 28px; color: var(--muted); }
-  .card {
-    background: var(--panel); border: 1px solid var(--line);
-    border-radius: 12px; padding: 22px; margin-bottom: 20px;
-  }
-  .drops { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-  @media (max-width: 700px) { .drops { grid-template-columns: 1fr; } }
-  .drop {
-    position: relative; border: 1.5px dashed var(--line); border-radius: 10px;
-    background: var(--panel-2); min-height: 210px; cursor: pointer;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; padding: 16px; transition: border-color .15s, background .15s;
-    overflow: hidden;
-  }
-  .drop:hover, .drop.over { border-color: var(--accent); background: #202832; }
-  .drop input[type=file] { display: none; }
-  .drop .label { font-weight: 600; margin-bottom: 4px; }
-  .drop .hint { color: var(--muted); font-size: 13px; }
-  .drop img { max-width: 100%; max-height: 260px; border-radius: 6px; display: block; }
-  .drop .fname {
-    color: var(--muted); font-size: 12px; margin-top: 8px;
-    max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .row { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; }
-  label.field { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
-  input[type=number] {
-    background: var(--panel-2); border: 1px solid var(--line); color: var(--text);
-    border-radius: 8px; padding: 11px 13px; font-size: 16px; width: 160px;
-    font-family: inherit;
-  }
-  input[type=number]:focus { outline: none; border-color: var(--accent); }
-  button {
-    background: var(--accent); color: #08201e; border: 0; border-radius: 8px;
-    padding: 12px 22px; font-size: 15px; font-weight: 650; cursor: pointer;
-    font-family: inherit;
-  }
-  button:hover:not(:disabled) { filter: brightness(1.08); }
-  button:disabled { background: var(--accent-dim); color: #9fc4bf; cursor: not-allowed; }
-  .note { color: var(--muted); font-size: 13px; margin-top: 14px; }
-  .stlrow { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 18px; }
-  .stlrow .stlnote { margin-top: 0; }
-  .note b { color: var(--text); font-weight: 600; }
-  .hidden { display: none !important; }
+  .soft { color: var(--soft); }
+  [hidden] { display: none !important; }
+  :focus-visible { outline: 3px solid var(--tape); outline-offset: 2px; }
+  button, input, label { touch-action: manipulation; }
 
-  .bar { height: 7px; background: var(--panel-2); border-radius: 4px; overflow: hidden; }
-  .bar > div { height: 100%; width: 0; background: var(--accent); transition: width .4s ease; }
-  .steprow { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
-  .steprow .pct { color: var(--muted); font-variant-numeric: tabular-nums; }
-  pre.log {
-    background: #0b0e12; border: 1px solid var(--line); border-radius: 8px;
-    padding: 12px 14px; margin: 16px 0 0; max-height: 240px; overflow: auto;
-    font: 12px/1.5 ui-monospace, "Cascadia Code", Consolas, monospace;
-    color: #a8b6c6; white-space: pre-wrap; word-break: break-word;
+  /* Soft corners: larger on panels, smaller on controls. */
+  .slot, .viewer, .sil figure, .log { border-radius: 14px; }
+  .btn, .key { border-radius: 10px; }
+  .tape { border-radius: 8px; overflow: hidden; }
+
+  .bar { display: flex; justify-content: space-between; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .bar b { font-weight: 650; }
+
+  /* Stages are stacked; the page snaps to one stage at a time. */
+  .frame { flex: 1; min-height: 0; container-type: size; }
+  main { height: 100%; overflow-y: auto; scroll-snap-type: y mandatory; scroll-behavior: smooth; overscroll-behavior: contain; scrollbar-width: none; }
+  main::-webkit-scrollbar { display: none; }
+  .stage { min-height: 100cqh; scroll-snap-align: start; scroll-snap-stop: always; }
+  .fit { width: min(100%, 1280px); min-height: 100cqh; margin: 0 auto; padding: 20px 16px; display: grid; gap: 18px; align-content: center; }
+  h1 { font: 500 clamp(34px, 5.2vw, 64px)/1 var(--serif); letter-spacing: -.02em; }
+  h2 { font: 500 clamp(26px, 3.6vw, 40px)/1.05 var(--serif); letter-spacing: -.01em; }
+
+  /* 1 Upload */
+  .intro { display: grid; gap: 18px; }
+  .slots { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .slot {
+    position: relative; overflow: hidden; background: var(--panel); cursor: pointer; aspect-ratio: 3 / 4; max-height: 44cqh; width: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 12px;
+  }
+  .slot input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .slot svg { height: 58%; fill: none; stroke: var(--ink); stroke-width: 1.4; stroke-linejoin: round; }
+  .slot b { font: 500 22px var(--serif); }
+  .slot:hover, .slot.over { background: var(--tape); }
+  .slot:focus-within { outline: 3px solid var(--tape); outline-offset: 2px; }
+  .slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: var(--ink); }
+  .slot .fname {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 12px; background: var(--ink); color: var(--paper);
+    font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .hrow { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .hrow input {
+    width: 4.6ch; border: 0; border-bottom: 1px solid var(--ink); border-radius: 0; background: none; color: var(--ink);
+    font: 500 30px var(--serif); text-align: right; padding: 0; outline-offset: 4px; -moz-appearance: textfield; appearance: textfield;
+  }
+  .hrow input::-webkit-outer-spin-button, .hrow input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .hrow input::placeholder { color: var(--line); }
+  .hrow .btn { margin-left: auto; }
+  .error { color: var(--rust); font-weight: 600; }
+  .run p { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-size: 15px; }
+  .tape { position: relative; height: 30px; border: 1px solid var(--ink); }
+  .tape i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--tape); transition: width .45s ease; }
+  .tape::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 10%) bottom / 100% 100% no-repeat,
+      repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 2%) bottom / 100% 35% no-repeat;
+  }
+  .log {
+    background: var(--panel); padding: 14px 16px; overflow: auto; max-height: 180px;
+    font: 12.5px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere;
   }
 
-  table { width: 100%; border-collapse: collapse; }
-  th, td { text-align: left; padding: 11px 10px; border-bottom: 1px solid var(--line); }
-  th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
-  td.val { font-size: 19px; font-weight: 650; font-variant-numeric: tabular-nums; }
-  td.pm { color: var(--muted); font-variant-numeric: tabular-nums; }
-  tr.flagged td.val { color: var(--warn); }
-  .pill {
-    display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px;
-    background: #3a2f1c; color: var(--warn); margin-left: 8px; vertical-align: middle;
-    font-weight: 600;
-  }
-  h2 { font-size: 16px; margin: 0 0 14px; font-weight: 650; }
-  .banner { border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; font-size: 14px; }
-  .banner.ok { background: #16301f; border: 1px solid #2c5c3c; color: var(--ok); }
-  .banner.warn { background: #302614; border: 1px solid #5c4a22; color: var(--warn); }
-  .banner.err { background: #331c1a; border: 1px solid #6b3733; color: var(--err); }
-  ul.flags { margin: 0; padding-left: 18px; }
-  ul.flags li { margin-bottom: 10px; color: #d3b98a; font-size: 13.5px; }
-  ul.flags li:last-child { margin-bottom: 0; }
-  iframe.viewer {
-    width: 100%; height: min(72vh, 680px); min-height: 360px; border: 1px solid var(--line);
-    border-radius: 8px; background: #000; display: block;
-  }
-  .viewer-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .viewer-heading h2 { margin: 0 0 14px; }
-  .viewer-expand { padding: 8px 12px; margin-bottom: 14px; white-space: nowrap; }
-  body.viewer-expanded { overflow: hidden; }
-  #viewer-card.expanded {
-    position: fixed; inset: 10px; z-index: 1000; margin: 0; max-width: none;
-    overflow: auto; background: var(--panel); box-shadow: 0 12px 50px #000b;
-  }
-  #viewer-card.expanded iframe.viewer { height: min(78vh, 900px); }
-  .imgs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  @media (max-width: 700px) { .imgs { grid-template-columns: 1fr; } }
-  .imgs figure { margin: 0; }
-  .imgs img { width: 100%; border-radius: 8px; border: 1px solid var(--line); display: block; }
-  .imgs figcaption { color: var(--muted); font-size: 12px; margin-top: 6px; }
-  a.btn-link {
-    color: var(--accent); text-decoration: none; font-size: 14px; font-weight: 600;
-  }
-  a.btn-link:hover { text-decoration: underline; }
+  /* 2 Measurements */
+  .draw { container-type: inline-size; width: 100%; }
+  .box { position: relative; }
+  .box svg { width: 50%; display: block; overflow: visible; }
+  .fig { stroke: var(--ink); fill: none; stroke-width: 1.4; }
+  .dim { stroke: var(--rust); stroke-width: 1.8; fill: none; }
+  .lead { stroke: var(--soft); stroke-width: .8; stroke-dasharray: 2 3; fill: none; }
+  .val { position: absolute; left: 51%; transform: translateY(-50%); display: flex; align-items: baseline; gap: .4em; white-space: nowrap; }
+  .val span { width: 4.8em; font-size: clamp(11px, 2.1cqw, 16px); color: var(--soft); }
+  .val b { font: 500 clamp(22px, 6.6cqw, 54px)/1 var(--serif); font-variant-numeric: lining-nums tabular-nums; }
+  .val small { font-size: clamp(10px, 1.9cqw, 15px); color: var(--soft); }
+  .val.flag b { color: var(--rust); }
+  .notes { min-height: 0; overflow: auto; }
+  .notes h3 { font: 500 22px/1.2 var(--serif); margin-bottom: 6px; }
+  .notes ul { list-style: none; padding: 0; }
+  .notes li { padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 15px; overflow-wrap: anywhere; }
+  .notes li b { display: block; font-weight: 650; color: var(--rust); }
+  .notes li b::first-letter { text-transform: uppercase; }
+  .notes .plain { color: var(--soft); border-bottom: 0; }
 
-  /* Keep the measurement flow comfortable on narrow touch screens. */
-  .wrap { width: min(100%, 1080px); }
-  button, input, .drop { touch-action: manipulation; }
-  .drop { -webkit-tap-highlight-color: transparent; }
-  .viewer { max-width: 100%; }
-  @media (max-width: 700px) {
-    .wrap { padding: 20px 14px 40px; }
-    header h1 { font-size: clamp(21px, 6vw, 25px); line-height: 1.2; }
-    header p { font-size: 14px; margin-bottom: 20px; }
-    .card { padding: 16px; margin-bottom: 14px; border-radius: 10px; }
-    .drops { gap: 12px; margin-bottom: 16px; }
-    .drop { min-height: 148px; padding: 14px; }
-    .drop img { max-height: 230px; object-fit: contain; }
-    .row { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: stretch; }
-    input[type=number] { width: 100%; min-height: 48px; }
-    button { min-height: 48px; width: 100%; }
-    .note { font-size: 12.5px; line-height: 1.5; }
-    .stlrow { align-items: stretch; }
-    .stlrow .stlnote { text-align: center; }
-    iframe.viewer { height: min(72vh, 620px); min-height: 360px; }
-    #viewer-card.expanded { inset: 0; border-radius: 0; padding: max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom)); }
-    #viewer-card.expanded iframe.viewer { height: calc(100dvh - 170px); min-height: 300px; }
-    .viewer-heading h2 { font-size: 15px; }
-    .viewer-expand { width: auto; min-height: 42px; padding: 8px 10px; font-size: 13px; }
-    table { table-layout: fixed; }
-    th, td { padding: 9px 6px; overflow-wrap: anywhere; }
-    th { font-size: 10px; letter-spacing: .02em; }
-    td { font-size: 13px; }
-    td.val { font-size: 15px; }
-    .pill { margin-left: 0; margin-top: 4px; }
-    pre.log { max-height: 180px; font-size: 11px; }
+  /* 3 Model */
+  .viewer { background: var(--ink); aspect-ratio: 4 / 5; max-height: 56cqh; width: 100%; overflow: hidden; }
+  .viewer iframe { width: 100%; height: 100%; border: 0; display: block; background: #000; }
+  .viewer:fullscreen { border-radius: 0; max-height: none; aspect-ratio: auto; }
+  .acts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-content: start; }
+  .btn {
+    border: 1px solid var(--ink); background: none; color: var(--ink); font: 600 15px var(--sans); padding: 0 16px; min-height: 48px;
+    cursor: pointer; text-align: left; text-decoration: none; display: inline-flex; align-items: center;
   }
-  @media (max-width: 380px) {
-    .wrap { padding-inline: 10px; }
-    .card { padding: 13px; }
-    th, td { padding-inline: 4px; }
-    td.val { font-size: 14px; }
+  .btn:hover:not(:disabled) { background: var(--tape); }
+  .btn:active:not(:disabled) { background: var(--ink); color: var(--paper); }
+  .btn:disabled { border-color: var(--line); color: var(--soft); cursor: default; }
+  .acts p { grid-column: 1 / -1; font-size: 14px; }
+
+  /* 4 Silhouettes */
+  .sil { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sil figure { background: var(--panel); aspect-ratio: 3 / 4; max-height: 62cqh; width: 100%; position: relative; overflow: hidden; }
+  .sil img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+  .sil figcaption { position: absolute; top: 10px; left: 12px; z-index: 1; font: 500 18px var(--serif); background: var(--paper); padding: 2px 10px; border-radius: 8px; }
+
+  /* Stage nav */
+  .nav { border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 16px max(10px, env(safe-area-inset-bottom)); }
+  .nav .where { font-size: 14px; }
+  .nav .keys { display: flex; gap: 8px; }
+  .key { width: 52px; height: 52px; border: 1px solid var(--ink); background: none; color: var(--ink); font: 400 22px/1 var(--sans); cursor: pointer; display: grid; place-items: center; }
+  .key svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+  .key:hover:not(:disabled) { background: var(--tape); }
+  .key:active:not(:disabled) { background: var(--ink); color: var(--paper); }
+  .key:disabled { border-color: var(--line); color: var(--line); cursor: default; }
+
+  /* Tablets and desktops: two columns, content sized to the screen height. */
+  @media (min-width: 800px) {
+    .bar, .nav { padding-inline: 32px; }
+    .fit { height: 100cqh; padding: 28px 32px; gap: 20px 48px; align-content: stretch; }
+
+    .s-upload { grid-template-columns: 5fr 7fr; grid-template-rows: minmax(0, 1fr); }
+    .s-upload .intro { align-self: stretch; align-content: start; gap: 22px; min-height: 0; grid-auto-rows: auto; }
+    .s-upload .log { max-height: 30cqh; }
+    .s-upload .slots { gap: 16px; min-height: 0; grid-template-rows: minmax(0, 1fr); }
+    .s-upload .slot { aspect-ratio: auto; max-height: none; height: 100%; min-height: 0; padding: 28px 12px; }
+    .s-upload .slot svg { flex: 1 1 0; height: 0; min-height: 0; max-height: 420px; }
+
+    .s-nums { grid-template-columns: 7fr 4fr; grid-template-rows: auto minmax(0, 1fr); }
+    .s-nums h2, .s-model h2, .s-sil h2 { grid-column: 1 / -1; }
+    .s-nums .draw { align-self: center; width: min(100%, calc((100cqh - 150px) * 5 / 3)); }
+    .s-nums .notes { align-self: start; max-height: 100%; }
+
+    .s-model { grid-template-columns: 1fr 240px; grid-template-rows: auto minmax(0, 1fr); }
+    .s-model .viewer { aspect-ratio: auto; max-height: none; height: 100%; min-height: 0; }
+    .s-model .acts { grid-template-columns: 1fr; align-self: center; }
+
+    .s-sil { grid-template-rows: auto minmax(0, 1fr) auto; }
+    .s-sil .sil { gap: 16px; min-height: 0; grid-template-rows: minmax(0, 1fr); }
+    .s-sil .sil figure { aspect-ratio: auto; max-height: none; height: 100%; min-height: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tape i { transition: none; }
+    main { scroll-behavior: auto; }
   }
 </style>
 </head>
 <body>
-<div class="wrap">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="front" viewBox="0 0 200 480">
+    <ellipse cx="100" cy="36" rx="17" ry="21"/>
+    <path id="half" d="M108 56 L108 68 C118 72 136 74 146 86 L190 244 C193 254 181 258 178 249 L137 118 L134 136 C132 160 126 172 126 188 C126 206 136 216 137 236 C137 280 131 310 129 346 C128 380 126 412 122 444 L128 458 L106 458 L108 444 C108 412 108 380 107 346 C106 310 103 282 100 256"/>
+    <use href="#half" transform="translate(200 0) scale(-1 1)"/>
+  </symbol>
+  <symbol id="side" viewBox="0 0 200 480">
+    <ellipse cx="102" cy="36" rx="18" ry="21"/>
+    <path d="M94 57 L94 70 C84 76 80 95 82 120 C83 150 86 170 88 190 C84 215 82 235 86 255 C88 300 90 320 92 346 C92 380 94 412 94 444 L92 458 L126 458 L112 444 C112 412 114 380 114 346 C118 310 122 282 122 250 C124 225 118 200 116 188 C120 165 126 140 124 115 C123 95 118 78 110 70 L110 57 Z"/>
+  </symbol>
+</svg>
 
-  <header>
-    <h1>Body Measurement from Two Photos</h1>
-    <p>Choose front and side photos and enter your height. Photos are processed on this device; only silhouettes and pose landmarks are sent for measurement.</p>
-  </header>
+<div class="bar"><b>Anthropometry</b><span class="soft">Photos stay on this device</span></div>
 
-  <!-- ---------------- Input form ---------------- -->
-  <section class="card" id="form-card">
-    <div class="drops">
-      <label class="drop" id="drop-front">
-        <input type="file" id="file-front" accept="image/*">
-        <div class="placeholder">
-          <div class="label">Front photo</div>
-          <div class="hint">Tap to choose or take a photo</div>
-        </div>
-        <img class="hidden" id="prev-front" alt="Front preview">
-        <div class="fname" id="name-front"></div>
-      </label>
+<div class="frame"><main id="main">
 
-      <label class="drop" id="drop-side">
-        <input type="file" id="file-side" accept="image/*">
-        <div class="placeholder">
-          <div class="label">Side photo</div>
-          <div class="hint">Tap to choose or take a photo</div>
-        </div>
-        <img class="hidden" id="prev-side" alt="Side preview">
-        <div class="fname" id="name-side"></div>
-      </label>
-    </div>
-
-    <div class="row">
-      <div>
-        <label class="field" for="height">Your height (cm)</label>
-        <input type="number" id="height" step="0.5"
-               min="{{ min_height }}" max="{{ max_height }}" placeholder="172">
+  <section class="stage" data-name="Upload"><div class="fit s-upload">
+    <div class="intro">
+      <h1>Body measurements from two photos</h1>
+      <div class="hrow">
+        <label for="height" class="soft">Height</label>
+        <input type="number" id="height" step="0.5" inputmode="decimal" min="{{ min_height }}" max="{{ max_height }}" placeholder="172">
+        <span class="soft">cm</span>
+        <button type="button" class="btn" id="run" hidden>Measure</button>
       </div>
-      <button id="run">Measure</button>
+      <p class="error" id="form-error" role="alert" hidden></p>
+      <div class="run" id="progress-card" hidden>
+        <p><span id="step-label">Starting</span><span id="step-pct">0%</span></p>
+        <div class="tape"><i id="bar-fill"></i></div>
+      </div>
+      <pre class="log" id="log" aria-label="Pipeline log" hidden></pre>
     </div>
-
-    <div class="note">
-      <b>Height is the only scale reference</b> — every measurement is calibrated from it, so an
-      inaccurate height rescales all results proportionally.
-      <br>
-      <b>Pose matters:</b> stand straight, arms hanging down but angled out roughly 15–20° so there is
-      a visible gap between arm and torso — and keep that same angle in both photos. Arms flush against
-      the body, or held straight out, both degrade the measurements.
-      The browser processes the photos locally and uploads only the derived black-and-white masks and pose points ({{ max_upload_mb }}MB request limit).
+    <div class="slots">
+      <label class="slot" id="drop-front">
+        <input type="file" id="file-front" accept="image/*">
+        <svg viewBox="0 0 200 480" aria-hidden="true"><use href="#front"/></svg><b>Front photo</b>
+        <img id="prev-front" alt="Front photo preview" hidden>
+        <span class="fname" id="name-front" hidden></span>
+      </label>
+      <label class="slot" id="drop-side">
+        <input type="file" id="file-side" accept="image/*">
+        <svg viewBox="0 0 200 480" aria-hidden="true"><use href="#side"/></svg><b>Side photo</b>
+        <img id="prev-side" alt="Side photo preview" hidden>
+        <span class="fname" id="name-side" hidden></span>
+      </label>
     </div>
+  </div></section>
 
-    <div class="banner err hidden" id="form-error"></div>
-    <div class="note hidden" id="local-status" aria-live="polite"></div>
-  </section>
-
-  <!-- ---------------- Progress ---------------- -->
-  <section class="card hidden" id="progress-card">
-    <div class="steprow">
-      <span id="step-label">Starting…</span>
-      <span class="pct" id="step-pct">0%</span>
-    </div>
-    <div class="bar"><div id="bar-fill"></div></div>
-    <pre class="log" id="log"></pre>
-  </section>
-
-  <!-- ---------------- Results ---------------- -->
-  <section class="card hidden" id="results-card">
+  <section class="stage" data-name="Measurements" hidden><div class="fit s-nums">
     <h2>Measurements</h2>
-    <div id="ratio-banner"></div>
-    <table>
-      <thead>
-        <tr><th>Measurement</th><th>Value</th><th title="Geometric error budget; does not include unobserved shape or capture bias">Geometric uncertainty</th></tr>
-      </thead>
-      <tbody id="results-body"></tbody>
-    </table>
-    <div class="note">
-      Height (<span id="echo-height"></span> cm) is the input calibration, not a measured output.
+    <div class="draw"><div class="box">
+      <svg viewBox="0 0 400 480" aria-hidden="true">
+        <g class="fig" transform="translate(40 0)"><use href="#front" width="200" height="480"/></g>
+        <path class="lead" d="M186 76 H400 M174 135 H400 M166 188 H400 M177 236 H400 M196 357 H400"/>
+        <path class="dim" d="M94 76 H186 M94 70 V82 M186 70 V82 M106 135 H174 M114 188 H166 M103 236 H177 M196 256 V458 M190 256 H202 M190 458 H202"/>
+      </svg>
+      <div class="val" id="val-shoulder" style="top:15.8%"><span>Shoulder</span><b></b><small></small></div>
+      <div class="val" id="val-chest" style="top:28.1%"><span>Chest</span><b></b><small></small></div>
+      <div class="val" id="val-waist" style="top:39.2%"><span>Waist</span><b></b><small></small></div>
+      <div class="val" id="val-hip" style="top:49.2%"><span>Hip</span><b></b><small></small></div>
+      <div class="val" id="val-inseam" style="top:74.4%"><span>Inseam</span><b></b><small></small></div>
+    </div></div>
+    <div class="notes">
+      <h3 id="notes-title">Reliability notes</h3>
+      <ul id="flags-list"></ul>
     </div>
-  </section>
+  </div></section>
 
-  <section class="card hidden" id="flags-card">
-    <h2>Reliability flags from the pipeline</h2>
-    <ul class="flags" id="flags-list"></ul>
-  </section>
+  <section class="stage" data-name="3D model" hidden><div class="fit s-model">
+    <h2>3D model</h2>
+    <div class="viewer" id="viewer-card"><iframe id="viewer" title="3D model viewer" allowfullscreen></iframe></div>
+    <div class="acts">
+      <button type="button" class="btn" id="viewer-expand">Full screen</button>
+      <a class="btn" id="viewer-link" target="_blank" rel="noopener">Open in new tab</a>
+      <button type="button" class="btn" id="stl-btn">Download .stl</button>
+      <button type="button" class="btn" id="delete-btn">Delete my data</button>
+      <p class="soft" id="stl-note" aria-live="polite"></p>
+      <p class="soft" id="data-note" aria-live="polite"></p>
+    </div>
+  </div></section>
 
-  <section class="card hidden" id="viewer-card">
-    <div class="viewer-heading">
-      <h2>3D reconstruction</h2>
-      <button type="button" class="viewer-expand" id="viewer-expand" aria-pressed="false">Expand view</button>
+  <section class="stage" data-name="Silhouettes" hidden><div class="fit s-sil">
+    <h2>Silhouettes measured</h2>
+    <div class="sil">
+      <figure><figcaption>Front</figcaption><img id="dbg-front" alt="Front silhouette and pose points"></figure>
+      <figure><figcaption>Side</figcaption><img id="dbg-side" alt="Side silhouette and pose points"></figure>
     </div>
-    <iframe class="viewer" id="viewer" title="3D hull viewer"></iframe>
-    <div class="note"><a class="btn-link" id="viewer-link" target="_blank" rel="noopener">Open viewer in a separate tab ↗</a></div>
-    <div class="stlrow">
-      <button type="button" id="stl-btn">Download 3D model (.stl)</button>
-      <span class="note stlnote" id="stl-note"></span>
-    </div>
-  </section>
+    <p class="soft">If an outline does not match your body, retake that photo against a plain background.</p>
+  </div></section>
 
-  <section class="card hidden" id="debug-card">
-    <h2>Silhouette &amp; pose check</h2>
-    <div class="imgs">
-      <figure>
-        <img id="dbg-front" alt="Front pose normalization">
-        <figcaption>Front — detected silhouette and pose landmarks</figcaption>
-      </figure>
-      <figure>
-        <img id="dbg-side" alt="Side pose normalization">
-        <figcaption>Side — detected silhouette and pose landmarks</figcaption>
-      </figure>
-    </div>
-    <div class="note">
-      If the green silhouette does not closely match your body outline, the measurements above
-      inherit that error — retake the photo against a plainer background.
-    </div>
-  </section>
+</main></div>
 
-</div>
+<nav class="nav" aria-label="Stages">
+  <span class="where"><b id="num">1</b> of <span id="count">4</span> <span class="soft" id="name">Upload</span></span>
+  <span class="keys">
+    <button type="button" class="key" id="back" aria-label="Previous stage">↑</button>
+    <button type="button" class="key" id="home" aria-label="Back to upload"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 12 3l9 8M6 9v11h12V9"/></svg></button>
+    <button type="button" class="key" id="next" aria-label="Next stage">↓</button>
+  </span>
+</nav>
 
 <script src="/static/anthropometry-preprocessing.js?v=2"></script>
 <script>
@@ -467,11 +453,52 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
   return { front, side, preprocessing: "browser-v2" };
 };
 </script>
-
 <script>
 (function () {
   const $ = (id) => document.getElementById(id);
   const files = { front: null, side: null };
+  const main = $("main");
+  const stages = [...document.querySelectorAll(".stage")];
+  let at = 0, running = false, hasResults = false;
+
+  // ---- stage navigation ----
+  const open = () => stages.filter((s) => !s.hidden);
+  function mark(i) {
+    const list = open();
+    at = Math.max(0, Math.min(list.length - 1, i));
+    $("num").textContent = at + 1;
+    $("count").textContent = hasResults ? list.length : stages.length;
+    $("name").textContent = list[at].dataset.name;
+    $("back").disabled = at === 0;
+    $("home").disabled = at === 0;
+    $("next").disabled = at >= list.length - 1;
+  }
+  function show(i) {
+    const list = open();
+    const to = Math.max(0, Math.min(list.length - 1, i));
+    main.scrollTo({ top: list[to].offsetTop - main.offsetTop });
+    mark(to);
+  }
+  $("back").onclick = () => show(at - 1);
+  $("next").onclick = () => show(at + 1);
+  $("home").onclick = () => show(0);
+  document.addEventListener("keydown", (e) => {
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    if (e.key === "ArrowUp") { e.preventDefault(); show(at - 1); }
+    if (e.key === "ArrowDown") { e.preventDefault(); show(at + 1); }
+  });
+  main.addEventListener("scroll", () => {
+    const mid = main.scrollTop + main.clientHeight / 2;
+    const i = open().findIndex((s) => {
+      const top = s.offsetTop - main.offsetTop;
+      return mid >= top && mid < top + s.offsetHeight;
+    });
+    if (i >= 0 && i !== at) mark(i);
+  }, { passive: true });
+  function setResultStages(visible) {
+    hasResults = visible;
+    stages.forEach((s, n) => { if (n > 0) s.hidden = !visible; });
+  }
 
   // ---- file pickers + drag/drop ----
   function wireDrop(kind) {
@@ -484,9 +511,10 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
       if (!file || !file.type.startsWith("image/")) return;
       files[kind] = file;
       prev.src = URL.createObjectURL(file);
-      prev.classList.remove("hidden");
-      drop.querySelector(".placeholder").classList.add("hidden");
+      prev.hidden = false;
       name.textContent = file.name;
+      name.hidden = false;
+      maybeStart();
     }
 
     input.addEventListener("change", () => accept(input.files[0]));
@@ -499,56 +527,70 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
   wireDrop("front");
   wireDrop("side");
 
-  // ---- submit ----
+  // ---- start ----
+  // A run starts by itself once both photos and a height are in. The
+  // Measure button only appears when that cannot happen: the height is
+  // still missing, a run failed, or the user wants to run again.
   const runBtn = $("run");
   const formError = $("form-error");
-  const viewerCard = $("viewer-card");
-  const viewerExpand = $("viewer-expand");
 
-  viewerExpand.addEventListener("click", () => {
-    const expanded = viewerCard.classList.toggle("expanded");
-    document.body.classList.toggle("viewer-expanded", expanded);
-    viewerExpand.setAttribute("aria-pressed", String(expanded));
-    viewerExpand.textContent = expanded ? "Close expanded view" : "Expand view";
-  });
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && viewerCard.classList.contains("expanded")) {
-      viewerExpand.click();
-    }
-  });
-
+  function syncRunButton() {
+    runBtn.hidden = running || !(files.front && files.side);
+    runBtn.textContent = hasResults ? "Measure again" : "Measure";
+  }
   function showError(msg) {
     formError.textContent = msg;
-    formError.classList.remove("hidden");
-    runBtn.disabled = false;
-    runBtn.textContent = "Measure";
+    formError.hidden = false;
+    running = false;
+    syncRunButton();
+    show(0);
+  }
+  function maybeStart() {
+    syncRunButton();
+    if (running || !files.front || !files.side) return;
+    if (!$("height").value.trim()) {
+      formError.textContent = "Enter your height to start.";
+      formError.hidden = false;
+      $("height").focus();
+      return;
+    }
+    start();
+  }
+  runBtn.addEventListener("click", start);
+  $("height").addEventListener("change", () => { if (!hasResults) maybeStart(); });
+
+  function setProgress(step, pct) {
+    $("step-label").textContent = step || "";
+    $("step-pct").textContent = pct + "%";
+    $("bar-fill").style.width = pct + "%";
   }
 
-  runBtn.addEventListener("click", async () => {
-    formError.classList.add("hidden");
+  async function start() {
+    formError.hidden = true;
     const height = $("height").value.trim();
-
-    if (!files.front) return showError("Please choose a front photo.");
-    if (!files.side) return showError("Please choose a side photo.");
-    if (!height) return showError("Please enter your height in centimetres.");
+    if (!files.front) return showError("Choose a front photo.");
+    if (!files.side) return showError("Choose a side photo.");
+    if (!height) return showError("Enter your height in centimetres.");
     if (typeof window.prepareAnthropometryInputs !== "function") {
-      return showError("The on-device photo processor is still loading. Wait a moment and try again.");
+      return showError("The photo processor is still loading. Wait a moment and try again.");
     }
 
-    runBtn.disabled = true;
-    runBtn.textContent = "Preparing privately…";
-    ["results-card", "flags-card", "viewer-card", "debug-card"].forEach((id) =>
-      $(id).classList.add("hidden"));
-    $("progress-card").classList.remove("hidden");
+    running = true;
+    syncRunButton();
+    if (stlTimer) clearInterval(stlTimer);
+    $("viewer").src = "about:blank";
+    setResultStages(false);
+    show(0);
+    $("progress-card").hidden = false;
+    $("log").hidden = false;
     $("log").textContent = "";
-    const localStatus = $("local-status");
-    localStatus.textContent = "Your photos are being processed on this device and are not uploaded.";
-    localStatus.classList.remove("hidden");
+    setProgress("Preparing photos on this device", 0);
 
     let res, data;
     try {
       const derived = await window.prepareAnthropometryInputs(files.front, files.side, (message) => {
         $("step-label").textContent = message;
+        $("log").textContent += ($("log").textContent ? "\n" : "") + message;
       });
       const fd = new FormData();
       fd.append("front_mask", derived.front.silhouette, "front-silhouette.png");
@@ -557,21 +599,18 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
       fd.append("side_landmarks", derived.side.landmarks);
       fd.append("preprocessing", derived.preprocessing || "browser-v1");
       fd.append("height", height);
-      runBtn.textContent = "Measuring…";
       res = await fetch("/api/run", { method: "POST", body: fd });
       data = await res.json();
     } catch (e) {
-      $("progress-card").classList.add("hidden");
-      localStatus.classList.add("hidden");
+      $("progress-card").hidden = true;
       return showError(e.message || "Could not prepare the photos on this device. Check your connection and try again.");
     }
     if (!res.ok) {
-      $("progress-card").classList.add("hidden");
-      localStatus.classList.add("hidden");
+      $("progress-card").hidden = true;
       return showError(data.error || "The run could not be started.");
     }
     poll(data.job_id);
-  });
+  }
 
   // ---- polling ----
   function poll(jobId) {
@@ -582,25 +621,26 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
         job = await r.json();
       } catch (e) { return; }
 
-      $("step-label").textContent = job.step || "";
-      $("step-pct").textContent = (job.progress || 0) + "%";
-      $("bar-fill").style.width = (job.progress || 0) + "%";
+      const done = job.state !== "running" && job.state !== "queued";
+      setProgress(job.step, done && job.state !== "error" ? 100 : (job.progress || 0));
 
       const log = $("log");
       const atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 40;
-      log.textContent = (job.log || []).join("\n");
+      if (job.log && job.log.length) log.textContent = job.log.join("\n");
       if (atBottom) log.scrollTop = log.scrollHeight;
 
-      if (job.state === "running" || job.state === "queued") return;
+      if (!done) return;
       clearInterval(timer);
-      runBtn.disabled = false;
-      runBtn.textContent = "Measure";
 
       if (job.state === "error") {
         showError(job.error || "The pipeline failed.");
         return;
       }
       render(jobId, job);
+      running = false;
+      syncRunButton();
+      // Let the tape rest at 100% for a moment, then move to the results.
+      setTimeout(() => show(1), 700);
     }, 900);
   }
 
@@ -616,30 +656,30 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
     if (s.state === "ready") {
       const mb = (s.size_bytes || 0) / (1024 * 1024);
       btn.disabled = false;
-      btn.textContent = "Download 3D model (.stl)";
-      note.textContent = mb ? `Ready — ${mb.toFixed(1)} MB.` : "Ready.";
+      btn.textContent = "Download .stl";
+      note.textContent = mb ? `3D file ready, ${mb.toFixed(1)} MB.` : "3D file ready.";
       btn.onclick = () => { window.location.href = "/runs/" + jobId + "/body.stl"; };
     } else if (s.state === "queued") {
       btn.disabled = true;
-      btn.textContent = "Starting mesh…";
-      note.textContent = "Your mesh is starting.";
+      btn.textContent = "Starting 3D file";
+      note.textContent = "";
     } else if (s.state === "running") {
       btn.disabled = true;
-      btn.textContent = "Building mesh…";
-      note.textContent = "About a minute. You can close this page — it keeps building.";
+      btn.textContent = "Building 3D file";
+      note.textContent = "About a minute. It keeps building if you close this page.";
     } else if (s.state === "error") {
       btn.disabled = false;
-      btn.textContent = "Retry 3D model (.stl)";
-      note.textContent = s.error || "The mesh export failed.";
+      btn.textContent = "Retry .stl";
+      note.textContent = s.error || "The 3D file could not be built.";
       btn.onclick = () => startStl(jobId);
     } else if (s.state === "unavailable") {
       btn.disabled = true;
-      btn.textContent = "Download 3D model (.stl)";
-      note.textContent = s.error || "No voxel grid to mesh.";
+      btn.textContent = "Download .stl";
+      note.textContent = s.error || "No 3D model to export.";
     } else {
       btn.disabled = false;
-      btn.textContent = "Download 3D model (.stl)";
-      note.textContent = "Built on request — takes about a minute.";
+      btn.textContent = "Download .stl";
+      note.textContent = "";
       btn.onclick = () => startStl(jobId);
     }
   }
@@ -675,14 +715,37 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
     } catch (e) { /* leave the button in its default state */ }
   }
 
+  // ---- full screen ----
+  $("viewer-expand").addEventListener("click", () => {
+    const card = $("viewer-card");
+    if (document.fullscreenElement) return document.exitFullscreen();
+    if (card.requestFullscreen) card.requestFullscreen().catch(() => window.open($("viewer-link").href, "_blank", "noopener"));
+    else window.open($("viewer-link").href, "_blank", "noopener");
+  });
+  document.addEventListener("fullscreenchange", () => {
+    $("viewer-expand").textContent = document.fullscreenElement ? "Exit full screen" : "Full screen";
+  });
+
   // ---- results ----
   const ROWS = [
-    ["Chest",          (r) => r.chest.circumferenceCm,  (r) => r.chest.uncertaintyCm,  "chest", (r) => r.chest.depthCapped],
-    ["Waist",          (r) => r.waist.circumferenceCm,  (r) => r.waist.uncertaintyCm,  "waist", (r) => r.waist.depthCapped],
-    ["Hip",            (r) => r.hip.circumferenceCm,    (r) => r.hip.uncertaintyCm,    "hip",   (r) => r.hip.depthCapped],
-    ["Shoulder width", (r) => r.shoulderWidthCm,        (r) => r.shoulderWidthUncertaintyCm, "shoulder", () => false],
-    ["Inseam",         (r) => r.inseamCm,               (r) => r.inseamUncertaintyCm,  "inseam", () => false],
+    ["chest",    (r) => r.chest.circumferenceCm, (r) => r.chest.uncertaintyCm,      (r) => r.chest.depthCapped],
+    ["waist",    (r) => r.waist.circumferenceCm, (r) => r.waist.uncertaintyCm,      (r) => r.waist.depthCapped],
+    ["hip",      (r) => r.hip.circumferenceCm,   (r) => r.hip.uncertaintyCm,        (r) => r.hip.depthCapped],
+    ["shoulder", (r) => r.shoulderWidthCm,       (r) => r.shoulderWidthUncertaintyCm, () => false],
+    ["inseam",   (r) => r.inseamCm,              (r) => r.inseamUncertaintyCm,      () => false],
   ];
+
+  function addNote(list, title, text, plain) {
+    const li = document.createElement("li");
+    if (plain) li.className = "plain";
+    if (title) {
+      const b = document.createElement("b");
+      b.textContent = title;
+      li.appendChild(b);
+    }
+    li.appendChild(document.createTextNode(text));
+    list.appendChild(li);
+  }
 
   function render(jobId, job) {
     const r = job.results;
@@ -693,74 +756,92 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
       if (m) flaggedNames.add(m[1].toLowerCase());
     });
 
-    const body = $("results-body");
-    body.innerHTML = "";
-    for (const [label, val, unc, key, capped] of ROWS) {
-      const tr = document.createElement("tr");
-      if (flaggedNames.has(key)) tr.className = "flagged";
-      let pill = flaggedNames.has(key) ? '<span class="pill">check flags</span>' : "";
+    const list = $("flags-list");
+    list.innerHTML = "";
+    for (const [key, val, unc, capped] of ROWS) {
+      const el = $("val-" + key);
       // A capped slice had its depth set by an assumed torso proportion
-      // rather than measured off the side photo. That is a different
-      // kind of caveat from the generic flags -- it says the number
-      // itself partly rests on an assumption -- so it gets its own mark.
-      if (capped(r)) pill += '<span class="pill">depth assumed</span>';
-      tr.innerHTML =
-        "<td>" + label + pill + "</td>" +
-        '<td class="val">' + val(r).toFixed(1) + " cm</td>" +
-        '<td class="pm">± ' + unc(r).toFixed(1) + " cm</td>";
-      body.appendChild(tr);
+      // rather than measured off the side photo, so the number partly
+      // rests on an assumption. It is marked like a flagged value and
+      // explained in the notes.
+      el.classList.toggle("flag", flaggedNames.has(key) || capped(r));
+      el.querySelector("b").textContent = val(r).toFixed(1);
+      el.querySelector("small").textContent = "cm ± " + unc(r).toFixed(1);
+      if (capped(r)) addNote(list, key, "Depth was assumed from torso proportion, not measured from the side photo.");
     }
-    $("echo-height").textContent = (r.heightCm).toFixed(1);
-    $("results-card").classList.remove("hidden");
+    // Pipeline flags read "name: explanation"; the name becomes the heading.
+    flags.forEach((f) => {
+      const m = /^([^:]{1,40}):\s*([\s\S]+)$/.exec(f);
+      if (m) addNote(list, m[1], m[2]); else addNote(list, "", f);
+    });
+    if (!job.ratios_ok) addNote(list, "Proportions", "Some proportion checks failed. Treat these numbers with care.");
+    $("notes-title").textContent = list.children.length ? "Reliability notes" : "No reliability notes";
+    addNote(list, "", (job.ratios_ok ? "Proportion checks passed. " : "") + "Scaled from a height of " + r.heightCm.toFixed(1) + " cm.", true);
 
-    const banner = $("ratio-banner");
-    if (job.ratios_ok) {
-      banner.className = "banner ok";
-      banner.textContent = "All anthropometric ratio checks passed (waist/hip, waist/chest, waist/height).";
-    } else {
-      banner.className = "banner warn";
-      banner.textContent = "Some anthropometric ratio checks failed — see the flags below before trusting these numbers.";
-    }
-
-    if (flags.length) {
-      const ul = $("flags-list");
-      ul.innerHTML = "";
-      flags.forEach((f) => {
-        const li = document.createElement("li");
-        li.textContent = f;
-        ul.appendChild(li);
-      });
-      $("flags-card").classList.remove("hidden");
-    }
-
+    setResultStages(true);
+    const modelStage = stages[2];
+    modelStage.hidden = !job.has_viewer;
     if (job.has_viewer) {
       const url = "/runs/" + jobId + "/hull_viewer.html";
       $("viewer-link").href = url;
-      // Unhide before handing the iframe a src, so the viewer lays out
-      // and sizes its canvas against real dimensions on first paint
-      // rather than relying on a later resize to correct a 0x0 start.
-      // (Measured: loading it hidden also works -- the rAF loop calls
-      // resize() every frame and recovers once the card is shown -- so
-      // this is ordering hygiene, not a fix for a known failure.)
-      $("viewer-card").classList.remove("hidden");
-      // Tear the previous viewer down before loading the next one.
-      // Each results render points this iframe at a new document, and
-      // each of those creates a WebGL context; pointing src straight at
-      // the new URL leaves the old context alive until the browser
-      // happens to collect it. Enough of those and the browser starts
-      // dropping contexts to stay under its limit -- which kills a view
-      // that is already on screen, silently. about:blank first makes
-      // the teardown deterministic: one live context at a time.
+      // Tear the previous viewer down before loading the next one. Each
+      // run points this iframe at a new document with its own WebGL
+      // context; about:blank first keeps one live context at a time, so
+      // the browser never drops a view that is already on screen.
       const frame = $("viewer");
       frame.src = "about:blank";
-      requestAnimationFrame(() => { frame.src = url; });
+      // A timer, not requestAnimationFrame: frames stop while the tab is
+      // in the background, and the viewer should still load there.
+      setTimeout(() => { frame.src = url; }, 50);
       initStl(jobId);
     }
 
     $("dbg-front").src = "/runs/" + jobId + "/debug_pose_normalization_front.png";
     $("dbg-side").src = "/runs/" + jobId + "/debug_pose_normalization_side.png";
-    $("debug-card").classList.remove("hidden");
+    showDataControls(jobId, job);
+    mark(at);
   }
+
+  // ---- data retention ----
+  function showDataControls(jobId, job) {
+    const note = $("data-note"), btn = $("delete-btn");
+    let kept = "No photos are stored.";
+    if (job.expires_at) {
+      const when = new Date(job.expires_at);
+      kept += " Run data is deleted on " + when.toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) + ".";
+    }
+    note.textContent = kept;
+    btn.disabled = false;
+    btn.textContent = "Delete my data";
+    $("viewer-expand").disabled = false;
+    btn.onclick = async () => {
+      if (!confirm("Delete this run's silhouettes, 3D model and measurements from the server? This cannot be undone.")) return;
+      btn.disabled = true;
+      btn.textContent = "Deleting";
+      try {
+        const r = await fetch("/api/job/" + jobId, { method: "DELETE" });
+        const d = await r.json();
+        if (!r.ok && r.status !== 404) throw new Error(d.error || "Delete failed.");
+      } catch (e) {
+        btn.disabled = false;
+        btn.textContent = "Delete my data";
+        note.textContent = "Could not delete: " + (e.message || "server unreachable") + ". Try again.";
+        return;
+      }
+      if (stlTimer) clearInterval(stlTimer);
+      $("viewer").src = "about:blank";
+      $("viewer-link").removeAttribute("href");
+      $("viewer-expand").disabled = true;
+      $("stl-btn").disabled = true;
+      $("stl-note").textContent = "";
+      stages[3].hidden = true;
+      btn.textContent = "Deleted";
+      note.textContent = "Your data was deleted from the server. The measurements stay only on this page.";
+      mark(at);
+    };
+  }
+
+  mark(0);
 })();
 </script>
 </body>

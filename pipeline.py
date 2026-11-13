@@ -152,7 +152,7 @@ def main():
     if args.measurements_only and args.debug:
         parser.error("--measurements-only cannot be combined with --debug")
 
-    print(f"Step 1: height = {args.height} cm (default placeholder)")
+    print(f"Step 1: height = {args.height} cm ")
     if args.front_mask or args.side_mask:
         print("[input] silhouette preprocessing: " + (
             "browser-v2 (cleaned on device, cropped landmark refinement)"

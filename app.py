@@ -27,6 +27,7 @@ import shutil
 import subprocess
 import sys
 import threading
+import time
 import uuid
 from datetime import datetime
 
@@ -58,8 +59,37 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 _jobs = {}
 _jobs_lock = threading.Lock()
 
+# ---------------------------------------------------------------------------
+# Data retention: automatic expiry + user-controlled deletion
+# ---------------------------------------------------------------------------
+#
+# Everything the server holds about a submission (silhouettes, landmarks,
+# voxel grids, measurements, viewer, STL, logs) lives in runs/<job_id>/,
+# so deleting a user's derived data means deleting that one folder plus
+# the job's in-memory entries.
+#
+# RUN_RETENTION_HOURS: a finished job folder is deleted this long after
+#   its last write. 0 disables automatic expiry.
+# RUN_SWEEP_SECONDS: how often the expiry sweeper looks for old folders.
+RUN_RETENTION_HOURS = float(os.environ.get("RUN_RETENTION_HOURS", "24"))
+SWEEP_INTERVAL_S = float(os.environ.get("RUN_SWEEP_SECONDS", "300"))
 
-def _start_background(function, *args, on_error=None):
+_life_lock = threading.Lock()
+_active = {}      # job_id -> number of worker threads still using the folder
+_procs = {}       # job_id -> set of live subprocesses (pipeline / viewer / STL)
+_deleted = set()  # job ids deleted by the user or by expiry; folder may still be going
+
+
+class JobDeleted(Exception):
+    """Raised inside a worker when its job was deleted before a step started."""
+
+
+def _is_deleted(job_id):
+    with _life_lock:
+        return job_id in _deleted
+
+
+def _start_background(job_id, function, *args, on_error=None):
     """
     Runs a pipeline/viewer/STL job on its own daemon thread, right away.
 
@@ -67,16 +97,191 @@ def _start_background(function, *args, on_error=None):
     immediately, so several people can run the pipeline at the same time.
     Each job already runs in its own runs/<id>/ directory as a separate
     subprocess, so concurrent jobs do not touch each other's files.
+
+    The thread is counted against job_id so expiry never removes a folder
+    that is still in use, and so a deletion requested mid-run can finish
+    the cleanup once the last worker for that job has let go of its files.
     """
+    with _life_lock:
+        _active[job_id] = _active.get(job_id, 0) + 1
+
     def run():
         try:
             function(*args)
+        except JobDeleted:
+            pass
         except Exception as error:
+            if _is_deleted(job_id):
+                return  # a killed subprocess after deletion is expected, not a failure
             logging.getLogger(__name__).exception("Background job failed")
             if on_error is not None:
                 on_error(error)
+        finally:
+            with _life_lock:
+                _active[job_id] -= 1
+                last = _active[job_id] == 0
+                if last:
+                    del _active[job_id]
+                pending_delete = last and job_id in _deleted
+            if pending_delete:
+                _finish_delete(job_id)
 
     threading.Thread(target=run, daemon=True, name=f"job-{function.__name__}").start()
+
+
+def _popen_tracked(job_id, cmd, **kwargs):
+    """Starts a subprocess for job_id and registers it so deletion can stop it."""
+    with _life_lock:
+        if job_id in _deleted:
+            raise JobDeleted(job_id)
+        proc = subprocess.Popen(cmd, **kwargs)
+        _procs.setdefault(job_id, set()).add(proc)
+    return proc
+
+
+def _untrack(job_id, proc):
+    with _life_lock:
+        procs = _procs.get(job_id)
+        if procs is not None:
+            procs.discard(proc)
+            if not procs:
+                del _procs[job_id]
+
+
+def _run_tracked(job_id, cmd, cwd, env, timeout):
+    """subprocess.run() equivalent whose process deletion can kill."""
+    proc = _popen_tracked(job_id, cmd, cwd=cwd, env=env, text=True,
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    try:
+        try:
+            stdout, stderr = proc.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            proc.communicate()
+            raise
+    finally:
+        _untrack(job_id, proc)
+    if _is_deleted(job_id):
+        raise JobDeleted(job_id)
+    return subprocess.CompletedProcess(cmd, proc.returncode, stdout, stderr)
+
+
+def _remove_dir(path, attempts=5):
+    """rmtree with a few retries: on Windows a just-killed process can hold files briefly."""
+    for i in range(attempts):
+        shutil.rmtree(path, ignore_errors=True)
+        if not os.path.exists(path):
+            return True
+        time.sleep(0.4 * (i + 1))
+    return not os.path.exists(path)
+
+
+def _finish_delete(job_id):
+    """Removes the folder of a deleted job once nothing is using it."""
+    if _remove_dir(os.path.join(RUNS_DIR, job_id)):
+        with _life_lock:
+            _deleted.discard(job_id)
+        return True
+    # Left in _deleted: the sweeper retries it, and nothing serves it meanwhile.
+    app.logger.warning("Could not remove the folder of deleted job %s yet; will retry", job_id)
+    return False
+
+
+def _delete_job(job_id):
+    """
+    Deletes all server-side data for one job. Returns "deleted" when the
+    folder is gone now, or "deleting" when a running step is being
+    stopped and its worker thread will remove the folder as it exits.
+    """
+    with _life_lock:
+        _deleted.add(job_id)
+        busy = job_id in _active
+        procs = list(_procs.get(job_id, ()))
+    for proc in procs:
+        try:
+            proc.kill()
+        except OSError:
+            pass
+    with _jobs_lock:
+        _jobs.pop(job_id, None)
+    with _stl_lock:
+        _stl_jobs.pop(job_id, None)
+    if busy:
+        return "deleting"
+    return "deleted" if _finish_delete(job_id) else "deleting"
+
+
+def _last_write(path):
+    """Newest modification time of the folder or anything inside it."""
+    newest = os.path.getmtime(path)
+    for root, _dirs, files in os.walk(path):
+        for name in files:
+            try:
+                newest = max(newest, os.path.getmtime(os.path.join(root, name)))
+            except OSError:
+                pass
+    return newest
+
+
+def _expires_at(job_dir):
+    if RUN_RETENTION_HOURS <= 0 or job_dir is None:
+        return None
+    try:
+        expiry = _last_write(job_dir) + RUN_RETENTION_HOURS * 3600
+    except OSError:
+        return None
+    return datetime.fromtimestamp(expiry).astimezone().isoformat(timespec="seconds")
+
+
+def _sweep_expired_runs(now=None):
+    """
+    One expiry pass: deletes every idle job folder whose last write is
+    older than the retention period, and retries deletions that could not
+    finish earlier. Returns the ids it removed.
+    """
+    if RUN_RETENTION_HOURS <= 0 or not os.path.isdir(RUNS_DIR):
+        return []
+    now = time.time() if now is None else now
+    cutoff = now - RUN_RETENTION_HOURS * 3600
+    removed = []
+    for name in os.listdir(RUNS_DIR):
+        path = os.path.join(RUNS_DIR, name)
+        if not _JOB_ID_RE.match(name) or not os.path.isdir(path):
+            continue
+        with _life_lock:
+            if name in _active:
+                continue
+            retry = name in _deleted
+        try:
+            expired = retry or _last_write(path) < cutoff
+        except OSError:
+            continue
+        if expired and _delete_job(name) == "deleted":
+            removed.append(name)
+    if removed:
+        app.logger.info("Expired %d job folder(s) past %.1f h retention", len(removed), RUN_RETENTION_HOURS)
+    return removed
+
+
+def _sweeper_loop():
+    while True:
+        try:
+            _sweep_expired_runs()
+        except Exception:
+            logging.getLogger(__name__).exception("Expiry sweep failed")
+        time.sleep(SWEEP_INTERVAL_S)
+
+
+_sweeper_started = False
+
+
+def _start_sweeper():
+    """Starts the expiry thread once per process (also under Gunicorn, which imports app)."""
+    global _sweeper_started
+    if _sweeper_started or RUN_RETENTION_HOURS <= 0:
+        return
+    _sweeper_started = True
+    threading.Thread(target=_sweeper_loop, daemon=True, name="run-expiry").start()
 
 # STL export runs on demand rather than as part of every job: marching
 # cubes over a ~9M-voxel grid plus smoothing and decimation costs about
@@ -196,6 +401,8 @@ def _job_dir(job_id):
     """
     if not _JOB_ID_RE.match(job_id or ""):
         return None
+    if _is_deleted(job_id):
+        return None  # deletion requested: never serve or rebuild from it again
     path = os.path.join(RUNS_DIR, job_id)
     return path if os.path.isdir(path) else None
 
@@ -233,8 +440,8 @@ def _run_pipeline(job_id, job_dir, front_path, side_path, height_cm, masks_prepr
         cmd.append("--masks-preprocessed")
 
     try:
-        proc = subprocess.Popen(
-            cmd, cwd=job_dir, env=env,
+        proc = _popen_tracked(
+            job_id, cmd, cwd=job_dir, env=env,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
             text=True, bufsize=1,
         )
@@ -252,6 +459,10 @@ def _run_pipeline(job_id, job_dir, front_path, side_path, height_cm, masks_prepr
         log_file.close()
         proc.stdout.close()
         proc.wait()
+        _untrack(job_id, proc)
+
+    if _is_deleted(job_id):
+        raise JobDeleted(job_id)
 
     with _jobs_lock:
         recorded = list(_jobs.get(job_id, {}).get("log", []))
@@ -316,9 +527,9 @@ def _export_viewer(job_id, job_dir, env):
     discard a set of measurements that computed fine.
     """
     try:
-        result = subprocess.run(
-            [sys.executable, os.path.join(PROJECT_ROOT, "export_hull_viewer.py")],
-            cwd=job_dir, env=env, capture_output=True, text=True, timeout=180,
+        result = _run_tracked(
+            job_id, [sys.executable, os.path.join(PROJECT_ROOT, "export_hull_viewer.py")],
+            cwd=job_dir, env=env, timeout=180,
         )
     except (OSError, subprocess.TimeoutExpired) as e:
         _append_log(job_id, f"(3D viewer export skipped: {e})")
@@ -386,11 +597,10 @@ def _export_stl(job_id, job_dir):
     part = os.path.join(job_dir, STL_PART)
 
     try:
-        result = subprocess.run(
-            [sys.executable, os.path.join(PROJECT_ROOT, "export_stl.py"),
-             "--grid", STL_GRID, "--out", STL_PART],
-            cwd=job_dir, env=env, capture_output=True, text=True,
-            timeout=STL_TIMEOUT_S,
+        result = _run_tracked(
+            job_id, [sys.executable, os.path.join(PROJECT_ROOT, "export_stl.py"),
+                     "--grid", STL_GRID, "--out", STL_PART],
+            cwd=job_dir, env=env, timeout=STL_TIMEOUT_S,
         )
     except (OSError, subprocess.TimeoutExpired) as e:
         _fail_stl(job_id, part, f"The mesh export did not finish: {e}")
@@ -550,7 +760,7 @@ def api_run():
         _jobs[job_id] = _new_job(job_id, height_cm)
 
     _start_background(
-        _run_pipeline, job_id, job_dir, front_path, side_path, height_cm,
+        job_id, _run_pipeline, job_id, job_dir, front_path, side_path, height_cm,
         request.form.get("preprocessing") == "browser-v2",
         on_error=lambda error: _update(job_id, state="error", error=f"Pipeline failed: {error}"),
     )
@@ -564,7 +774,31 @@ def api_job(job_id):
         job = _jobs.get(job_id)
         if job is None:
             return jsonify({"error": "Unknown job."}), 404
-        return jsonify(dict(job))
+        job = dict(job)
+    job["retention_hours"] = RUN_RETENTION_HOURS if RUN_RETENTION_HOURS > 0 else None
+    job["expires_at"] = _expires_at(_job_dir(job_id)) if job.get("state") in ("done", "error") else None
+    return jsonify(job)
+
+
+@app.route("/api/job/<job_id>", methods=["DELETE"])
+def api_job_delete(job_id):
+    """
+    User-controlled deletion: removes everything the server holds for
+    this job -- silhouettes, landmarks, voxel grids, measurements, viewer,
+    STL and logs -- and stops any step still running for it.
+
+    The job id is the only credential, as it already is for viewing the
+    results, so whoever holds the results link can delete them.
+    """
+    if not _JOB_ID_RE.match(job_id or ""):
+        abort(404)
+    with _jobs_lock:
+        known = job_id in _jobs
+    if not known and not os.path.isdir(os.path.join(RUNS_DIR, job_id)):
+        return jsonify({"error": "Unknown job, or its data was already deleted."}), 404
+    state = _delete_job(job_id)
+    app.logger.info("Job %s deleted by user (%s)", job_id, state)
+    return jsonify({"state": state, "deleted": True})
 
 
 @app.route("/api/job/<job_id>/stl", methods=["GET", "POST"])
@@ -592,7 +826,7 @@ def api_job_stl(job_id):
         _stl_jobs[job_id] = {"state": "queued"}
 
     _start_background(
-        _export_stl, job_id, job_dir,
+        job_id, _export_stl, job_id, job_dir,
         on_error=lambda error: _fail_stl(job_id, os.path.join(job_dir, STL_PART), str(error)),
     )
     return jsonify(_stl_status(job_id, job_dir))
@@ -631,6 +865,11 @@ def too_large(_e):
     return jsonify({
         "error": f"Those photos exceed the {MAX_UPLOAD_BYTES // (1024 * 1024)}MB upload limit."
     }), 413
+
+
+# Expiry runs in every process that serves the app, including Gunicorn
+# (which imports this module rather than running __main__).
+_start_sweeper()
 
 
 if __name__ == "__main__":
