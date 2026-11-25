@@ -12,6 +12,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     MKL_NUM_THREADS=1 \
     NUMEXPR_NUM_THREADS=1 \
     WEB_CONCURRENCY_THREADS=8 \
+    MAX_PENDING_COMPUTE_JOBS=20 \
     RUN_RETENTION_HOURS=24 \
     MAX_GRID_VOXELS=400000000
 
@@ -29,7 +30,7 @@ COPY requirements.txt ./requirements.txt
 RUN python -m pip install --no-cache-dir --upgrade pip \
     && python -m pip install --no-cache-dir -r requirements.txt
 
-# Copy the current Python modules (including voxel_memory and
+# Copy the current Python modules (including compute_queue, lean_grid, voxel_memory and
 # memory_diagnostics) plus the browser assets and pinned pose model. Rebuilding
 # the image therefore includes the optimized pipeline, without local run data.
 COPY *.py hull_viewer_template.html pose_landmarker_heavy.task ./
@@ -49,6 +50,9 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
     CMD ["python", "-c", "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.environ.get('PORT', '5000') + '/', timeout=4).close()"]
 
 # One Gunicorn worker is intentional: job state is currently held in memory.
-# Request threads keep the UI responsive; every pipeline/viewer/STL job starts
-# immediately on its own thread, so several users can run jobs at the same time.
+# Request threads keep the UI responsive; pipeline and STL jobs run as
+# subprocesses, one per CPU at a time, and the rest wait in line. Override with
+# -e MAX_CONCURRENT_COMPUTE_JOBS=N, e.g. when the container has a --cpus quota
+# (which the CPU count does not reflect) or little RAM: allow about 0.7 GB per
+# job, plus 1.7 GB for the one STL export that may run among them.
 CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 1 --threads ${WEB_CONCURRENCY_THREADS:-8} --timeout 180 --error-logfile - --capture-output app:app"]

@@ -67,7 +67,8 @@ from scipy import ndimage
 from scipy.signal import savgol_filter
 
 from visual_hull import compute_scale_mm_per_px, body_center_x
-from voxel_memory import check_grid_size, component_counts
+from voxel_memory import check_grid_size
+from lean_grid import IntervalGrid, close_cube, component_sizes
 
 # Depth beyond this multiple of the body's own median depth is not a
 # torso -- it is a limb the side view cannot attribute to a part.
@@ -102,11 +103,6 @@ EDGE_ACCEPT_DEPTH_FRACTION = 0.25
 # Measured at width 101 on the sample: ankle bump 103 -> 87px (gone),
 # foot flare 112/120/117 -> 112/117/119px (kept), chest 149 -> 149px.
 EDGE_MEDIAN_ROWS = 101
-
-# Chunk width (in X voxels) for building the occupancy grid. The carve
-# is now per-column rather than per-height, so the full (nx, ny, nz)
-# comparison would need three temporaries the size of the output.
-X_CHUNK = 64
 
 # Smallest front-silhouette region that can be a limb rather than
 # noise, in mm^2. An arm covers hundreds of cm^2 of the front mask; the
@@ -314,37 +310,20 @@ def _open_disk(mask, radius_px):
     unchanged and the body still one connected solid of the same span
     and height.
     """
-    eroded = ndimage.distance_transform_edt(mask) > radius_px
+    eroded = cv2.distanceTransform(mask.astype(np.uint8), cv2.DIST_L2, cv2.DIST_MASK_PRECISE) > radius_px
     if not eroded.any():
         return np.zeros_like(mask)
-    return ndimage.distance_transform_edt(~eroded) <= radius_px
-
-
-def _close_chessboard(vol, radius_px):
-    """
-    Binary closing by a cube of the given radius, via boolean maximum
-    and minimum filters. Preserves the previous chessboard-distance result.
-
-    The pad is not decoration. scipy's binary_closing hands its
-    border_value to *both* passes, so border_value=1 means the volume
-    is dilated inward from every array face before being eroded back;
-    constant-True filter borders reproduce that without padded copies.
-    """
-    # A chessboard ball is a cube. Boolean max/min filters perform the same
-    # dilation/erosion without full-volume int32 distance fields or padding.
-    # Constant True reproduces the padded foreground used by the old code.
-    width = 2 * radius_px + 1
-    dilated = ndimage.maximum_filter(vol, size=width, mode="constant", cval=1)
-    if dilated.all():
-        # Preserve the old CDT's no-background (-1-distance) result, including
-        # tiny/all-solid volumes, rather than silently changing geometry.
-        return np.zeros_like(vol, dtype=bool)
-    return ndimage.minimum_filter(dilated, size=width, mode="constant", cval=1)
+    return cv2.distanceTransform((~eroded).astype(np.uint8), cv2.DIST_L2, cv2.DIST_MASK_PRECISE) <= radius_px
 
 
 def _round_slice(sl, voxel_mm, fraction):
     """Round one 2D cross-section, sizing the kernel per connected part."""
-    out = np.zeros_like(sl)
+    # Crop to the occupied box first: the rest of the slice is empty.
+    full = np.zeros_like(sl)
+    ra, rb = np.flatnonzero(sl.any(axis=1)), np.flatnonzero(sl.any(axis=0))
+    box = (slice(ra[0], ra[-1] + 1), slice(rb[0], rb[-1] + 1))
+    sl = np.ascontiguousarray(sl[box])
+    out = full[box]
     n_labels, labels = cv2.connectedComponents(sl, connectivity=8)
     for c in range(1, n_labels):
         mask = labels == c
@@ -378,7 +357,7 @@ def _round_slice(sl, voxel_mm, fraction):
         # scaled by. Rounding a corner is not a licence to remove a
         # part, so keep the original where the opening empties it.
         out[a0:a1, b0:b1] |= opened if opened.any() else part
-    return out
+    return full
 
 
 def round_cross_sections(occupied, voxel_mm, limb_columns=None, fraction=0.9):
@@ -442,12 +421,12 @@ def round_cross_sections(occupied, voxel_mm, limb_columns=None, fraction=0.9):
 
     Each part is sized on its own bounding box within its plane.
     """
-    src = np.asarray(occupied, dtype=np.uint8)
-    out = np.zeros_like(src)
+    src = occupied
+    out = np.zeros(src.shape, dtype=np.uint8)
 
     # Torso, legs, head: axis is vertical, so XZ is transverse.
     for j in range(src.shape[1]):
-        sl = src[:, j, :]
+        sl = src[:, j, :].astype(np.uint8)
         if sl.any():
             out[:, j, :] |= _round_slice(sl, voxel_mm, fraction)
 
@@ -457,11 +436,13 @@ def round_cross_sections(occupied, voxel_mm, limb_columns=None, fraction=0.9):
     # Arms: axis is horizontal, so YZ is transverse.
     limb = np.asarray(limb_columns, dtype=bool)
     for i in range(src.shape[0]):
-        sl = src[i, :, :] & limb[i, :, None]
+        if not limb[i].any():
+            continue
+        sl = (src[i, :, :] & limb[i, :, None]).astype(np.uint8)
         if sl.any():
             out[i, :, :] |= _round_slice(sl, voxel_mm, fraction)
 
-    rounded = out.astype(bool)
+    rounded = out
     del src, out
 
     # Close the shoulder junction, then clip back to the carve so the
@@ -480,31 +461,34 @@ def round_cross_sections(occupied, voxel_mm, limb_columns=None, fraction=0.9):
     # after the first pass and pay nothing; each extra pass costs a few
     # percent of volume, so the smallest radius that works is used.
     if LIMB_JUNCTION_MM > 0:
-        # _close_chessboard treats everything outside the array as
+        # close_cube treats everything outside the array as
         # solid. Letting the erosion see the array edge as background
         # instead eats the full radius from any surface flush against
         # it -- the crown of the head at y=0 and the soles at y=ymax --
         # for a mesh 1690mm tall on a 1730mm subject.
-        base = np.asarray(occupied, dtype=bool)
         best = None
         for mm in (LIMB_JUNCTION_MM * k for k in LIMB_JUNCTION_STEPS):
-            bridged = _close_chessboard(
-                rounded, max(1, int(round(mm / voxel_mm)))
-            ) & base
-            best = bridged
-            labels, n_parts = ndimage.label(bridged)
-            if n_parts <= 1:
+            r = max(1, int(round(mm / voxel_mm)))
+            # Columns further than one closing cube from the body cannot change.
+            xs_f = np.flatnonzero(occupied.f.any(axis=1))
+            x0 = max(0, xs_f[0] - 2 * r - 1)
+            x1 = min(rounded.shape[0], xs_f[-1] + 2 * r + 2)
+            bridged = close_cube(rounded[x0:x1], r)
+            for q in range(0, x1 - x0, 64):
+                bridged[q:q + 64] &= occupied.block(slice(x0 + q, min(x0 + q + 64, x1)), slice(None))
+            best = (x0, x1, bridged)
+            sizes = component_sizes(bridged)
+            if len(sizes) <= 1:
                 break
-            sizes = component_counts(labels, n_parts)
-            del labels
             # Whatever is still loose at this point is a speck, not a
             # limb: stop rather than keep inflating the whole body to
             # chase a few hundred voxels export_stl will discard.
             if sizes.max() / max(bridged.sum(), 1) >= 1.0 - LIMB_DEBRIS_FRACTION:
                 break
-        rounded = best
+        x0, x1, bridged = best
+        rounded[x0:x1] = bridged
 
-    return rounded
+    return rounded.view(bool)
 
 
 def carve_from_front_profile(front_mask, side_mask, height_cm, voxel_mm=2.0,
@@ -617,14 +601,7 @@ def carve_from_front_profile(front_mask, side_mask, height_cm, voxel_mm=2.0,
         limb_columns = narrow
 
     check_grid_size((len(xs), len(ys), len(zs)), "profile display hull")
-    occupied = np.zeros((len(xs), len(ys), len(zs)), dtype=bool)
-    for i0 in range(0, len(xs), X_CHUNK):
-        i1 = min(i0 + X_CHUNK, len(xs))
-        occupied[i0:i1] = (
-            occ_f[i0:i1, :, None]
-            & (zs[None, None, :] >= lo_ij[i0:i1, :, None])
-            & (zs[None, None, :] <= hi_ij[i0:i1, :, None])
-        )
+    occupied = IntervalGrid(occ_f.astype(bool), lo_ij, hi_ij, zs)
 
     return {
         "occupied": occupied,

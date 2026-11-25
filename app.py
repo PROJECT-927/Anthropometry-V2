@@ -37,6 +37,8 @@ import cv2
 import numpy as np
 from flask import Flask, jsonify, render_template, request, send_from_directory, abort
 
+from compute_queue import ComputeQueue, available_cpus
+
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 RUNS_DIR = os.path.join(PROJECT_ROOT, "runs")
 
@@ -58,6 +60,18 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 _jobs = {}
 _jobs_lock = threading.Lock()
+
+# A job is one fully CPU-bound process, so running more of them than there are
+# CPUs finishes nothing sooner; it only adds their memory together. Pipeline
+# and STL jobs share these slots, and whoever does not get one waits in line.
+#
+# MAX_CONCURRENT_COMPUTE_JOBS: unset/empty = one per CPU, 0 = no limit.
+# MAX_PENDING_COMPUTE_JOBS: how many may wait before new ones are refused.
+_queue = ComputeQueue(
+    workers=int(os.environ.get("MAX_CONCURRENT_COMPUTE_JOBS") or available_cpus()),
+    pending=int(os.environ.get("MAX_PENDING_COMPUTE_JOBS") or 20),
+)
+QUEUE_FULL_MESSAGE = "The server is busy right now. Please try again in a minute."
 
 # ---------------------------------------------------------------------------
 # Data retention: automatic expiry + user-controlled deletion
@@ -89,25 +103,33 @@ def _is_deleted(job_id):
         return job_id in _deleted
 
 
-def _start_background(job_id, function, *args, on_error=None):
+def _start_background(job_id, function, *args, on_error=None, heavy=False):
     """
-    Runs a pipeline/viewer/STL job on its own daemon thread, right away.
+    Runs a pipeline/STL job on its own daemon thread once _queue has a slot
+    for it. Returns False, starting nothing, when the waiting line is full.
 
-    There is deliberately no shared queue: every user's submission starts
-    immediately, so several people can run the pipeline at the same time.
-    Each job already runs in its own runs/<id>/ directory as a separate
-    subprocess, so concurrent jobs do not touch each other's files.
+    Several people's jobs still run at the same time, up to the slot limit.
+    Each runs in its own runs/<id>/ directory as a separate subprocess, so
+    concurrent jobs do not touch each other's files.
 
     The thread is counted against job_id so expiry never removes a folder
     that is still in use, and so a deletion requested mid-run can finish
     the cleanup once the last worker for that job has let go of its files.
     """
+    ticket = _queue.join(job_id, heavy)
+    if ticket is None:
+        return False
     with _life_lock:
         _active[job_id] = _active.get(job_id, 0) + 1
 
     def run():
         try:
-            function(*args)
+            if not _queue.acquire(ticket, cancelled=lambda: _is_deleted(job_id)):
+                raise JobDeleted(job_id)
+            try:
+                function(*args)
+            finally:
+                _queue.release(ticket)
         except JobDeleted:
             pass
         except Exception as error:
@@ -127,6 +149,7 @@ def _start_background(job_id, function, *args, on_error=None):
                 _finish_delete(job_id)
 
     threading.Thread(target=run, daemon=True, name=f"job-{function.__name__}").start()
+    return True
 
 
 def _popen_tracked(job_id, cmd, **kwargs):
@@ -206,6 +229,7 @@ def _delete_job(job_id):
         _jobs.pop(job_id, None)
     with _stl_lock:
         _stl_jobs.pop(job_id, None)
+    _queue.wake()  # a job still in line leaves it
     if busy:
         return "deleting"
     return "deleted" if _finish_delete(job_id) else "deleting"
@@ -324,6 +348,7 @@ PROGRESS_MARKERS = [
     ("Step 6:", 84, "Fitting measurement ellipses"),
     ("Step 7:", 92, "Propagating uncertainty"),
     ("Wrote measurements.json", 95, "Writing results"),
+    ("Building 3D viewer", 97, "Building 3D viewer"),
 ]
 
 # Lines the pipeline emits that are progress//diagnostics rather than
@@ -352,7 +377,7 @@ def _new_job(job_id, height_cm):
         "id": job_id,
         "state": "queued",
         "progress": 2,
-        "step": "Starting",
+        "step": "Waiting for a free slot",
         "log": [],
         "error": None,
         "results": None,
@@ -413,7 +438,7 @@ def _job_dir(job_id):
 
 def _run_pipeline(job_id, job_dir, front_path, side_path, height_cm, masks_preprocessed=False):
     """
-    Runs pipeline.py, then export_hull_viewer.py, inside job_dir.
+    Runs pipeline.py (which also builds the 3D viewer) inside job_dir.
 
     sys.executable rather than a bare "python" so the subprocess is
     guaranteed to be the same interpreter (and therefore the same
@@ -434,7 +459,7 @@ def _run_pipeline(job_id, job_dir, front_path, side_path, height_cm, masks_prepr
         "--front-landmarks", os.path.join(job_dir, "front_landmarks.json"),
         "--side-landmarks", os.path.join(job_dir, "side_landmarks.json"),
         "--height", str(height_cm),
-        "--debug",
+        "--web",
     ]
     if masks_preprocessed:
         cmd.append("--masks-preprocessed")
@@ -487,9 +512,7 @@ def _run_pipeline(job_id, job_dir, front_path, side_path, height_cm, masks_prepr
     with open(results_path, "r", encoding="utf-8") as f:
         results = json.load(f)
 
-    _update(job_id, progress=97, step="Building 3D viewer")
-    has_viewer = _export_viewer(job_id, job_dir, env)
-
+    has_viewer = os.path.exists(os.path.join(job_dir, "hull_viewer.html"))
     _update(job_id, state="done", progress=100, step="Complete",
             results=results, flags=flags, ratios_ok=ratios_ok, has_viewer=has_viewer)
 
@@ -518,32 +541,6 @@ def _consume_pipeline_output(proc, job_id, flags, log_file):
         stripped = line.strip()
         if stripped.startswith("! "):
             flags.append(stripped[2:].strip())
-
-
-def _export_viewer(job_id, job_dir, env):
-    """
-    Exports the interactive hull viewer. Deliberately non-fatal: the
-    viewer is an inspection aid, so failing to build it should not
-    discard a set of measurements that computed fine.
-    """
-    try:
-        result = _run_tracked(
-            job_id, [sys.executable, os.path.join(PROJECT_ROOT, "export_hull_viewer.py")],
-            cwd=job_dir, env=env, timeout=180,
-        )
-    except (OSError, subprocess.TimeoutExpired) as e:
-        _append_log(job_id, f"(3D viewer export skipped: {e})")
-        return False
-
-    _record_export_output(job_id, job_dir, "viewer.log", result)
-    if result.returncode != 0:
-        _append_log(job_id, "(3D viewer export failed; measurements are unaffected)")
-        return False
-
-    for line in result.stdout.splitlines():
-        if line.strip():
-            _append_log(job_id, line.strip())
-    return os.path.exists(os.path.join(job_dir, "hull_viewer.html"))
 
 
 def _record_export_output(job_id, job_dir, filename, result):
@@ -767,11 +764,16 @@ def api_run():
     with _jobs_lock:
         _jobs[job_id] = _new_job(job_id, height_cm)
 
-    _start_background(
+    started = _start_background(
         job_id, _run_pipeline, job_id, job_dir, front_path, side_path, height_cm,
         request.form.get("preprocessing") == "browser-v2",
         on_error=lambda error: _update(job_id, state="error", error=f"Pipeline failed: {error}"),
     )
+    if not started:
+        with _jobs_lock:
+            _jobs.pop(job_id, None)
+        shutil.rmtree(job_dir, ignore_errors=True)
+        return jsonify({"error": QUEUE_FULL_MESSAGE}), 429
 
     return jsonify({"job_id": job_id})
 
@@ -783,6 +785,10 @@ def api_job(job_id):
         if job is None:
             return jsonify({"error": "Unknown job."}), 404
         job = dict(job)
+    if job["state"] == "queued":
+        ahead = _queue.ahead(job_id)
+        if ahead:
+            job["step"] = f"Waiting for a free slot ({ahead} ahead of you)"
     job["retention_hours"] = RUN_RETENTION_HOURS if RUN_RETENTION_HOURS > 0 else None
     job["expires_at"] = _expires_at(_job_dir(job_id)) if job.get("state") in ("done", "error") else None
     return jsonify(job)
@@ -833,10 +839,14 @@ def api_job_stl(job_id):
             return jsonify(dict(_stl_jobs[job_id]))
         _stl_jobs[job_id] = {"state": "queued"}
 
-    _start_background(
-        job_id, _export_stl, job_id, job_dir,
+    started = _start_background(
+        job_id, _export_stl, job_id, job_dir, heavy=True,
         on_error=lambda error: _fail_stl(job_id, os.path.join(job_dir, STL_PART), str(error)),
     )
+    if not started:
+        with _stl_lock:
+            _stl_jobs.pop(job_id, None)
+        return jsonify({"state": "error", "error": QUEUE_FULL_MESSAGE}), 429
     return jsonify(_stl_status(job_id, job_dir))
 
 

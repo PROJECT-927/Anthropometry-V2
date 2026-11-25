@@ -684,8 +684,8 @@ window.prepareAnthropometryInputs = async (frontFile, sideFile, onProgress) => {
       btn.onclick = () => { window.location.href = "/runs/" + jobId + "/body.stl"; };
     } else if (s.state === "queued") {
       btn.disabled = true;
-      btn.textContent = "Starting 3D file";
-      note.textContent = "";
+      btn.textContent = "Waiting to build";
+      note.textContent = "Starts as soon as the server has a free slot.";
     } else if (s.state === "running") {
       btn.disabled = true;
       btn.textContent = "Building 3D file";

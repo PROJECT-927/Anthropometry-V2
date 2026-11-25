@@ -41,6 +41,7 @@ from scipy import ndimage
 from scipy.signal import savgol_filter
 
 from voxel_memory import check_grid_size, component_counts
+from lean_grid import RectGrid
 
 
 class VisualHullError(RuntimeError):
@@ -126,9 +127,7 @@ def _carve_grid(front_mask, side_mask, x_range, y_range, z_range, voxel_mm,
                          cx_f + xs[:, None] / scale_f)
     occ_s = _sample_mask(side_mask, top_s + ys[:, None] / scale_s,
                          cx_s + zs[None, :] / scale_s)
-    occupied = np.empty((len(xs), ny, nz), dtype=bool)
-    np.logical_and(occ_f[:, :, None], occ_s[None, :, :], out=occupied)
-    return occupied, xs, ys, zs
+    return RectGrid.from_tables(occ_f, occ_s), xs, ys, zs
 
 
 def visual_hull(front_mask, side_mask, height_cm, voxel_mm=2.0,
@@ -185,7 +184,10 @@ def visual_hull(front_mask, side_mask, height_cm, voxel_mm=2.0,
             "(front/side masks, height_cm, and calibration)."
         )
 
-    ix, iy, iz = np.where(coarse_occ)
+    rects = [(y, q) for y, r in enumerate(coarse_occ.rows) for q in r]
+    ix = np.array([v for _, q in rects for v in q[:2]])
+    iy = np.array([y for y, _ in rects])
+    iz = np.array([v for _, q in rects for v in q[2:]])
     pad = 1
     x_lo, x_hi = max(0, ix.min() - pad), min(len(cxs) - 1, ix.max() + pad)
     y_lo, y_hi = max(0, iy.min() - pad), min(len(cys) - 1, iy.max() + pad)
@@ -522,6 +524,8 @@ def keep_largest_3d_component(occupied):
     accidentally amputate a real limb the way a naive "keep the largest
     per-slice blob" rule could.
     """
+    if isinstance(occupied, RectGrid):
+        return occupied.keep_largest()
     labeled, n = ndimage.label(occupied, structure=np.ones((3, 3, 3)))
     if n <= 1:
         return occupied
@@ -573,7 +577,8 @@ def _track_blobs_over_height(occ, x_mm, z_mm, max_jump_mm=60.0):
     active = []  # list of (track_index, last_blob)
 
     for iy in range(ny):
-        row_blobs = _row_blobs(occ[:, iy, :], x_mm, z_mm)
+        row_blobs = (occ.row_blobs(iy, x_mm, z_mm) if isinstance(occ, RectGrid)
+                     else _row_blobs(occ[:, iy, :], x_mm, z_mm))
         matched = set()
         new_active = []
         for blob in row_blobs:
@@ -619,7 +624,9 @@ def smooth_hull_extents(hull, min_track_rows=5, window=15, polyorder=3, max_jump
     x_mm, z_mm = hull["x_mm"], hull["z_mm"]
 
     tracks = _track_blobs_over_height(occ, x_mm, z_mm, max_jump_mm=max_jump_mm)
-    corrected = occ.copy()
+    lean = isinstance(occ, RectGrid)
+    new_rows = [list(r) for r in occ.rows] if lean else None
+    corrected = None if lean else occ.copy()
 
     for track in tracks:
         rows, blobs = track["rows"], track["blobs"]
@@ -639,6 +646,11 @@ def smooth_hull_extents(hull, min_track_rows=5, window=15, polyorder=3, max_jump
             new_z_lo = cz[i] - max(float(z_neg[i]), 0.0)
             new_z_hi = cz[i] + max(float(z_pos[i]), 0.0)
 
+            if lean:
+                new_rows[iy][blob['label'] - 1] = occ.shrink(
+                    iy, blob['label'], x_mm, z_mm, new_x_lo, new_x_hi, new_z_lo, new_z_hi)
+                continue
+
             # Re-label just this row instead of retaining int32 labels for
             # every row in every track (formerly ~4 bytes per grid cell).
             row_labels, _ = ndimage.label(occ[:, iy, :], structure=np.ones((3, 3)))
@@ -652,6 +664,8 @@ def smooth_hull_extents(hull, min_track_rows=5, window=15, polyorder=3, max_jump
             row_slice[this_blob_mask] = False
             row_slice[keep] = True
 
+    if lean:
+        return RectGrid(occ.shape, [[q for q in r if q is not None] for r in new_rows])
     return corrected
 
 

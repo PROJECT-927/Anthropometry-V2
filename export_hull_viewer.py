@@ -21,7 +21,8 @@ import json
 import os
 
 import numpy as np
-from scipy.ndimage import binary_erosion
+
+from lean_grid import surface_indices
 from memory_diagnostics import memory_snapshot
 
 # Resolved relative to this script, not the working directory: the
@@ -34,13 +35,8 @@ DEFAULT_NPZ_CANDIDATES = ["visual_hull_corrected.npz", "visual_hull.npz"]
 
 
 def extract_surface_points(occ, x_mm, y_mm, z_mm, height_mm, target_points, seed=42):
-    surface = np.empty_like(occ, dtype=bool)
-    binary_erosion(occ, output=surface)
-    np.logical_not(surface, out=surface)
-    np.logical_and(occ, surface, out=surface)
-    indices = np.flatnonzero(surface)
+    indices = surface_indices(occ)
     n_surface = len(indices)
-    del surface
     # Select before constructing three coordinate arrays. Flat indices follow
     # the same C order as np.where, preserving the seeded point selection.
     rng = np.random.default_rng(seed)
@@ -61,20 +57,24 @@ def extract_surface_points(occ, x_mm, y_mm, z_mm, height_mm, target_points, seed
     return pts_i16, n_surface
 
 
-def main():
+def main(d=None):
+    """d: the npz contents as a dict, when the caller already has them in memory."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--npz", default=None,
                          help="Defaults to visual_hull_corrected.npz, falling back to visual_hull.npz")
     parser.add_argument("--measurements", default="measurements.json")
     parser.add_argument("--out", default="hull_viewer.html")
     parser.add_argument("--points", type=int, default=90000)
-    args = parser.parse_args()
+    args = parser.parse_args([] if d is not None else None)
 
     npz_path = args.npz
+    if d is not None:
+        npz_path = DEFAULT_NPZ_CANDIDATES[0]
     if npz_path is None:
         npz_path = next((p for p in DEFAULT_NPZ_CANDIDATES if os.path.exists(p)), DEFAULT_NPZ_CANDIDATES[-1])
 
-    d = np.load(npz_path)
+    if d is None:
+        d = np.load(npz_path)
     occ = d["occupied"]
     x_mm, y_mm, z_mm = d["x_mm"], d["y_mm"], d["z_mm"]
     voxel_mm = float(d["voxel_mm"])

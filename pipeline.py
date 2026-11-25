@@ -13,10 +13,16 @@ import argparse
 import json
 import sys
 import hashlib
+import traceback
 from pathlib import Path
 
 import cv2
 import numpy as np
+
+# OpenCV keeps its own thread pool and ignores OMP_NUM_THREADS. One thread per
+# job: the pool burns far more CPU than it saves here, and concurrent jobs
+# are what should be using the other cores.
+cv2.setNumThreads(1)
 
 from grabcut import adaptive_contour_grabcut
 from mediapipe_silhouette import (extract_silhouette, extract_silhouette_landmark_prior,
@@ -133,6 +139,9 @@ def main():
     parser.add_argument("--height", type=float, default=DEFAULT_HEIGHT_CM,
                          help=f"User height in cm (Step 1 placeholder, default {DEFAULT_HEIGHT_CM})")
     parser.add_argument("--debug", action="store_true", help="Write debug visualization images")
+    parser.add_argument("--web", action="store_true",
+                        help="What app.py needs and nothing more: measurements, viewer, STL grid and "
+                             "pose images; skips visual_hull.npz and the other debug plots")
     parser.add_argument("--measurements-only", action="store_true",
                         help="Save only measurement JSON; skip masks, hull files and display rounding")
     parser.add_argument("--output", type=Path, default=Path("measurements.json"),
@@ -151,6 +160,9 @@ def main():
     args = parser.parse_args()
     if args.measurements_only and args.debug:
         parser.error("--measurements-only cannot be combined with --debug")
+    if args.web and (args.measurements_only or args.debug):
+        parser.error("--web cannot be combined with --measurements-only or --debug")
+    pose_images = args.debug or args.web  # the results page shows these two
 
     print(f"Step 1: height = {args.height} cm ")
     if args.front_mask or args.side_mask:
@@ -160,11 +172,11 @@ def main():
 
     try:
         if all((args.front_mask, args.side_mask, args.front_landmarks, args.side_landmarks)):
-            front_result = process_view(None, "front", args.height, debug=args.debug,
+            front_result = process_view(None, "front", args.height, debug=pose_images,
                                         mask_path=args.front_mask,
                                         landmarks_path=args.front_landmarks,
                                         masks_preprocessed=args.masks_preprocessed)
-            side_result = process_view(None, "side", args.height, debug=args.debug,
+            side_result = process_view(None, "side", args.height, debug=pose_images,
                                        mask_path=args.side_mask,
                                        landmarks_path=args.side_landmarks,
                                        masks_preprocessed=args.masks_preprocessed)
@@ -242,7 +254,7 @@ def main():
         f"side scale={hull['side_scale_mm_per_px']:.3f} mm/px"
     )
 
-    if not args.measurements_only:
+    if not args.measurements_only and not args.web:
         np.savez_compressed(
             "visual_hull.npz",
             occupied=hull["occupied"], x_mm=hull["x_mm"], y_mm=hull["y_mm"], z_mm=hull["z_mm"],
@@ -316,16 +328,19 @@ def main():
         display_axes = (hull["x_mm"], hull["y_mm"], hull["z_mm"])
         chest_hull = None
 
+    viewer_grid = None
     if not args.measurements_only:
-        np.savez_compressed(
-            "visual_hull_corrected.npz",
-            occupied=display_occupied, x_mm=display_axes[0], y_mm=display_axes[1], z_mm=display_axes[2],
+        viewer_grid = dict(
+            occupied=np.asarray(display_occupied), x_mm=display_axes[0], y_mm=display_axes[1], z_mm=display_axes[2],
             voxel_mm=hull["voxel_mm"], waist_y_mm=correction["waist_y_mm"],
             front_scale_mm_per_px=hull["front_scale_mm_per_px"],
             side_scale_mm_per_px=hull["side_scale_mm_per_px"],
             height_cm=args.height,
         )
+        np.savez_compressed("visual_hull_corrected.npz", **viewer_grid)
         print("Wrote visual_hull_corrected.npz")
+        if not args.web:
+            viewer_grid = None
     del display_occupied, display_axes
 
     if args.debug:
@@ -444,6 +459,18 @@ def main():
         json.dump(measurements_out, f, indent=2)
     print(f"Wrote {args.output}")
 
+    if args.web:
+        # In this process, on the grid already in memory: a second interpreter
+        # would spend over a second re-importing and decompressing the same
+        # thing. The viewer is an inspection aid, so a failure is not fatal.
+        print("Building 3D viewer...")
+        try:
+            import export_hull_viewer
+            export_hull_viewer.main(viewer_grid)
+        except Exception:
+            traceback.print_exc()
+            print("(3D viewer export failed; measurements are unaffected)")
+
     print("\nPipeline complete (Steps 1-7).")
 
 
@@ -451,7 +478,7 @@ if __name__ == "__main__":
     # Identify deployed allocation code; this distinguishes rebuilt images
     # from an older image still running on the instance.
     for name in ("visual_hull.py", "voxel_memory.py", "profile_carve.py",
-                 "waist_correction.py", "measurement_extraction.py"):
+                 "waist_correction.py", "measurement_extraction.py", "lean_grid.py"):
         path = Path(__file__).with_name(name)
         print(f"[build] {name}: {hashlib.sha256(path.read_bytes()).hexdigest()[:16]}", flush=True)
     memory_snapshot("pipeline:start")
